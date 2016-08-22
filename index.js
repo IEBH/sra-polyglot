@@ -182,6 +182,11 @@ _.mixin({
 // }}}
 
 var polyglot = module.exports = {
+	/**
+	* List of example search queries
+	* See tests/examples.js for the outputs in each case
+	* @var {array}
+	*/
 	examples: [
 		{title: 'Failure of antibiotic prescribing for bacterial infections', query: '"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic'},
 		{title: 'Clinical prediction guides for whiplash', query: '"Neck"[Mesh] OR Neck OR Necks OR "Cervical Vertebrae"[Mesh] OR "Cervical Vertebrae" OR "Neck Muscles"[Mesh] OR "Neck Muscles" OR "Neck Injuries"[Mesh] OR "Whiplash Injuries"[Mesh] OR "Radiculopathy"[Mesh] OR "Neck Injuries" OR "Neck Injury" OR Whiplash OR Radiculopathies OR Radiculopathy\n\n AND\n\n "Pain"[Mesh] OR Pain OR Pains OR Aches OR Ache OR Sore\n\n AND\n\n "Decision Support Techniques"[Mesh] OR "Predictive Value of Tests"[Mesh] OR "Observer Variation"[Mesh] OR Decision Support OR Decision Aids OR Decision Aid OR Decision Analysis OR Decision Modeling OR Decision modelling OR Prediction OR Predictions OR Predictor OR Predicting OR Predicted'},
@@ -190,12 +195,23 @@ var polyglot = module.exports = {
 		{title: 'Positioning for acute respiratory distress in hospitalised infants and children', query: 'exp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.\n\nAND\n\nexp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.\n\nAND\n\n((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)'},
 	],
 
+	/**
+	* Translate the given query using the given engine ID
+	* @param {string} query The query to translate
+	* @param {string} engine The ID of the engine to use
+	* @return {string} The translated search query
+	*/
 	translate: function(query, engine) {
 		var activeEngine = _.find(polyglot.engines, {id: engine});
 		if (!activeEngine) throw new Error('Engine not found: ' + engine);
 		return activeEngine.rewriter.call(activeEngine, query + '');
 	},
 
+	/**
+	* Translate the given query using all the supported engines
+	* @param {string} query The query to translate
+	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
+	*/
 	translateAll: function(query) {
 		var output = {};
 		polyglot.engines.forEach(function(engine) {
@@ -204,13 +220,24 @@ var polyglot = module.exports = {
 		return output;
 	},
 
+	/**
+	* Collection of supported engines
+	* Each engine should specify:
+	* 	id - The unique ID of each engine
+	*	alias - Supported alternative names for each engine
+	*	title - Human readable name of the engine
+	*	rewriter - function that takes a query and returns the syntax translation
+	*	linker - optional function that takes a query and provides the direct searching method
+	*	adjacency - supported adjacency format for the given engine
+	*
+	* @var {array}
+	*/
 	engines: [
 		// PubMed {{{
 		{
 			id: 'pubmed',
 			aliases: ['pubmed', 'p', 'pm', 'pubm'],
 			title: 'PubMed',
-			allowSearch: true,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
@@ -240,7 +267,6 @@ var polyglot = module.exports = {
 			id: 'ovid',
 			aliases: ['ovid', 'o', 'ov'],
 			title: 'Ovid Medline',
-			allowSearch: true,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
@@ -270,7 +296,6 @@ var polyglot = module.exports = {
 			id: 'cochrane',
 			aliases: ['cochrane', 'c'],
 			title: 'Cochrane CENTRAL',
-			allowSearch: false,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
@@ -326,7 +351,6 @@ var polyglot = module.exports = {
 			id: 'embase',
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
-			allowSearch: false,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
@@ -358,7 +382,6 @@ var polyglot = module.exports = {
 			id: 'webofscience',
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
-			allowSearch: false,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
@@ -420,7 +443,6 @@ var polyglot = module.exports = {
 			id: 'cinahl',
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
-			allowSearch: false,
 			rewriter: function(q) {
 				return _(q)
 					.wrapLines()
