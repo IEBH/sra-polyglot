@@ -8,7 +8,7 @@ describe('Translate adjacency searches (ADJ format)', function() {
 	});
 
 	it('translate `term1 ADJ3 term2` -> OV `term1 ADJ3 term2`', function() {
-		expect(polyglot.translate('term1 ADJ3 term2', 'ovid')).to.equal('(term1 ADJ3 term2)');
+		expect(polyglot.translate('term1 ADJ3 term2', 'ovid')).to.equal('(term1 adj3 term2)');
 	});
 
 	it('translate `term1 ADJ3 term2` -> CO `term1 NEAR3 term2`', function() {
@@ -19,8 +19,8 @@ describe('Translate adjacency searches (ADJ format)', function() {
 		expect(polyglot.translate('term1 ADJ3 term2', 'embase')).to.equal('');
 	});
 
-	it('translate `term1 ADJ3 term2` -> CI N/A`', function() {
-		expect(polyglot.translate('term1 ADJ3 term2', 'cinahl')).to.equal('');
+	it('translate `term1 ADJ3 term2` -> CI `term1 N3 term2`', function() {
+		expect(polyglot.translate('term1 ADJ3 term2', 'cinahl')).to.equal('(term1 N3 term2)');
 	});
 
 	it('translate `term1 ADJ3 term2` -> WS N/A', function() {
@@ -36,7 +36,7 @@ describe('Translate adjacency searches (NEAR3 format)', function() {
 	});
 
 	it('translate `term1 NEAR3 term2` -> OV `term1 ADJ3 term2`', function() {
-		expect(polyglot.translate('term1 NEAR3 term2', 'ovid')).to.equal('(term1 ADJ3 term2)');
+		expect(polyglot.translate('term1 NEAR3 term2', 'ovid')).to.equal('(term1 adj3 term2)');
 	});
 
 	it('translate `term1 NEAR3 term2` -> CO `term1 NEAR3 term2`', function() {
@@ -47,8 +47,8 @@ describe('Translate adjacency searches (NEAR3 format)', function() {
 		expect(polyglot.translate('term1 NEAR3 term2', 'embase')).to.equal('');
 	});
 
-	it('translate `term1 NEAR3 term2` -> CI N/A`', function() {
-		expect(polyglot.translate('term1 NEAR3 term2', 'cinahl')).to.equal('');
+	it('translate `term1 NEAR3 term2` -> CI `term1 N3 term2`', function() {
+		expect(polyglot.translate('term1 NEAR3 term2', 'cinahl')).to.equal('(term1 N3 term2)');
 	});
 
 	it('translate `term1 NEAR3 term2` -> WS N/A', function() {
