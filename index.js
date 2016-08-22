@@ -181,7 +181,7 @@ _.mixin({
 });
 // }}}
 
-var polyglot = module.exports = {
+module.exports = {
 	/**
 	* List of example search queries
 	* See tests/examples.js for the outputs in each case
@@ -202,7 +202,7 @@ var polyglot = module.exports = {
 	* @return {string} The translated search query
 	*/
 	translate: function(query, engine) {
-		var activeEngine = _.find(polyglot.engines, {id: engine});
+		var activeEngine = _.find(this.engines, {id: engine});
 		if (!activeEngine) throw new Error('Engine not found: ' + engine);
 		return activeEngine.rewriter.call(activeEngine, query + '');
 	},
@@ -214,7 +214,7 @@ var polyglot = module.exports = {
 	*/
 	translateAll: function(query) {
 		var output = {};
-		polyglot.engines.forEach(function(engine) {
+		this.engines.forEach(function(engine) {
 			output[engine.id] = engine.rewriter.call(engine, query + ''); // We need to clone the string to prevent side-effects with some engines
 		});
 		return output;

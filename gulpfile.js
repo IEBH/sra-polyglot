@@ -10,6 +10,6 @@ gulp.task('build', function () {
 		.pipe(rename('ngPolyglot.js'))
 		.pipe(inject.wrap('angular.module(\'ngPolyglot\', []).service(\'Polyglot\', function() {\n', '});'))
 		.pipe(replace(/^.*require\(.*\);\s+$/gm, ''))
-		.pipe(replace(/^var polyglot = .+$/m, 'return {'))
+		.pipe(replace(/^module.exports = .+$/m, 'return {'))
 		.pipe(gulp.dest('./dist'));
 });
