@@ -1,8 +1,7 @@
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-// PubMed -> * {{{
-describe('Translate double subject terms (PubMed -> *)', function() {
+describe('Translate multiple MESH terms (PubMed -> *)', function() {
 
 	it('translate PM `"term1 term2"[Mesh]` -> PM `"term1 term2"[Mesh]`', function() {
 		expect(polyglot.translate('"term1 term2"[Mesh]', 'pubmed')).to.equal('("term1 term2"[Mesh])');
@@ -29,10 +28,8 @@ describe('Translate double subject terms (PubMed -> *)', function() {
 	});
 
 });
-// }}}
 
-// Ovid -> * {{{
-describe('Translate double subject terms (Ovid -> *)', function() {
+describe('Translate multiple MESH terms (Ovid -> *)', function() {
 
 	it('translate OV `exp term1 term2/` -> PM `"term1 term2"[Mesh]`', function() {
 		expect(polyglot.translate('exp term1 term2/', 'pubmed')).to.equal('("term1 term2"[Mesh])');
@@ -59,4 +56,3 @@ describe('Translate double subject terms (Ovid -> *)', function() {
 	});
 
 });
-// }}}
