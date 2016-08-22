@@ -197,9 +197,11 @@ var polyglot = module.exports = {
 	},
 
 	translateAll: function(query) {
-		return polyglot.engines.map(function(engine) {
-			return engine.rewriter.call(engine, query + ''); // We need to clone the string to prevent side-effects with some engines
+		var output = {};
+		polyglot.engines.forEach(function(engine) {
+			output[engine.id] = engine.rewriter.call(engine, query + ''); // We need to clone the string to prevent side-effects with some engines
 		});
+		return output;
 	},
 
 	engines: [
