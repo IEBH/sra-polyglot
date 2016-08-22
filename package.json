@@ -1,0 +1,38 @@
+{
+  "name": "sra-polyglot",
+  "version": "1.0.0",
+  "description": "CREBP-SRA tool to convert between different medical database search formats",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CREBP/polyglot.git"
+  },
+  "keywords": [
+    "search",
+    "translation",
+    "syntax",
+    "conversion",
+    "polyglot",
+    "medical",
+    "research"
+  ],
+  "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CREBP/polyglot/issues"
+  },
+  "homepage": "https://github.com/CREBP/polyglot#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2"
+  },
+  "dependencies": {
+    "lodash": "^4.15.0"
+  }
+}
