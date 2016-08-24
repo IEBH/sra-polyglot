@@ -39,6 +39,7 @@ group
 A sub-grouping of nodes. This represents a lexical parentheses level.
 
 | Property | Type | Description |
+| `field` | String Enum | The field to use for complex logical comparisons (see the `phrase` section for the full list) |
 | `nodes` | Array | Sub-nodes to include within the search group |
 
 
