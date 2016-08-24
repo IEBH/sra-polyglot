@@ -119,7 +119,7 @@ module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/.exec(q))) {
+			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/i.exec(q))) {
 				trimLastLeaf();
 				branch.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;
