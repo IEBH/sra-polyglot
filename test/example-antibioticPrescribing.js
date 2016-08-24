@@ -151,13 +151,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 
 	it('should translate the example into PubMed format', function() {
 		expect(polyglot.translate(example.query, 'pubmed')).to.equal(
-			'("Primary Health Care"[MESH] OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
+			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
-			'("Treatment Failure"[MESH] OR Treatment failure OR Treatment failures)\n\n' +
+			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n\n' +
 			'AND\n\n' +
-			'("Bacterial Infections"[MESH] OR Bacteria OR Bacterial)\n\n' +
+			'("Bacterial Infections"[Mesh] OR "Bacteria OR Bacterial")\n\n' +
 			'AND\n\n' +
-			'("Anti-Bacterial Agents"[MESH] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)'
+			'("Anti-Bacterial Agents"[Mesh] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 

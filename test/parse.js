@@ -126,7 +126,7 @@ describe('Parse', function() {
 	});
 
 	it('should identify field specific phrase objects (PubMed syntax)', function() {
-		expect(polyglot.parse('foo[tiab] and bar baz[tw] and quz[ab] and (thud and waldo)[tiab]')).to.deep.equal([
+		expect(polyglot.parse('foo[tiab] and bar baz[ti] and quz[ab] and (thud and waldo)[tiab]')).to.deep.equal([
 			{
 				type: 'phrase',
 				field: 'title+abstract',

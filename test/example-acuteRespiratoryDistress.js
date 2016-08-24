@@ -2,7 +2,7 @@ var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
+describe.skip('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
 	var example = _.find(polyglot.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
 
 	it('should compile the object tree correctly', function() {
