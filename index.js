@@ -334,7 +334,7 @@ module.exports = {
 								case 'phrase':
 									if (branch.field) {
 										return (
-											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											branch.content +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
@@ -343,7 +343,7 @@ module.exports = {
 											)
 										);
 									} else {
-										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										return branch.content;
 									}
 								case 'joinAnd':
 									return 'AND';
@@ -551,7 +551,7 @@ module.exports = {
 								case 'group':
 									return '(' + compileWalker(branch.nodes) + ')';
 								case 'phrase':
-									return branch.content;
+									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 								case 'joinAnd':
 									return 'AND';
 								case 'joinOr':
