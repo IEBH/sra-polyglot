@@ -42,13 +42,13 @@ module.exports = {
 
 	/**
 	* Parse a given string into a lexical object tree
-	* This tree can then be recompiled via compile()
+	* This tree can then be recompiled via each engines compile()
 	* @param {string} query The query string to compile. This can be multiline
 	* @param {Object} [options] Optional options to use when parsing
 	* @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
 	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
 	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
-	* @see compile()
+	* @return {array} Array representing the parsed tree nodes
 	*/
 	parse: function(query, options) {
 		var settings = _.defaults(options, {
@@ -58,11 +58,11 @@ module.exports = {
 		});
 
 		var q = query + ''; // Clone query
-		var tree = []; // Tree is the full parsed tree
+		var tree = {nodes: []}; // Tree is the full parsed tree
 		var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
 		var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
 		var lastGroup; // Optional reference to the previously created group (used to pin things)
-		var leaf = branch; // Leaf is the current leaf node
+		var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
 		var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
 
 		if (settings.groupLines) {
@@ -83,7 +83,7 @@ module.exports = {
 		function trimLastLeaf() {
 			if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
 				leaf.content = leaf.content.substr(0, leaf.content.length - 1);
-				if (!leaf.content) branch.pop();
+				if (!leaf.content) branch.nodes.pop();
 			}
 		};
 		// }}}
@@ -93,35 +93,36 @@ module.exports = {
 			var match;
 
 			if (/^\(/.test(q)) {
-				lastGroup = {type: 'group', nodes: []};
-				branch.push(lastGroup);
+				var newGroup = {type: 'group', nodes: []};
+				branch.nodes.push(newGroup);
 				branchStack.push(branch);
-				branch = lastGroup.nodes;
-				leaf = branch;
+				branch = newGroup;
+				leaf = branch.nodes;
 			} else if (/^\)/.test(q)) {
+				lastGroup = branch;
 				branch = branchStack.pop();
-				leaf = branch;
+				leaf = branch.nodes;
 			} else if (afterWhitespace && (match = /^and/i.exec(q))) {
 				trimLastLeaf();
-				branch.push({type: 'joinAnd'});
+				branch.nodes.push({type: 'joinAnd'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^or/i.exec(q))) {
 				trimLastLeaf();
-				branch.push({type: 'joinOr'});
+				branch.nodes.push({type: 'joinOr'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^not/i.exec(q))) {
 				trimLastLeaf();
-				branch.push({type: 'joinNot'});
+				branch.nodes.push({type: 'joinNot'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/i.exec(q))) {
 				trimLastLeaf();
-				branch.push({type: 'joinNear', proximity: _.toNumber(match[2])});
+				branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
@@ -140,7 +141,7 @@ module.exports = {
 				leaf.recurse = false;
 			} else if (match = /^(\n+)/.exec(q)) {
 				if (settings.preserveNewlines) {
-					branch.push({type: 'raw', content: match[0]});
+					branch.nodes.push({type: 'raw', content: match[0]});
 					leaf = undefined;
 				}
 				q = q.substr(match[0].length);
@@ -212,12 +213,12 @@ module.exports = {
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
 					if (nextChar == '"' && (match = /^"(.*?)"/.exec(q))) { // First character is a speachmark - slurp until we see the next one
 						leaf = {type: 'phrase', content: match[1]};
-						branch.push(leaf);
+						branch.nodes.push(leaf);
 						q = q.substr(match[0].length);
 						cropString = false;
 					} else { // All other first chars - just dump into a buffer and let it fill slowly
 						leaf = {type: 'phrase', content: nextChar};
-						branch.push(leaf);
+						branch.nodes.push(leaf);
 					}
 				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
 					leaf.content += nextChar;
@@ -228,7 +229,7 @@ module.exports = {
 			if (cropString) q = q.substr(1); // Crop 1 character
 		}
 
-		return tree;
+		return tree.nodes;
 	},
 
 	/**
@@ -236,7 +237,7 @@ module.exports = {
 	* Each engine should specify:
 	*	title - Human readable name of the engine
 	*	aliases - Alternative names for each engine
-	*	compile() - function that takes a parsed tree object and returns a string
+	*	compile() - function that takes a parsed tree array and returns a string
 	*	open() - optional function that takes a query and provides the direct searching method
 	*
 	* @var {array}
