@@ -244,6 +244,7 @@ module.exports = {
 		var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
 		var lastGroup; // Optional reference to the previously created group (used to pin things)
 		var leaf = branch; // Leaf is the current leaf node
+		var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
 
 		if (settings.groupLines) {
 			var lines = q.split('\n');
@@ -281,25 +282,25 @@ module.exports = {
 			} else if (/^\)/.test(q)) {
 				branch = branchStack.pop();
 				leaf = branch;
-			} else if (match = /^and/i.exec(q)) {
+			} else if (afterWhitespace && (match = /^and/i.exec(q))) {
 				trimLastLeaf();
 				branch.push({type: 'joinAnd'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^or/i.exec(q)) {
+			} else if (afterWhitespace && (match = /^or/i.exec(q))) {
 				trimLastLeaf();
 				branch.push({type: 'joinOr'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^not/i.exec(q)) {
+			} else if (afterWhitespace && (match = /^not/i.exec(q))) {
 				trimLastLeaf();
 				branch.push({type: 'joinNot'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^(near|adj|n)([0-9]+)/.exec(q)) {
+			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/.exec(q))) {
 				trimLastLeaf();
 				branch.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;
@@ -311,7 +312,7 @@ module.exports = {
 				if (/^".*"$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (/^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
+			} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
 				leaf.type = 'mesh';
 				leaf.recurse = true;
 				leaf.content = leaf.content.substr(4); // Remove 'exp ' prefix
@@ -325,7 +326,8 @@ module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\.(tw|ab|pt|fs)\./i.exec(q)) { // Field specifier - Ovid syntax
+				afterWhitespace = true;
+			} else if (match = /^\.(tw|ab|pt|fs|sh|xm)\./i.exec(q)) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -378,15 +380,17 @@ module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else {
-				if (_.isUndefined(leaf) && q.substr(0, 1) != ' ') {
-					leaf = {type: 'phrase', content: q.substr(0,1)};
+				var nextChar = q.substr(0, 1);
+				if (_.isUndefined(leaf) && nextChar != ' ') {
+					leaf = {type: 'phrase', content: nextChar};
 					branch.push(leaf);
-				} else if (_.isArray(leaf) && q.substr(0, 1) != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
-					leaf = {type: 'phrase', content: q.substr(0, 1)};
+				} else if (_.isArray(leaf) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
+					leaf = {type: 'phrase', content: nextChar};
 					branch.push(leaf);
 				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
-					leaf.content += q.substr(0, 1);
+					leaf.content += nextChar;
 				}
+				afterWhitespace = (!afterWhitespace && nextChar == ' ');
 			}
 
 			if (cropString) q = q.substr(1); // Crop 1 character
