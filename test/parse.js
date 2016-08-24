@@ -126,7 +126,7 @@ describe('Parse', function() {
 	});
 
 	it('should identify field specific phrase objects (PubMed syntax)', function() {
-		expect(polyglot.parse('foo[tiab] and bar baz[tw] and quz[ab]')).to.deep.equal([
+		expect(polyglot.parse('foo[tiab] and bar baz[tw] and quz[ab] and (thud and waldo)[tiab]')).to.deep.equal([
 			{
 				type: 'phrase',
 				field: 'title+abstract',
@@ -144,11 +144,27 @@ describe('Parse', function() {
 				field: 'abstract',
 				content: 'quz',
 			},
+			{type: 'joinAnd'},
+			{
+				type: 'group',
+				field: 'title+abstract',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'thud',
+					},
+					{type: 'joinAnd'},
+					{
+						type: 'phrase',
+						content: 'waldo',
+					},
+				],
+			},
 		]);
 	});
 
 	it('should identify field specific phrase objects (Ovid syntax)', function() {
-		expect(polyglot.parse('foo.tw. and bar baz.pt. and quz.ab.')).to.deep.equal([
+		expect(polyglot.parse('foo.tw. and bar baz.pt. and quz.ab. and (thud and waldo).fs.')).to.deep.equal([
 			{
 				type: 'phrase',
 				field: 'title+abstract',
@@ -165,6 +181,22 @@ describe('Parse', function() {
 				type: 'phrase',
 				field: 'abstract',
 				content: 'quz',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'group',
+				field: 'floatingSubheading',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'thud',
+					},
+					{type: 'joinAnd'},
+					{
+						type: 'phrase',
+						content: 'waldo',
+					},
+				],
 			},
 		]);
 	});

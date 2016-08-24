@@ -242,6 +242,7 @@ module.exports = {
 		var tree = []; // Tree is the full parsed tree
 		var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
 		var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
+		var lastGroup; // Optional reference to the previously created group (used to pin things)
 		var leaf = branch; // Leaf is the current leaf node
 
 		if (settings.groupLines) {
@@ -272,10 +273,10 @@ module.exports = {
 			var match;
 
 			if (/^\(/.test(q)) {
-				var newBranch = {type: 'group', nodes: []};
-				branch.push(newBranch);
+				lastGroup = {type: 'group', nodes: []};
+				branch.push(lastGroup);
 				branchStack.push(branch);
-				branch = newBranch.nodes;
+				branch = lastGroup.nodes;
 				leaf = branch;
 			} else if (/^\)/.test(q)) {
 				branch = branchStack.pop();
@@ -324,36 +325,54 @@ module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\.(tw|ab|pt)\./i.exec(q)) { // Field specifier - Ovid syntax
+			} else if (match = /^\.(tw|ab|pt|fs)\./i.exec(q)) { // Field specifier - Ovid syntax
+				// Figure out the leaf to use (usually the last one) or the previously used group {{{
+				var useLeaf;
+				if (_.isObject(leaf) && leaf.type == 'phrase') {
+					useLeaf = leaf;
+				} else if (_.isArray(leaf) && lastGroup) {
+					useLeaf = lastGroup;
+				}
+				// }}}
+
 				switch (match[1].toLowerCase()) {
 					case 'ti':
-						leaf.field = 'title';
+						useLeaf.field = 'title';
 						break;
 					case 'tw':
-						leaf.field = 'title+abstract';
+						useLeaf.field = 'title+abstract';
 						break;
 					case 'ab':
-						leaf.field = 'abstract';
+						useLeaf.field = 'abstract';
 						break;
 					case 'pt':
-						leaf.field = 'practiceGuideline';
+						useLeaf.field = 'practiceGuideline';
 						break;
 					case 'fs':
-						leaf.field = 'floatingSubheading';
+						useLeaf.field = 'floatingSubheading';
 						break;
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (match = /^\[(tiab|tw|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
+				// Figure out the leaf to use (usually the last one) or the previously used group {{{
+				var useLeaf;
+				if (_.isObject(leaf) && leaf.type == 'phrase') {
+					useLeaf = leaf;
+				} else if (_.isArray(leaf) && lastGroup) {
+					useLeaf = lastGroup;
+				}
+				// }}}
+
 				switch (match[1].toLowerCase()) {
 					case 'tw':
-						leaf.field = 'title';
+						useLeaf.field = 'title';
 						break;
 					case 'tiab':
-						leaf.field = 'title+abstract';
+						useLeaf.field = 'title+abstract';
 						break;
 					case 'ab':
-						leaf.field = 'abstract';
+						useLeaf.field = 'abstract';
 						break;
 				}
 				q = q.substr(match[0].length);
