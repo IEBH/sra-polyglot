@@ -353,6 +353,14 @@ module.exports = {
 					case 'fs':
 						useLeaf.field = 'floatingSubheading';
 						break;
+					case 'sh':
+						useLeaf.type = 'mesh';
+						useLeaf.recurse = false;
+						break;
+					case 'xm':
+						useLeaf.type = 'mesh';
+						useLeaf.recurse = true;
+						break;
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
