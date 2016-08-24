@@ -2,7 +2,7 @@ var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe.skip('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
+describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
 	var example = _.find(polyglot.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
 
 	it('should compile the object tree correctly', function() {
@@ -399,7 +399,7 @@ describe.skip('Example test "Positioning for acute respiratory distress in hospi
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
-								content: 'postur*',
+								content: 'position*',
 							},
 						],
 					},
@@ -580,7 +580,7 @@ describe.skip('Example test "Positioning for acute respiratory distress in hospi
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
-										content: 'forward*',
+										content: 'forward',
 									},
 								],
 							},
@@ -743,7 +743,6 @@ describe.skip('Example test "Positioning for acute respiratory distress in hospi
 			// }}}
 		];
 		// }}}
-		console.log(require('util').inspect(polyglot.parse(example.query), {depth: null, colors: true}))
 		expect(polyglot.parse(example.query)).to.deep.equal(tree);
 	});
 

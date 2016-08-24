@@ -42,13 +42,13 @@ module.exports = {
 
 	/**
 	* Parse a given string into a lexical object tree
-	* This tree can then be recompiled via compile()
+	* This tree can then be recompiled via each engines compile()
 	* @param {string} query The query string to compile. This can be multiline
 	* @param {Object} [options] Optional options to use when parsing
 	* @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
 	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
 	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
-	* @see compile()
+	* @return {array} Array representing the parsed tree nodes
 	*/
 	parse: function(query, options) {
 		var settings = _.defaults(options, {
@@ -93,12 +93,13 @@ module.exports = {
 			var match;
 
 			if (/^\(/.test(q)) {
-				lastGroup = {type: 'group', nodes: []};
-				branch.nodes.push(lastGroup);
+				var newGroup = {type: 'group', nodes: []};
+				branch.nodes.push(newGroup);
 				branchStack.push(branch);
-				branch = lastGroup;
+				branch = newGroup;
 				leaf = branch.nodes;
 			} else if (/^\)/.test(q)) {
+				lastGroup = branch;
 				branch = branchStack.pop();
 				leaf = branch.nodes;
 			} else if (afterWhitespace && (match = /^and/i.exec(q))) {
@@ -236,7 +237,7 @@ module.exports = {
 	* Each engine should specify:
 	*	title - Human readable name of the engine
 	*	aliases - Alternative names for each engine
-	*	compile() - function that takes a parsed tree object and returns a string
+	*	compile() - function that takes a parsed tree array and returns a string
 	*	open() - optional function that takes a query and provides the direct searching method
 	*
 	* @var {array}
