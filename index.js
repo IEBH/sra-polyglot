@@ -209,12 +209,16 @@ module.exports = {
 				cropString = false;
 			} else {
 				var nextChar = q.substr(0, 1);
-				if (_.isUndefined(leaf) && nextChar != ' ') {
-					leaf = {type: 'phrase', content: nextChar};
-					branch.push(leaf);
-				} else if (_.isArray(leaf) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
-					leaf = {type: 'phrase', content: nextChar};
-					branch.push(leaf);
+				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
+					if (nextChar == '"' && (match = /^"(.*?)"/.exec(q))) { // First character is a speachmark - slurp until we see the next one
+						leaf = {type: 'phrase', content: match[1]};
+						branch.push(leaf);
+						q = q.substr(match[0].length);
+						cropString = false;
+					} else { // All other first chars - just dump into a buffer and let it fill slowly
+						leaf = {type: 'phrase', content: nextChar};
+						branch.push(leaf);
+					}
 				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
 					leaf.content += nextChar;
 				}
