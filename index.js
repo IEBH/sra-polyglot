@@ -242,6 +242,59 @@ module.exports = {
 		pubmed: {
 			title: 'PubMed',
 			aliases: ['pubmed', 'p', 'pm', 'pubm'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										return (
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? '[ti]' :
+												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'title+abstract' ? '[tiab]' :
+												'' // Unsupported field suffix for PubMed
+											)
+										);
+									} else {
+										return '(' + compileWalker(branch.nodes) + ')';
+									}
+								case 'phrase':
+									if (branch.field) {
+										return (
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												(branch.field == 'title') ? '[ti]' :
+												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'title+abstract' ? '[tiab]' :
+												'' // Unsupported field suffix for PubMed
+											)
+										);
+									} else {
+										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'AND';
+								case 'mesh':
+									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'GET',
@@ -257,6 +310,57 @@ module.exports = {
 		ovid: {
 			title: 'Ovid Medline',
 			aliases: ['ovid', 'o', 'ov'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										return (
+											'(' + compileWalker(branch.nodes) + ')' +
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+										);
+									} else {
+										return '(' + compileWalker(branch.nodes) + ')';
+									}
+								case 'phrase':
+									if (branch.field) {
+										return (
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+										);
+									} else {
+										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'ADJ' + branch.proximity;
+								case 'mesh':
+									return (branch.recurse ? 'exp ' : '') + branch.content + '/';
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'POST',
@@ -272,6 +376,59 @@ module.exports = {
 		cochrane: {
 			title: 'Cochrane CENTRAL',
 			aliases: ['cochrane', 'c'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										return (
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+										)
+									} else {
+										return '(' + compileWalker(branch.nodes) + ')';
+									}
+								case 'phrase':
+									if (branch.field) {
+										return (
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+										)
+									} else {
+										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'NEAR' + branch.proximity;
+								case 'mesh':
+									return '[mh ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'POST',
@@ -313,6 +470,59 @@ module.exports = {
 		embase: {
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										return (
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+										);
+									} else {
+										return '(' + compileWalker(branch.nodes) + ')';
+									}
+								case 'phrase':
+									if (branch.field) {
+										return (
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+										);
+									} else {
+										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'AND';
+								case 'mesh':
+									return "'" + branch.content + "'/exp";
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'GET',
@@ -329,6 +539,35 @@ module.exports = {
 		wos: {
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									return '(' + compileWalker(branch.nodes) + ')';
+								case 'phrase':
+									return branch.content;
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'AND';
+								case 'mesh':
+									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'POST',
@@ -375,6 +614,52 @@ module.exports = {
 		cinahl: {
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
+			compile: function(tree) {
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch) {
+							switch (branch.type) {
+								case 'group':
+									return '(' + compileWalker(branch.nodes) + ')';
+								case 'phrase':
+									if (branch.field && branch.field == 'title+abstract') {
+										return (
+											'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											' ' +
+											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
+										);
+									} else if (branch.field) {
+										return (
+											(
+												branch.field == 'title' ? 'TI' :
+												branch.field == 'abstract' ? 'AB' :
+												'??' // Unsupported field suffix for PubMed
+											)
+											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
+										);
+									} else {
+										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+								case 'joinAnd':
+									return 'AND';
+								case 'joinOr':
+									return 'OR';
+								case 'joinNot':
+									return 'NOT';
+								case 'joinNear':
+									return 'N' + branch.proximity;
+								case 'mesh':
+									return '(MH "' + branch.content + '+")';
+								case 'raw':
+									return branch.content;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+						})
+						.join(' ');
+				};
+				return compileWalker(tree);
+			},
 			open: function(query) {
 				return {
 					method: 'POST',
