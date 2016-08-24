@@ -146,7 +146,7 @@ module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
-			} else if (match = /^\.(tw|ab|pt|fs|sh|xm)\./i.exec(q)) { // Field specifier - Ovid syntax
+			} else if ((match = /^\.(tw|ti|ab|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|pt|fs|sh|xm)/i.exec(q))) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -160,6 +160,7 @@ module.exports = {
 					case 'ti':
 						useLeaf.field = 'title';
 						break;
+					case 'ti,ab':
 					case 'tw':
 						useLeaf.field = 'title+abstract';
 						break;
