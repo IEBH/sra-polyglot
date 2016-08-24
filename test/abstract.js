@@ -24,7 +24,7 @@ describe('Translate abstract searches (PubMed -> *)', function() {
 	});
 
 	it('translate PM `term1[ab]` -> WS N/A', function() {
-		expect(polyglot.translate('term1[ab]', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1[ab]', 'wos')).to.equal('()');
 	});
 
 });
@@ -52,7 +52,7 @@ describe('Translate abstract searches (Ovid -> *)', function() {
 	});
 
 	it('translate OV `term1:ab` -> WS N/A', function() {
-		expect(polyglot.translate('term1:ab', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1:ab', 'wos')).to.equal('()');
 	});
 
 });

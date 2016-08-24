@@ -24,7 +24,7 @@ describe('Translate single MESH terms (PubMed -> *)', function() {
 	});
 
 	it('translate PM `term1[Mesh]` -> WS `term1 term2`', function() {
-		expect(polyglot.translate('term1[Mesh]', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1[Mesh]', 'wos')).to.equal('()');
 	});
 
 });
@@ -52,7 +52,7 @@ describe('Translate single MESH terms (Ovid -> *)', function() {
 	});
 
 	it('translate OV `exp term1 term2/` -> WS `term1 term2`', function() {
-		expect(polyglot.translate('exp term1/', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('exp term1/', 'wos')).to.equal('()');
 	});
 
 });

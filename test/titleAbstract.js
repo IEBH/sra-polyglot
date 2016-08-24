@@ -24,7 +24,7 @@ describe('Translate title + abstract searches (PubMed -> *)', function() {
 	});
 
 	it('translate PM `term1[tiab]` -> WS N/A', function() {
-		expect(polyglot.translate('term1[tiab]', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1[tiab]', 'wos')).to.equal('()');
 	});
 
 });
@@ -52,7 +52,7 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 	});
 
 	it('translate OV `term1:ti,ab` -> WS N/A', function() {
-		expect(polyglot.translate('term1:ti,ab', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1:ti,ab', 'wos')).to.equal('()');
 	});
 
 });
@@ -80,7 +80,7 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', fu
 	});
 
 	it('translate OV `term1.tw` -> WS N/A', function() {
-		expect(polyglot.translate('term1.tw', 'webofscience')).to.equal('()');
+		expect(polyglot.translate('term1.tw', 'wos')).to.equal('()');
 	});
 
 });

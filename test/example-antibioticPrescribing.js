@@ -210,7 +210,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into WoS format', function() {
-		expect(polyglot.translate(example.query, 'webofscience')).to.equal(
+		expect(polyglot.translate(example.query, 'wos')).to.equal(
 			'(Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
 			'AND\n\n' +
 			'(Treatment failure OR Treatment failures)\n\n' +

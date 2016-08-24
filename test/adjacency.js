@@ -24,7 +24,7 @@ describe('Translate adjacency searches (ADJ format)', function() {
 	});
 
 	it('translate `term1 ADJ3 term2` -> WS N/A', function() {
-		expect(polyglot.translate('term1 ADJ3 term2', 'webofscience')).to.equal('');
+		expect(polyglot.translate('term1 ADJ3 term2', 'wos')).to.equal('');
 	});
 
 });
@@ -52,7 +52,7 @@ describe('Translate adjacency searches (NEAR3 format)', function() {
 	});
 
 	it('translate `term1 NEAR3 term2` -> WS N/A', function() {
-		expect(polyglot.translate('term1 NEAR3 term2', 'webofscience')).to.equal('');
+		expect(polyglot.translate('term1 NEAR3 term2', 'wos')).to.equal('');
 	});
 
 });

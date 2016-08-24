@@ -1,186 +1,5 @@
 var _ = require('lodash');
 
-// Lodash extensions {{{
-_.mixin({
-	/**
-	* Wrap all non-logical non-empty lines in brackets
-	* @param string q The input query to wrap
-	* @return string The output query wrapped with brackets
-	*/
-	wrapLines: function(q) {
-		return q.split("\n").map(function(line) {
-			line = _.trim(line);
-			if (!line) return line; // Empty line
-			if (/^(AND|OR)$/i.test(line)) return line; // Logical line - dont wrap
-			return '(' + line + ')';
-		}).join("\n");
-	},
-
-	/**
-	* Replace UTF8 weirdness with speachmarks
-	* @param string q The input query to replace
-	* @return string The cleaned up query
-	*/
-	replaceJunk: function(q) {
-		return q.replace(/[“”«»„’']/g, '"');
-	},
-
-	/**
-	* Replace MeSH terms with the string specififed
-	* This function will also obey any engine specific overrides
-	* e.g.
-	*       "Something"[MESH] // Replaces in all instances
-	*       "Something|Embase=Something Else"[MESH] // Replaces as 'something' in most cases, 'something else' in Embase engine
-	*
-	* @param string query The incomming full query string (PubMed format)
-	* @param string replacement The replacement to apply ($1 is the original term)
-	* @param string engine The active engine object
-	* @return string The query string with replacements applied
-	*/
-	replaceMesh: function(q, replacement, engine) {
-		[
-			/"(.+?)"\[MESH\]/ig, // Pubmed style
-			/exp\s+(.+?)\//ig, // Ovid style
-		].forEach(function(re) {
-			q = q.replace(re, function(line, mesh) {
-				if (!/\|/.test(mesh)) {  // Simple replacement
-					return replacement.replace('$1', mesh);
-				} else { // Using rule set
-					var rules = {};
-					mesh.split(/\|/).forEach(function(term) {
-						var ruleSyntax = /^\s*(.+)\s*=\s*(.+)\s*$/.exec(term);
-						if (ruleSyntax) {
-							rules[ruleSyntax[1].toLowerCase()] = ruleSyntax[2];
-						} else {
-							rules['DEFAULT'] = term;
-						}
-					});
-					var matchingRule = _.find(engine.aliases, function(alias) {
-						return !! rules[alias];
-					});
-					if (matchingRule) { // There is a rule specific to this engine
-						return replacement.replace('$1', rules[matchingRule]);
-					} else if (rules['DEFAULT']) {
-						return replacement.replace('$1', rules['DEFAULT']);
-					} else {
-						return '';
-					}
-				}
-			});
-		});
-		return q;
-	},
-
-
-	/**
-	* Replace search fields for titles + abstracts
-	* e.g. "Something"[tiab] => "Something".tw.
-	* @param {string} q The query to operate on
-	* @param {string} engine The currently active engine
-	* @param {Object} options Additional options to parse
-	* @param {string} [options.title=ti] What to replace title based syntax with
-	* @param {string} [options.abstract=ab] What to replace abstract based syntax with
-	* @param {string} [options.titleAbstract=tiab] What to replace combined title + abstract based syntax with
-	* @param {string} [options.unknown=?] What to replace unknown filed syntax with
-	* @return {string} The query string with replacements applied
-	*/
-	replaceSearchFields: function(q, replacement, engine, options) {
-		var settings = _.defaults(options, {
-			title: 'ti',
-			abstract: 'ab',
-			titleAbstract: 'tiab',
-			unknown: '?',
-		});
-
-		[
-			/"(.+?)"\[(TIAB|TW|AB)\]/ig, // Pubmed style
-			/"(.+?)"\.(TW|TI|AB)\./ig, // Ovid style
-			/(AND |OR )(.+?)\[(TIAB|TW|AB)\]/ig, // Pubmed style without quote enclosure
-			/(AND |OR )(.+?)\.(TIAB|TW|AB)\./ig, // Ovid style without quote enclosure
-		].forEach(function(re) {
-			q = q.replace(re, function(line) {
-				var prefix, term, fields;
-				// If we are passed the optional prefix argument we need to stash that
-				if (arguments.length == 6) {
-					prefix = arguments[1];
-					term = arguments[2];
-					fields = arguments[3];
-				} else {
-					prefix = '';
-					term = arguments[1];
-					fields = arguments[2];
-				}
-
-				switch (fields.toLowerCase()) {
-					case 'ti':
-						fields = settings.title;
-						break;
-					case 'ab':
-						fields = settings.abstract;
-						break;
-					case 'tiab':
-					case 'tw':
-						fields = settings.titleAbstract;
-						break;
-					default:
-						fields = settings.unknown;
-				}
-
-				var out = replacement
-					.replace('$1', term)
-					.replace('$2', fields);
-
-				if (prefix) out = prefix + out; // Add optional prefix back, if any
-				return out;
-			});
-		});
-
-		return q.replace(/"{2,}/g, '"'); // Remove doubled up speachmarks (inserted during Ovid term rewrite above)
-	},
-
-
-	/**
-	* Replace adjacency markers
-	* e.g. Ovid 'NEAR3' => CENTRAL 'adj3'
-	* @param string q The query to operate on
-	* @param string engine The currently active engine
-	* @return string The query string with replacements applied
-	*/
-	replaceAdjacency: function(q, engine) {
-		[
-			/adj([0-9+]) /ig,
-			/NEAR([0-9+]) /ig,
-			/NEAR\/([0-9+]) /ig,
-		].forEach(function(re) {
-			q = q.replace(re, function(line, number) {
-				var out = engine.adjacency(engine, number);
-				return out ? out + ' ' : '';
-			});
-		});
-		return q;
-	},
-
-	/**
-	* Removes redundent speachmarks for single search terms
-	* e.g. "single"[tiab] => single[tiab]
-	*/
-	replaceRedundentEncasing: function(q, engine) {
-		return q.replace(/"([a-z0-9\-_]+?)"/ig, '$1');
-	},
-
-	/**
-	* Simple text replacer wrapped in lodash handlers
-	* This is really just STRING.replace() for lodash
-	* @param string query The query to operate on
-	* @param string|regexp search The search query to execute
-	* @param string|regexp replacement The replacement to apply
-	*/
-	replace: function(q, search, replacement) {
-		return q.replace(search, replacement);
-	},
-});
-// }}}
-
 module.exports = {
 	/**
 	* List of example search queries
@@ -197,14 +16,15 @@ module.exports = {
 
 	/**
 	* Translate the given query using the given engine ID
+	* This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
 	* @param {string} query The query to translate
 	* @param {string} engine The ID of the engine to use
 	* @return {string} The translated search query
 	*/
 	translate: function(query, engine) {
-		var activeEngine = _.find(this.engines, {id: engine});
-		if (!activeEngine) throw new Error('Engine not found: ' + engine);
-		return activeEngine.rewriter.call(activeEngine, query + '');
+		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
+		var tree = this.parse(query);
+		return this.engines[engine].compile(tree);
 	},
 
 	/**
@@ -214,9 +34,8 @@ module.exports = {
 	*/
 	translateAll: function(query) {
 		var output = {};
-		this.engines.forEach(function(engine) {
-			output[engine.id] = engine.rewriter.call(engine, query + ''); // We need to clone the string to prevent side-effects with some engines
-		});
+		var tree = this.parse(query);
+		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree));
 		return output;
 	},
 
@@ -410,97 +229,56 @@ module.exports = {
 	/**
 	* Collection of supported engines
 	* Each engine should specify:
-	* 	id - The unique ID of each engine
-	*	alias - Supported alternative names for each engine
 	*	title - Human readable name of the engine
-	*	rewriter - function that takes a query and returns the syntax translation
-	*	linker - optional function that takes a query and provides the direct searching method
-	*	adjacency - supported adjacency format for the given engine
+	*	aliases - Alternative names for each engine
+	*	compile() - function that takes a parsed tree object and returns a string
+	*	open() - optional function that takes a query and provides the direct searching method
 	*
 	* @var {array}
 	*/
-	engines: [
+	engines: {
 		// PubMed {{{
-		{
-			id: 'pubmed',
-			aliases: ['pubmed', 'p', 'pm', 'pubm'],
+		pubmed: {
 			title: 'PubMed',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('"$1"[MESH]', this)
-					.replaceSearchFields('"$1"[$2]', this, {title: 'ti', abstract: 'ab', titleAbstract: 'tiab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			aliases: ['pubmed', 'p', 'pm', 'pubm'],
+			open: function(query) {
 				return {
 					method: 'GET',
 					action: 'https://www.ncbi.nlm.nih.gov/pubmed',
 					fields: {
-						term: engine.query,
+						term: query,
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return '';
 			},
 		},
 		// }}}
 		// Ovid Medline {{{
-		{
-			id: 'ovid',
-			aliases: ['ovid', 'o', 'ov'],
+		ovid: {
 			title: 'Ovid Medline',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('exp $1/', this)
-					.replaceSearchFields('"$1".$2.', this, {title: 'ti', abstract: 'ab', titleAbstract: 'tw'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			aliases: ['ovid', 'o', 'ov'],
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
 					fields: {
-						textBox: engine.query,
+						textBox: query,
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return 'adj' + number;
 			},
 		},
 		// }}}
 		// Cochrane CENTRAL {{{
-		{
-			id: 'cochrane',
-			aliases: ['cochrane', 'c'],
+		cochrane: {
 			title: 'Cochrane CENTRAL',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('[mh "$1"]', this)
-					.replaceSearchFields('"$1":$2', this, {title: 'ti', abstract: 'ab', titleAbstract: 'ti,ab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			aliases: ['cochrane', 'c'],
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
 					fields: {
 						'submitSearch': 'Go',
 						'searchRows[0].searchCriterias[0].fieldRestriction': null,
-						'searchRows[0].searchCriterias[0].term': engine.query,
+						'searchRows[0].searchCriterias[0].term': query,
 						'searchRows[0].searchOptions.searchProducts': null,
 						'searchRows[0].searchOptions.searchStatuses': null,
 						'searchRows[0].searchOptions.searchType': 'All',
@@ -528,59 +306,29 @@ module.exports = {
 					}
 				};
 			},
-			adjacency: function(engine, number) {
-				return 'NEAR' + number;
-			},
 		},
 		// }}}
 		// Embase {{{
-		{
-			id: 'embase',
+		embase: {
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace("'", '')
-					.replaceMesh("'$1'/exp", this)
-					.replaceSearchFields('"$1":$2', this, {title: 'ti', abstract: 'ab', titleAbstract: 'ti,ab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'GET',
 					action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
 					fields: {
 						sb: 'y',
-						search_query: engine.query.replace(/\n+/g, ' '),
+						search_query: query.replace(/\n+/g, ' '),
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return 'NEAR/' + number;
 			},
 		},
 		// }}}
 		// Web of Science {{{
-		{
-			id: 'webofscience',
+		wos: {
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace(/"(.+?)"\[MESH\] (AND|OR) /ig, '')
-					.replace(/"(.+?)"\[MESH\]/ig, '')
-					.replaceSearchFields('', this, {})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
@@ -597,7 +345,7 @@ module.exports = {
 						input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
 						sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
 						formUpdated: 'true',
-						'value(input1)': engine.query,
+						'value(input1)': query,
 						'value(select1)': 'TS',
 						x: '798',
 						y: '311',
@@ -620,41 +368,22 @@ module.exports = {
 					},
 				};
 			},
-			adjacency: function(engine, number) {
-				return '';
-			},
 		},
 		// }}}
 		// CINAHL {{{
-		{
-			id: 'cinahl',
+		cinahl: {
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace("'", '')
-					.replaceMesh('(MH "$1+")', this)
-					// FIXME: TIAB =~ TI term AND AB term
-					.replaceSearchFields('$2 "$1"', this, {title: 'ti', abstract: 'ab', titleAbstract: ''})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
-			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
 					fields: {
-						bquery: engine.query,
+						bquery: query,
 					},
 				};
 			},
-			adjacency: function(engine, number) {
-				return 'N' + number;
-			},
 		},
 		// }}}
-	],
+	},
 };

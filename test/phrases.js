@@ -24,7 +24,7 @@ describe('Translate search phrases (PubMed -> *)', function() {
 	});
 
 	it('translate PM `"term1 term2"` -> WS `"term1 term2"`', function() {
-		expect(polyglot.translate('"term1 term2"', 'webofscience')).to.equal('("term1 term2")');
+		expect(polyglot.translate('"term1 term2"', 'wos')).to.equal('("term1 term2")');
 	});
 
 });
@@ -52,7 +52,7 @@ describe('Translate search phrases (Ovid -> *)', function() {
 	});
 
 	it('translate OV `exp term1 term2/` -> WS `"term1 term2"`', function() {
-		expect(polyglot.translate('"term1 term2"', 'webofscience')).to.equal('("term1 term2")');
+		expect(polyglot.translate('"term1 term2"', 'wos')).to.equal('("term1 term2")');
 	});
 
 });
