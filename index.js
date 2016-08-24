@@ -333,23 +333,26 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										return (
+										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
+											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
-										);
+											);
 									} else {
-										return '(' + compileWalker(branch.nodes) + ')';
+										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
+									break;
 								case 'phrase':
 									if (branch.field) {
-										return (
+										buffer +=
 											branch.content +
 											(
 												branch.field == 'title' ? ':ti' :
@@ -357,27 +360,43 @@ module.exports = {
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
 											)
-										);
 									} else {
-										return branch.content;
+										buffer += branch.content;
 									}
+									break;
 								case 'joinAnd':
-									return 'AND';
+									buffer += 'AND';
+									break;
 								case 'joinOr':
-									return 'OR';
+									buffer += 'OR';
+									break;
 								case 'joinNot':
-									return 'NOT';
+									buffer += 'NOT';
+									break;
 								case 'joinNear':
-									return 'ADJ' + branch.proximity;
+									buffer += 'ADJ' + branch.proximity;
+									break;
 								case 'mesh':
-									return (branch.recurse ? 'exp ' : '') + branch.content + '/';
+									buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
@@ -399,53 +418,70 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										return (
+										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
-											)
-										)
+											);
 									} else {
-										return '(' + compileWalker(branch.nodes) + ')';
+										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
+									break;
 								case 'phrase':
 									if (branch.field) {
-										return (
+										buffer +=
 											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
-											)
-										)
+											);
 									} else {
-										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									}
+									break;
 								case 'joinAnd':
-									return 'AND';
+									buffer += 'AND';
+									break;
 								case 'joinOr':
-									return 'OR';
+									buffer += 'OR';
+									break;
 								case 'joinNot':
-									return 'NOT';
+									buffer += 'NOT';
+									break;
 								case 'joinNear':
-									return 'NEAR' + branch.proximity;
+									buffer += 'NEAR' + branch.proximity;
+									break;
 								case 'mesh':
-									return '[mh ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									buffer += '[mh ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
@@ -493,53 +529,68 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										return (
+										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
-											)
-										);
+											);
 									} else {
-										return '(' + compileWalker(branch.nodes) + ')';
+										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
+									break;
 								case 'phrase':
 									if (branch.field) {
-										return (
+										buffer +=
 											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												'' // Unsupported field suffix for PubMed
-											)
-										);
+											);
 									} else {
-										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									}
+									break;
 								case 'joinAnd':
-									return 'AND';
-								case 'joinOr':
-									return 'OR';
-								case 'joinNot':
-									return 'NOT';
 								case 'joinNear':
-									return 'AND';
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
 								case 'mesh':
-									return "'" + branch.content + "'/exp";
+									buffer += "'" + branch.content + "'/exp";
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
@@ -562,29 +613,46 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									return '(' + compileWalker(branch.nodes) + ')';
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
 								case 'phrase':
-									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									break;
 								case 'joinAnd':
-									return 'AND';
-								case 'joinOr':
-									return 'OR';
-								case 'joinNot':
-									return 'NOT';
 								case 'joinNear':
-									return 'AND';
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
 								case 'mesh':
-									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
@@ -637,46 +705,63 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									return '(' + compileWalker(branch.nodes) + ')';
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
 								case 'phrase':
 									if (branch.field && branch.field == 'title+abstract') {
-										return (
+										buffer +=
 											'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
 											' ' +
-											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
-										);
+											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									} else if (branch.field) {
-										return (
+										buffer +=
 											(
 												branch.field == 'title' ? 'TI' :
 												branch.field == 'abstract' ? 'AB' :
 												'??' // Unsupported field suffix for PubMed
 											)
-											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
-										);
+											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									} else {
-										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									}
+									break;
 								case 'joinAnd':
-									return 'AND';
+									buffer += 'AND';
+									break;
 								case 'joinOr':
-									return 'OR';
+									buffer += 'OR';
+									break;
 								case 'joinNot':
-									return 'NOT';
+									buffer += 'NOT';
+									break;
 								case 'joinNear':
-									return 'N' + branch.proximity;
+									buffer += 'N' + branch.proximity;
+									break;
 								case 'mesh':
-									return '(MH "' + branch.content + '+")';
+									buffer += '(MH "' + branch.content + '+")';
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
