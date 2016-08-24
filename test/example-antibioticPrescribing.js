@@ -5,6 +5,146 @@ var polyglot = require('..');
 describe('Example test "Failure of antibiotic prescribing for bacterial infections"', function() {
 	var example = _.find(polyglot.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
 
+	it('should parse the object tree correctly', function() {
+		/*
+			"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice
+			AND
+			"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures
+			AND
+			"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial
+			AND
+			"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic
+		*/
+		// Tree structure {{{
+		var tree = [
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'mesh',
+						content: 'Primary Health Care',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Primary care',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Primary healthcare',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Family practice',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'General practice',
+					},
+				],
+			},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'mesh',
+						content: 'Treatment Failure',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Treatment failure',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Treatment failures',
+					},
+				],
+			},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'mesh',
+						content: 'Bacterial Infections',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Bacteria',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Bacterial',
+					},
+				],
+			},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'mesh',
+						content: 'Anti-Bacterial Agents',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Antibacterial Agents',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Antibacterial Agent',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Antibiotics',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'Antibiotic',
+					},
+				],
+			},
+		];
+		// }}}
+		expect(polyglot.parse(example.query)).to.deep.equal(tree);
+	});
+
 	it('should translate the example into PubMed format', function() {
 		expect(polyglot.translate(example.query, 'pubmed')).to.equal(
 			'("Primary Health Care"[MESH] OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +

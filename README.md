@@ -27,3 +27,68 @@ Will output an object structure like:
 ```
 
 See the JSDoc of the [inline code](index.js) for more details on the supported APIs.
+
+
+
+Parsed Tree Object
+==================
+Each of the following sub-sections describes a node which can be contained within the compiled tree.
+
+group
+-----
+A sub-grouping of nodes. This represents a lexical parentheses level.
+
+| Property | Type | Description |
+| `nodes` | Array | Sub-nodes to include within the search group |
+
+
+joinAnd
+-------
+A logical 'And' condition between the previous and next element.
+
+
+joinNear
+-------
+A proximity join between the previous and next element.
+
+| Property | Type | Description |
+| `proximity` | Number | The number of (usually) words to allow as a maximum proximity scan |
+
+
+joinNot
+-------
+A logical 'Not' condition between the previous and next element.
+
+
+joinOr
+------
+A logical 'Or' condition between the previous and next element.
+
+
+mesh
+----
+A valid Mesh heading.
+
+| Property | Type | Description |
+| `content` | String | The Mesh heading to use |
+| `recurse` | Boolean | Whether to recurse down child Mesh nodes when searching. This is only present if the input syntax supports it (Ovid MEDLINE specifically) |
+
+
+phrase
+------
+A simple text phrase.
+
+| Property | Type | Description |
+| `field` | String Enum: `title`, `abstract`, `title+abstract`, `practiceGuideline`, `floatingSubheading` | The field to use for simple phrase comparisons |
+| `content` | String | If specified the string of text to search for in the field specified by `context`. Cannot be used with `nodes` |
+| `nodes`   | Array | If specified points to a group of nodes used to compile the search expression to be searched in the field specified by `context`. The `nodes` structure must contain exactly 1 element and it must be of a group type. Cannot be used with `content` |
+
+
+raw
+---
+A string of text that should be passed from the input to the output.
+This string can contain control characters line linefeeds.
+
+
+| Property | Type | Description |
+| `content` | String | The string of text to preserve |

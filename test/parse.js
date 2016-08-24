@@ -1,0 +1,213 @@
+var _ = require('lodash');
+var expect = require('chai').expect;
+var polyglot = require('..');
+
+describe('Parse', function() {
+	it('should parse the most basic phrase', function() {
+		expect(polyglot.parse('foo bar baz')).to.deep.equal([
+			{
+				type: 'phrase',
+				content: 'foo bar baz',
+			},
+		]);
+	});
+
+	it('should parse a compound phrase (and)', function() {
+		expect(polyglot.parse('(foo and bar and baz)')).to.deep.equal([
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'foo',
+					},
+					{type: 'joinAnd'},
+					{
+						type: 'phrase',
+						content: 'bar',
+					},
+					{type: 'joinAnd'},
+					{
+						type: 'phrase',
+						content: 'baz',
+					},
+				],
+			},
+		]);
+	});
+
+	it('should parse a compound phrase (and) + (and)', function() {
+		expect(polyglot.parse('(foo or bar) and (baz or quz or quuz)')).to.deep.equal([
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'foo',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'bar',
+					},
+				],
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'baz',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'quz',
+					},
+					{type: 'joinOr'},
+					{
+						type: 'phrase',
+						content: 'quuz',
+					},
+				],
+			},
+		]);
+	});
+
+	it('should parse Mesh terms (PubMed syntax)', function() {
+		expect(polyglot.parse('foo[mesh] and "bar baz"[mesh] and quz quuz[mesh]')).to.deep.equal([
+			{
+				type: 'mesh',
+				content: 'foo',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'mesh',
+				content: 'bar baz',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'mesh',
+				content: 'quz quuz',
+			},
+		]);
+	});
+
+	it('should parse Mesh terms (Ovid syntax)', function() {
+		expect(polyglot.parse('exp foo/ and exp bar baz/ and quz/ and quz quuz/')).to.deep.equal([
+			{
+				type: 'mesh',
+				content: 'foo',
+				recurse: true,
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'mesh',
+				content: 'bar baz',
+				recurse: true,
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'mesh',
+				content: 'quz',
+				recurse: false,
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'mesh',
+				content: 'quz quuz',
+				recurse: false,
+			},
+		]);
+	});
+
+	it('should identify field specific phrase objects (PubMed syntax)', function() {
+		expect(polyglot.parse('foo[tiab] and bar baz[tw] and quz[ab]')).to.deep.equal([
+			{
+				type: 'phrase',
+				field: 'title+abstract',
+				content: 'foo',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'phrase',
+				field: 'title',
+				content: 'bar baz',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'phrase',
+				field: 'abstract',
+				content: 'quz',
+			},
+		]);
+	});
+
+	it('should identify field specific phrase objects (Ovid syntax)', function() {
+		expect(polyglot.parse('foo.tw. and bar baz.pt. and quz.ab.')).to.deep.equal([
+			{
+				type: 'phrase',
+				field: 'title+abstract',
+				content: 'foo',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'phrase',
+				field: 'practiceGuideline',
+				content: 'bar baz',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'phrase',
+				field: 'abstract',
+				content: 'quz',
+			},
+		]);
+	});
+
+	it('should wrap lines as groups and preserve linefeeds', function() {
+		expect(polyglot.parse('foo near3 bar\n\nand\n\nbaz not quz')).to.deep.equal([
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'foo',
+					},
+					{
+						type: 'joinNear',
+						proximity: 3,
+					},
+					{
+						type: 'phrase',
+						content: 'bar',
+					},
+				],
+			},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{type: 'joinAnd'},
+			{
+				type: 'raw',
+				content: '\n\n',
+			},
+			{
+				type: 'group',
+				nodes: [
+					{
+						type: 'phrase',
+						content: 'baz',
+					},
+					{type: 'joinNot'},
+					{
+						type: 'phrase',
+						content: 'quz',
+					},
+				],
+			},
+		]);
+	});
+});

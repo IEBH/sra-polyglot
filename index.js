@@ -220,6 +220,161 @@ module.exports = {
 		return output;
 	},
 
+
+	/**
+	* Parse a given string into a lexical object tree
+	* This tree can then be recompiled via compile()
+	* @param {string} query The query string to compile. This can be multiline
+	* @param {Object} [options] Optional options to use when parsing
+	* @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
+	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
+	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
+	* @see compile()
+	*/
+	parse: function(query, options) {
+		var settings = _.defaults(options, {
+			groupLines: true,
+			groupLinesAlways: false,
+			preserveNewlines: true,
+		});
+
+		var q = query + ''; // Clone query
+		var tree = []; // Tree is the full parsed tree
+		var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
+		var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
+		var leaf = branch; // Leaf is the current leaf node
+
+		if (settings.groupLines) {
+			var lines = q.split('\n');
+			if (settings.groupLinesAlways || lines.length > 1) {
+				q = lines
+					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves
+					.map(line => _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) ? '(' + line + ')' : line)
+					.join('\n');
+			}
+		}
+
+		// Utility functions {{{
+		/**
+		* Trim previous leaf content if it has any text
+		* The leaf will be removed completely if it is now blank
+		*/
+		function trimLastLeaf() {
+			if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
+				leaf.content = leaf.content.substr(0, leaf.content.length - 1);
+				if (!leaf.content) branch.pop();
+			}
+		};
+		// }}}
+
+		while (q.length) {
+			var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
+			var match;
+
+			if (/^\(/.test(q)) {
+				var newBranch = {type: 'group', nodes: []};
+				branch.push(newBranch);
+				branchStack.push(branch);
+				branch = newBranch.nodes;
+				leaf = branch;
+			} else if (/^\)/.test(q)) {
+				branch = branchStack.pop();
+				leaf = branch;
+			} else if (match = /^and/i.exec(q)) {
+				trimLastLeaf();
+				branch.push({type: 'joinAnd'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^or/i.exec(q)) {
+				trimLastLeaf();
+				branch.push({type: 'joinOr'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^not/i.exec(q)) {
+				trimLastLeaf();
+				branch.push({type: 'joinNot'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^(near|adj|n)([0-9]+)/.exec(q)) {
+				trimLastLeaf();
+				branch.push({type: 'joinNear', proximity: _.toNumber(match[2])});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^\[mesh\]/i.exec(q)) { // Mesh term - PubMed syntax
+				leaf.type = 'mesh';
+				if (/^".*"$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (/^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
+				leaf.type = 'mesh';
+				leaf.recurse = true;
+				leaf.content = leaf.content.substr(4); // Remove 'exp ' prefix
+			} else if (/^\//.test(q) && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
+				leaf.type = 'mesh';
+				leaf.recurse = false;
+			} else if (match = /^(\n+)/.exec(q)) {
+				if (settings.preserveNewlines) {
+					branch.push({type: 'raw', content: match[0]});
+					leaf = undefined;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^\.(tw|ab|pt)\./i.exec(q)) { // Field specifier - Ovid syntax
+				switch (match[1].toLowerCase()) {
+					case 'ti':
+						leaf.field = 'title';
+						break;
+					case 'tw':
+						leaf.field = 'title+abstract';
+						break;
+					case 'ab':
+						leaf.field = 'abstract';
+						break;
+					case 'pt':
+						leaf.field = 'practiceGuideline';
+						break;
+					case 'fs':
+						leaf.field = 'floatingSubheading';
+						break;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^\[(tiab|tw|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
+				switch (match[1].toLowerCase()) {
+					case 'tw':
+						leaf.field = 'title';
+						break;
+					case 'tiab':
+						leaf.field = 'title+abstract';
+						break;
+					case 'ab':
+						leaf.field = 'abstract';
+						break;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else {
+				if (_.isUndefined(leaf) && q.substr(0, 1) != ' ') {
+					leaf = {type: 'phrase', content: q.substr(0,1)};
+					branch.push(leaf);
+				} else if (_.isArray(leaf) && q.substr(0, 1) != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
+					leaf = {type: 'phrase', content: q.substr(0, 1)};
+					branch.push(leaf);
+				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
+					leaf.content += q.substr(0, 1);
+				}
+			}
+
+			if (cropString) q = q.substr(1); // Crop 1 character
+		}
+
+		return tree;
+	},
+
 	/**
 	* Collection of supported engines
 	* Each engine should specify:
