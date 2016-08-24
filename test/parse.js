@@ -76,20 +76,23 @@ describe('Parse', function() {
 	});
 
 	it('should parse Mesh terms (PubMed syntax)', function() {
-		expect(polyglot.parse('foo[mesh] and "bar baz"[mesh] and quz quuz[mesh]')).to.deep.equal([
+		expect(polyglot.parse('foo[mesh] and "bar baz"[mesh:noexp] and quz quuz[mesh]')).to.deep.equal([
 			{
 				type: 'mesh',
 				content: 'foo',
+				recurse: true,
 			},
 			{type: 'joinAnd'},
 			{
 				type: 'mesh',
 				content: 'bar baz',
+				recurse: false,
 			},
 			{type: 'joinAnd'},
 			{
 				type: 'mesh',
 				content: 'quz quuz',
+				recurse: true,
 			},
 		]);
 	});
