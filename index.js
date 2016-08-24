@@ -249,53 +249,68 @@ module.exports = {
 			compile: function(tree) {
 				var compileWalker = function(tree) {
 					return tree
-						.map(function(branch) {
+						.map(function(branch, branchIndex) {
+							var buffer = '';
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										return (
+										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
 												branch.field == 'title' ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
 												'' // Unsupported field suffix for PubMed
-											)
-										);
+											);
 									} else {
-										return '(' + compileWalker(branch.nodes) + ')';
+										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
+									break;
 								case 'phrase':
 									if (branch.field) {
-										return (
+										buffer +=
 											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
 											(
 												(branch.field == 'title') ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
 												'' // Unsupported field suffix for PubMed
-											)
-										);
+											);
 									} else {
-										return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									}
-								case 'joinAnd':
-									return 'AND';
-								case 'joinOr':
-									return 'OR';
-								case 'joinNot':
-									return 'NOT';
+									break;
 								case 'joinNear':
-									return 'AND';
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
 								case 'mesh':
-									return (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									break;
 								case 'raw':
-									return branch.content;
+									buffer += branch.content;
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
 						})
-						.join(' ');
+						.join('');
 				};
 				return compileWalker(tree);
 			},
