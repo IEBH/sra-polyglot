@@ -184,7 +184,7 @@ module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\[(tiab|tw|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
+			} else if (match = /^\[(tiab|ti|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -195,11 +195,11 @@ module.exports = {
 				// }}}
 
 				switch (match[1].toLowerCase()) {
-					case 'tw':
-						useLeaf.field = 'title';
-						break;
 					case 'tiab':
 						useLeaf.field = 'title+abstract';
+						break;
+					case 'ti':
+						useLeaf.field = 'title';
 						break;
 					case 'ab':
 						useLeaf.field = 'abstract';
