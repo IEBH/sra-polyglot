@@ -1,6 +1,6 @@
 {
   "name": "sra-polyglot",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "CREBP-SRA tool to convert between different medical database search formats",
   "main": "index.js",
   "directories": {
