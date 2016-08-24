@@ -155,7 +155,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 			'AND\n\n' +
 			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n\n' +
 			'AND\n\n' +
-			'("Bacterial Infections"[Mesh] OR "Bacteria OR Bacterial")\n\n' +
+			'("Bacterial Infections"[Mesh] OR Bacteria OR Bacterial)\n\n' +
 			'AND\n\n' +
 			'("Anti-Bacterial Agents"[Mesh] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
