@@ -22,6 +22,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
+						recurse: true,
 						content: 'Primary Health Care',
 					},
 					{type: 'joinOr'},
@@ -60,6 +61,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
+						recurse: true,
 						content: 'Treatment Failure',
 					},
 					{type: 'joinOr'},
@@ -88,6 +90,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
+						recurse: true,
 						content: 'Bacterial Infections',
 					},
 					{type: 'joinOr'},
@@ -116,6 +119,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
+						recurse: true,
 						content: 'Anti-Bacterial Agents',
 					},
 					{type: 'joinOr'},
