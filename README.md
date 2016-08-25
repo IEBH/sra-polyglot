@@ -10,7 +10,7 @@ It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot
 ```javascript
 var polyglot = require('sra-polyglot');
 
-var queries =polyglot.translateAll('"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic');
+var queries = polyglot.translateAll('"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic');
 
 console.log(queries);
 ```
@@ -50,8 +50,8 @@ Plain-text phrases
 To search for basic phrases simply specify the words within the search term with or without being enclosed in speachmarks. Specific search fields can be specified by appending it to the term in any of the following supported formats:
 
 * `Term` (Generic search in all fields)
-* `Term[ti]` (PubMed field specification, also supported: `tiab`, `ti`, `ab`)
-* `Term.ti.` (Ovid MEDLINE field specification, also supported: `ti`, `ti,ab`, `tw`, `ab`, `pt`, `fs`, `sh`, `xm`)
+* `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `ab`)
+* `Term.ti.` (Ovid MEDLINE field specification, fields also supported: `ti`, `ti,ab`, `tw`, `ab`, `pt`, `fs`, `sh`, `xm`)
 
 
 Mesh Headings
@@ -109,9 +109,10 @@ group
 -----
 A sub-grouping of nodes. This represents a lexical parentheses level.
 
-| Property | Type | Description |
-| `field` | String Enum | The field to use for complex logical comparisons (see the `phrase` section for the full list) |
-| `nodes` | Array | Sub-nodes to include within the search group |
+| Property | Type        | Description                                                                                   |
+|----------|-------------|-----------------------------------------------------------------------------------------------|
+| `field`  | String Enum | The field to use for complex logical comparisons (see the `phrase` section for the full list) |
+| `nodes`  | Array       | Sub-nodes to include within the search group                                                  |
 
 
 joinAnd
@@ -123,7 +124,8 @@ joinNear
 -------
 A proximity join between the previous and next element.
 
-| Property | Type | Description |
+| Property    | Type   | Description                                                        |
+|-------------|--------|--------------------------------------------------------------------|
 | `proximity` | Number | The number of (usually) words to allow as a maximum proximity scan |
 
 
@@ -141,8 +143,9 @@ mesh
 ----
 A valid Mesh heading.
 
-| Property | Type | Description |
-| `content` | String | The Mesh heading to use |
+| Property  | Type    | Description                                                                                                                               |
+|-----------|---------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `content` | String  | The Mesh heading to use                                                                                                                   |
 | `recurse` | Boolean | Whether to recurse down child Mesh nodes when searching. This is only present if the input syntax supports it (Ovid MEDLINE specifically) |
 
 
@@ -150,10 +153,11 @@ phrase
 ------
 A simple text phrase.
 
-| Property | Type | Description |
-| `field` | String Enum: `title`, `abstract`, `title+abstract`, `practiceGuideline`, `floatingSubheading` | The field to use for simple phrase comparisons |
-| `content` | String | If specified the string of text to search for in the field specified by `context`. Cannot be used with `nodes` |
-| `nodes`   | Array | If specified points to a group of nodes used to compile the search expression to be searched in the field specified by `context`. The `nodes` structure must contain exactly 1 element and it must be of a group type. Cannot be used with `content` |
+| Property  | Type                                                                                          | Description                                                                                                                                                                                                                                          |
+|-----------|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `field`   | String Enum: `title`, `abstract`, `title+abstract`, `practiceGuideline`, `floatingSubheading` | The field to use for simple phrase comparisons                                                                                                                                                                                                       |
+| `content` | String                                                                                        | If specified the string of text to search for in the field specified by `context`. Cannot be used with `nodes`                                                                                                                                       |
+| `nodes`   | Array                                                                                         | If specified points to a group of nodes used to compile the search expression to be searched in the field specified by `context`. The `nodes` structure must contain exactly 1 element and it must be of a group type. Cannot be used with `content` |
 
 
 raw
@@ -162,5 +166,6 @@ A string of text that should be passed from the input to the output.
 This string can contain control characters such as line-feeds.
 
 
-| Property | Type | Description |
+| Property  | Type   | Description                    |
+|-----------|--------|--------------------------------|
 | `content` | String | The string of text to preserve |
