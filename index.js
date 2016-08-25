@@ -122,7 +122,7 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/i.exec(q))) {
+			} else if (afterWhitespace && (match = /^(near\/|near|adj|n)([0-9]+)/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;
@@ -632,7 +632,6 @@ var polyglot = module.exports = {
 									}
 									break;
 								case 'joinAnd':
-								case 'joinNear':
 									buffer += 'AND';
 									break;
 								case 'joinOr':
@@ -640,6 +639,9 @@ var polyglot = module.exports = {
 									break;
 								case 'joinNot':
 									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
 									buffer += "'" + branch.content + "'/exp";
@@ -711,7 +713,6 @@ var polyglot = module.exports = {
 									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									break;
 								case 'joinAnd':
-								case 'joinNear':
 									buffer += 'AND';
 									break;
 								case 'joinOr':
@@ -719,6 +720,9 @@ var polyglot = module.exports = {
 									break;
 								case 'joinNot':
 									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
 									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
