@@ -1,6 +1,6 @@
 var _ = require('lodash');
 
-module.exports = {
+var polyglot = module.exports = {
 	/**
 	* List of example search queries
 	* See tests/examples.js for the outputs in each case
@@ -19,23 +19,25 @@ module.exports = {
 	* This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
 	* @param {string} query The query to translate
 	* @param {string} engine The ID of the engine to use
+	* @param {Object} options Optional options structure to pass to the engine
 	* @return {string} The translated search query
 	*/
-	translate: function(query, engine) {
+	translate: function(query, engine, options) {
 		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
 		var tree = this.parse(query);
-		return this.engines[engine].compile(tree);
+		return this.engines[engine].compile(tree, options);
 	},
 
 	/**
 	* Translate the given query using all the supported engines
 	* @param {string} query The query to translate
+	* @param {Object} options Optional options structure to pass to each engine
 	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
 	*/
-	translateAll: function(query) {
+	translateAll: function(query, options) {
 		var output = {};
 		var tree = this.parse(query);
-		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree));
+		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree, options));
 		return output;
 	},
 
@@ -247,7 +249,24 @@ module.exports = {
 		pubmed: {
 			title: 'PubMed',
 			aliases: ['pubmed', 'p', 'pm', 'pubm'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to PubMed output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '*'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -330,7 +349,24 @@ module.exports = {
 		ovid: {
 			title: 'Ovid Medline',
 			aliases: ['ovid', 'o', 'ov'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to Ovid MEDLINE output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '$'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -415,7 +451,24 @@ module.exports = {
 		cochrane: {
 			title: 'Cochrane CENTRAL',
 			aliases: ['cochrane', 'c'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to Cochrane CENTRAL output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -526,7 +579,24 @@ module.exports = {
 		embase: {
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to Embase output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -610,7 +680,24 @@ module.exports = {
 		wos: {
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to Web of Science output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -702,7 +789,24 @@ module.exports = {
 		cinahl: {
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
-			compile: function(tree) {
+
+			/**
+			* Compile a tree structure to CINAHL output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
 				var compileWalker = function(tree) {
 					return tree
 						.map(function(branch, branchIndex) {
@@ -776,5 +880,54 @@ module.exports = {
 			},
 		},
 		// }}}
+	},
+
+
+	/**
+	* Collection of utility functions to apply common behaviour to a compiled tree
+	* @var {Object}
+	*/
+	tools: {
+		/**
+		* Apply a series of text replacements to every matching node object within a tree
+		* This function mutates tree
+		* @param {array} tree The tree sturcture to operate on
+		* @param {null|array} types Type filter to apply. If falsy all are used
+		* @param {array} replacements Array of replacements to apply. Each must be of the form `{subject: STRING|REGEXP, value: STRING|FUNCTION}`
+		* @return {array} The input tree element with the replacements applied
+		*/
+		replaceContent: function(tree, types, replacements) {
+			polyglot.tools.visit(tree, types, function(branch) {
+				if (!branch.content) return;
+				replacements.forEach(function(replacement) {
+					branch.content = branch.content.replace(replacement.subject, replacement.value);
+				});
+			});
+			return tree;
+		},
+
+		
+		/**
+		* Visit the given node types within a deeply nested tree and run a function
+		* This function may mutate the input tree depending on the actions of the callbacks
+		* @param {array} tree The tree sturcture to operate on
+		* @param {null|array} types Node filter to apply to (if falsy all are used)
+		* @param {function} callback The callback to call with each node
+		* @return {array} The input tree
+		*/
+		visit: function(tree, types, callback) {
+			var treeWalker = function(tree) {
+				tree.forEach(function(branch) {
+					// Fire callback if it matches
+					if (!types || _.includes(types, branch.type)) callback(branch);
+
+					// Walk down nodes if its a group
+					if (branch.type == 'group') treeWalker(branch.nodes);
+				});
+			};
+
+			treeWalker(tree);
+			return tree;
+		},
 	},
 };
