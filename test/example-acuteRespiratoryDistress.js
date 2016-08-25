@@ -4,18 +4,30 @@ var polyglot = require('..');
 
 describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
 	var example = _.find(polyglot.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
+	expect(example).to.be.an.object;
+	expect(example).to.have.property('query');
 
 	it('should compile the object tree correctly', function() {
 		/*
+		# Lung diseases or other infections
 		exp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.
 		AND
+
+		# Posture
 		exp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.
+
 		AND
+
+		# RCTs
 		((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)
 		*/
 		// Tree structure {{{
 		var tree = [
 			// Line 1 {{{
+			{
+				type: 'comment',
+				content: 'Lung diseases or other infections',
+			},
 			{
 				type: 'group',
 				nodes: [
@@ -380,6 +392,10 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 			},
 			// Line 2 {{{
 			{
+				type: 'comment',
+				content: 'Posture',
+			},
+			{
 				type: 'group',
 				nodes: [
 					{
@@ -655,6 +671,10 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 				content: '\n\n',
 			},
 			// Line 3 {{{
+			{
+				type: 'comment',
+				content: 'RCTs',
+			},
 			{
 				type: 'group',
 				nodes: [

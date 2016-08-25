@@ -4,6 +4,8 @@ var polyglot = require('..');
 
 describe('Example test "Failure of antibiotic prescribing for bacterial infections"', function() {
 	var example = _.find(polyglot.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
+	expect(example).to.be.an.object;
+	expect(example).to.have.property('query');
 
 	it('should parse the object tree correctly', function() {
 		/*
