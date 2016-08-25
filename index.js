@@ -24,7 +24,7 @@ var polyglot = module.exports = {
 	*/
 	translate: function(query, engine, options) {
 		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
-		var tree = this.parse(query);
+		var tree = this.parse(query, options);
 		return this.engines[engine].compile(tree, options);
 	},
 
@@ -36,7 +36,7 @@ var polyglot = module.exports = {
 	*/
 	translateAll: function(query, options) {
 		var output = {};
-		var tree = this.parse(query);
+		var tree = this.parse(query, options);
 		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree, options));
 		return output;
 	},
