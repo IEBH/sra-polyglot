@@ -1,187 +1,7 @@
 angular.module('ngPolyglot', []).service('Polyglot', function() {
 
-// Lodash extensions {{{
-_.mixin({
-	/**
-	* Wrap all non-logical non-empty lines in brackets
-	* @param string q The input query to wrap
-	* @return string The output query wrapped with brackets
-	*/
-	wrapLines: function(q) {
-		return q.split("\n").map(function(line) {
-			line = _.trim(line);
-			if (!line) return line; // Empty line
-			if (/^(AND|OR)$/i.test(line)) return line; // Logical line - dont wrap
-			return '(' + line + ')';
-		}).join("\n");
-	},
-
-	/**
-	* Replace UTF8 weirdness with speachmarks
-	* @param string q The input query to replace
-	* @return string The cleaned up query
-	*/
-	replaceJunk: function(q) {
-		return q.replace(/[“”«»„’']/g, '"');
-	},
-
-	/**
-	* Replace MeSH terms with the string specififed
-	* This function will also obey any engine specific overrides
-	* e.g.
-	*       "Something"[MESH] // Replaces in all instances
-	*       "Something|Embase=Something Else"[MESH] // Replaces as 'something' in most cases, 'something else' in Embase engine
-	*
-	* @param string query The incomming full query string (PubMed format)
-	* @param string replacement The replacement to apply ($1 is the original term)
-	* @param string engine The active engine object
-	* @return string The query string with replacements applied
-	*/
-	replaceMesh: function(q, replacement, engine) {
-		[
-			/"(.+?)"\[MESH\]/ig, // Pubmed style
-			/exp\s+(.+?)\//ig, // Ovid style
-		].forEach(function(re) {
-			q = q.replace(re, function(line, mesh) {
-				if (!/\|/.test(mesh)) {  // Simple replacement
-					return replacement.replace('$1', mesh);
-				} else { // Using rule set
-					var rules = {};
-					mesh.split(/\|/).forEach(function(term) {
-						var ruleSyntax = /^\s*(.+)\s*=\s*(.+)\s*$/.exec(term);
-						if (ruleSyntax) {
-							rules[ruleSyntax[1].toLowerCase()] = ruleSyntax[2];
-						} else {
-							rules['DEFAULT'] = term;
-						}
-					});
-					var matchingRule = _.find(engine.aliases, function(alias) {
-						return !! rules[alias];
-					});
-					if (matchingRule) { // There is a rule specific to this engine
-						return replacement.replace('$1', rules[matchingRule]);
-					} else if (rules['DEFAULT']) {
-						return replacement.replace('$1', rules['DEFAULT']);
-					} else {
-						return '';
-					}
-				}
-			});
-		});
-		return q;
-	},
-
-
-	/**
-	* Replace search fields for titles + abstracts
-	* e.g. "Something"[tiab] => "Something".tw.
-	* @param {string} q The query to operate on
-	* @param {string} engine The currently active engine
-	* @param {Object} options Additional options to parse
-	* @param {string} [options.title=ti] What to replace title based syntax with
-	* @param {string} [options.abstract=ab] What to replace abstract based syntax with
-	* @param {string} [options.titleAbstract=tiab] What to replace combined title + abstract based syntax with
-	* @param {string} [options.unknown=?] What to replace unknown filed syntax with
-	* @return {string} The query string with replacements applied
-	*/
-	replaceSearchFields: function(q, replacement, engine, options) {
-		var settings = _.defaults(options, {
-			title: 'ti',
-			abstract: 'ab',
-			titleAbstract: 'tiab',
-			unknown: '?',
-		});
-
-		[
-			/"(.+?)"\[(TIAB|TW|AB)\]/ig, // Pubmed style
-			/"(.+?)"\.(TW|TI|AB)\./ig, // Ovid style
-			/(AND |OR )(.+?)\[(TIAB|TW|AB)\]/ig, // Pubmed style without quote enclosure
-			/(AND |OR )(.+?)\.(TIAB|TW|AB)\./ig, // Ovid style without quote enclosure
-		].forEach(function(re) {
-			q = q.replace(re, function(line) {
-				var prefix, term, fields;
-				// If we are passed the optional prefix argument we need to stash that
-				if (arguments.length == 6) {
-					prefix = arguments[1];
-					term = arguments[2];
-					fields = arguments[3];
-				} else {
-					prefix = '';
-					term = arguments[1];
-					fields = arguments[2];
-				}
-
-				switch (fields.toLowerCase()) {
-					case 'ti':
-						fields = settings.title;
-						break;
-					case 'ab':
-						fields = settings.abstract;
-						break;
-					case 'tiab':
-					case 'tw':
-						fields = settings.titleAbstract;
-						break;
-					default:
-						fields = settings.unknown;
-				}
-
-				var out = replacement
-					.replace('$1', term)
-					.replace('$2', fields);
-
-				if (prefix) out = prefix + out; // Add optional prefix back, if any
-				return out;
-			});
-		});
-
-		return q.replace(/"{2,}/g, '"'); // Remove doubled up speachmarks (inserted during Ovid term rewrite above)
-	},
-
-
-	/**
-	* Replace adjacency markers
-	* e.g. Ovid 'NEAR3' => CENTRAL 'adj3'
-	* @param string q The query to operate on
-	* @param string engine The currently active engine
-	* @return string The query string with replacements applied
-	*/
-	replaceAdjacency: function(q, engine) {
-		[
-			/adj([0-9+]) /ig,
-			/NEAR([0-9+]) /ig,
-			/NEAR\/([0-9+]) /ig,
-		].forEach(function(re) {
-			q = q.replace(re, function(line, number) {
-				var out = engine.adjacency(engine, number);
-				return out ? out + ' ' : '';
-			});
-		});
-		return q;
-	},
-
-	/**
-	* Removes redundent speachmarks for single search terms
-	* e.g. "single"[tiab] => single[tiab]
-	*/
-	replaceRedundentEncasing: function(q, engine) {
-		return q.replace(/"([a-z0-9\-_]+?)"/ig, '$1');
-	},
-
-	/**
-	* Simple text replacer wrapped in lodash handlers
-	* This is really just STRING.replace() for lodash
-	* @param string query The query to operate on
-	* @param string|regexp search The search query to execute
-	* @param string|regexp replacement The replacement to apply
-	*/
-	replace: function(q, search, replacement) {
-		return q.replace(search, replacement);
-	},
-});
-// }}}
-
-return {
+var polyglot;
+return polyglot = {
 	/**
 	* List of example search queries
 	* See tests/examples.js for the outputs in each case
@@ -197,123 +17,537 @@ return {
 
 	/**
 	* Translate the given query using the given engine ID
+	* This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
 	* @param {string} query The query to translate
 	* @param {string} engine The ID of the engine to use
+	* @param {Object} options Optional options structure to pass to the engine
 	* @return {string} The translated search query
 	*/
-	translate: function(query, engine) {
-		var activeEngine = _.find(this.engines, {id: engine});
-		if (!activeEngine) throw new Error('Engine not found: ' + engine);
-		return activeEngine.rewriter.call(activeEngine, query + '');
+	translate: function(query, engine, options) {
+		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
+		var tree = this.parse(query, options);
+		return this.engines[engine].compile(tree, options);
 	},
 
 	/**
 	* Translate the given query using all the supported engines
 	* @param {string} query The query to translate
+	* @param {Object} options Optional options structure to pass to each engine
 	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
 	*/
-	translateAll: function(query) {
+	translateAll: function(query, options) {
 		var output = {};
-		this.engines.forEach(function(engine) {
-			output[engine.id] = engine.rewriter.call(engine, query + ''); // We need to clone the string to prevent side-effects with some engines
-		});
+		var tree = this.parse(query, options);
+		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree, options));
 		return output;
+	},
+
+
+	/**
+	* Parse a given string into a lexical object tree
+	* This tree can then be recompiled via each engines compile()
+	* @param {string} query The query string to compile. This can be multiline
+	* @param {Object} [options] Optional options to use when parsing
+	* @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
+	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
+	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
+	* @return {array} Array representing the parsed tree nodes
+	*/
+	parse: function(query, options) {
+		var settings = _.defaults(options, {
+			groupLines: true,
+			groupLinesAlways: false,
+			preserveNewlines: true,
+		});
+
+		var q = query + ''; // Clone query
+		var tree = {nodes: []}; // Tree is the full parsed tree
+		var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
+		var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
+		var lastGroup; // Optional reference to the previously created group (used to pin things)
+		var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
+		var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
+
+		if (settings.groupLines) {
+			var lines = q.split('\n');
+			if (settings.groupLinesAlways || lines.length > 1) {
+				q = lines
+					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves
+					.map(line => _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) ? '(' + line + ')' : line)
+					.join('\n');
+			}
+		}
+
+		// Utility functions {{{
+		/**
+		* Trim previous leaf content if it has any text
+		* The leaf will be removed completely if it is now blank
+		*/
+		function trimLastLeaf() {
+			if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
+				leaf.content = leaf.content.substr(0, leaf.content.length - 1);
+				if (!leaf.content) branch.nodes.pop();
+			}
+		};
+		// }}}
+
+		while (q.length) {
+			var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
+			var match;
+
+			if (/^\(/.test(q)) {
+				var newGroup = {type: 'group', nodes: []};
+				branch.nodes.push(newGroup);
+				branchStack.push(branch);
+				branch = newGroup;
+				leaf = branch.nodes;
+			} else if (/^\)/.test(q)) {
+				lastGroup = branch;
+				branch = branchStack.pop();
+				leaf = branch.nodes;
+			} else if (afterWhitespace && (match = /^and/i.exec(q))) {
+				trimLastLeaf();
+				branch.nodes.push({type: 'joinAnd'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (afterWhitespace && (match = /^or/i.exec(q))) {
+				trimLastLeaf();
+				branch.nodes.push({type: 'joinOr'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (afterWhitespace && (match = /^not/i.exec(q))) {
+				trimLastLeaf();
+				branch.nodes.push({type: 'joinNot'});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/i.exec(q))) {
+				trimLastLeaf();
+				branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
+				leaf = undefined;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^\[mesh(:NoExp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
+				leaf.type = 'mesh';
+				leaf.recurse = ! match[1];
+				if (/^".*"$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
+				leaf.type = 'mesh';
+				leaf.recurse = true;
+				leaf.content = leaf.content.substr(4); // Remove 'exp ' prefix
+			} else if (/^\//.test(q) && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
+				leaf.type = 'mesh';
+				leaf.recurse = false;
+			} else if (match = /^(\n+)/.exec(q)) {
+				if (settings.preserveNewlines) {
+					branch.nodes.push({type: 'raw', content: match[0]});
+					leaf = undefined;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+				afterWhitespace = true;
+			} else if ((match = /^\.(tw|ti|ab|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|pt|fs|sh|xm)/i.exec(q))) { // Field specifier - Ovid syntax
+				// Figure out the leaf to use (usually the last one) or the previously used group {{{
+				var useLeaf;
+				if (_.isObject(leaf) && leaf.type == 'phrase') {
+					useLeaf = leaf;
+				} else if (_.isArray(leaf) && lastGroup) {
+					useLeaf = lastGroup;
+				}
+				// }}}
+
+				switch (match[1].toLowerCase()) {
+					case 'ti':
+						useLeaf.field = 'title';
+						break;
+					case 'ti,ab':
+					case 'tw':
+						useLeaf.field = 'title+abstract';
+						break;
+					case 'ab':
+						useLeaf.field = 'abstract';
+						break;
+					case 'pt':
+						useLeaf.field = 'practiceGuideline';
+						break;
+					case 'fs':
+						useLeaf.field = 'floatingSubheading';
+						break;
+					case 'sh':
+						useLeaf.type = 'mesh';
+						useLeaf.recurse = false;
+						break;
+					case 'xm':
+						useLeaf.type = 'mesh';
+						useLeaf.recurse = true;
+						break;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if (match = /^\[(tiab|ti|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
+				// Figure out the leaf to use (usually the last one) or the previously used group {{{
+				var useLeaf;
+				if (_.isObject(leaf) && leaf.type == 'phrase') {
+					useLeaf = leaf;
+				} else if (_.isArray(leaf) && lastGroup) {
+					useLeaf = lastGroup;
+				}
+				// }}}
+
+				switch (match[1].toLowerCase()) {
+					case 'tiab':
+						useLeaf.field = 'title+abstract';
+						break;
+					case 'ti':
+						useLeaf.field = 'title';
+						break;
+					case 'ab':
+						useLeaf.field = 'abstract';
+						break;
+				}
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else {
+				var nextChar = q.substr(0, 1);
+				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
+					if (nextChar == '"' && (match = /^"(.*?)"/.exec(q))) { // First character is a speachmark - slurp until we see the next one
+						leaf = {type: 'phrase', content: match[1]};
+						branch.nodes.push(leaf);
+						q = q.substr(match[0].length);
+						cropString = false;
+					} else { // All other first chars - just dump into a buffer and let it fill slowly
+						leaf = {type: 'phrase', content: nextChar};
+						branch.nodes.push(leaf);
+					}
+				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
+					leaf.content += nextChar;
+				}
+				afterWhitespace = (!afterWhitespace && nextChar == ' ');
+			}
+
+			if (cropString) q = q.substr(1); // Crop 1 character
+		}
+
+		return tree.nodes;
 	},
 
 	/**
 	* Collection of supported engines
 	* Each engine should specify:
-	* 	id - The unique ID of each engine
-	*	alias - Supported alternative names for each engine
 	*	title - Human readable name of the engine
-	*	rewriter - function that takes a query and returns the syntax translation
-	*	linker - optional function that takes a query and provides the direct searching method
-	*	adjacency - supported adjacency format for the given engine
+	*	aliases - Alternative names for each engine
+	*	compile() - function that takes a parsed tree array and returns a string
+	*	open() - optional function that takes a query and provides the direct searching method
+	*	debugging - optional boolean specifying that the engine is for debugging purposes only
 	*
 	* @var {array}
 	*/
-	engines: [
+	engines: {
 		// PubMed {{{
-		{
-			id: 'pubmed',
-			aliases: ['pubmed', 'p', 'pm', 'pubm'],
+		pubmed: {
 			title: 'PubMed',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('"$1"[MESH]', this)
-					.replaceSearchFields('"$1"[$2]', this, {title: 'ti', abstract: 'ab', titleAbstract: 'tiab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+			aliases: ['pubmed', 'p', 'pm', 'pubm'],
+
+			/**
+			* Compile a tree structure to PubMed output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '*'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										buffer +=
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? '[ti]' :
+												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'title+abstract' ? '[tiab]' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer +=
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												(branch.field == 'title') ? '[ti]' :
+												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'title+abstract' ? '[tiab]' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+									break;
+								case 'joinNear':
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'mesh':
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'GET',
 					action: 'https://www.ncbi.nlm.nih.gov/pubmed',
 					fields: {
-						term: engine.query,
+						term: query,
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return '';
 			},
 		},
 		// }}}
 		// Ovid Medline {{{
-		{
-			id: 'ovid',
-			aliases: ['ovid', 'o', 'ov'],
+		ovid: {
 			title: 'Ovid Medline',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('exp $1/', this)
-					.replaceSearchFields('"$1".$2.', this, {title: 'ti', abstract: 'ab', titleAbstract: 'tw'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+			aliases: ['ovid', 'o', 'ov'],
+
+			/**
+			* Compile a tree structure to Ovid MEDLINE output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '$'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										buffer +=
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer +=
+											branch.content +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											)
+									} else {
+										buffer += branch.content;
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'ADJ' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
 					fields: {
-						textBox: engine.query,
+						textBox: query,
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return 'adj' + number;
 			},
 		},
 		// }}}
 		// Cochrane CENTRAL {{{
-		{
-			id: 'cochrane',
-			aliases: ['cochrane', 'c'],
+		cochrane: {
 			title: 'Cochrane CENTRAL',
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replaceMesh('[mh "$1"]', this)
-					.replaceSearchFields('"$1":$2', this, {title: 'ti', abstract: 'ab', titleAbstract: 'ti,ab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+			aliases: ['cochrane', 'c'],
+
+			/**
+			* Compile a tree structure to Cochrane CENTRAL output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										buffer +=
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer +=
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += '[mh ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
 					fields: {
 						'submitSearch': 'Go',
 						'searchRows[0].searchCriterias[0].fieldRestriction': null,
-						'searchRows[0].searchCriterias[0].term': engine.query,
+						'searchRows[0].searchCriterias[0].term': query,
 						'searchRows[0].searchOptions.searchProducts': null,
 						'searchRows[0].searchOptions.searchStatuses': null,
 						'searchRows[0].searchOptions.searchType': 'All',
@@ -341,59 +575,177 @@ return {
 					}
 				};
 			},
-			adjacency: function(engine, number) {
-				return 'NEAR' + number;
-			},
 		},
 		// }}}
 		// Embase {{{
-		{
-			id: 'embase',
+		embase: {
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace("'", '')
-					.replaceMesh("'$1'/exp", this)
-					.replaceSearchFields('"$1":$2', this, {title: 'ti', abstract: 'ab', titleAbstract: 'ti,ab'})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+
+			/**
+			* Compile a tree structure to Embase output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									if (branch.field) {
+										buffer +=
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer +=
+											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+									break;
+								case 'joinAnd':
+								case 'joinNear':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'mesh':
+									buffer += "'" + branch.content + "'/exp";
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'GET',
 					action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
 					fields: {
 						sb: 'y',
-						search_query: engine.query.replace(/\n+/g, ' '),
+						search_query: query.replace(/\n+/g, ' '),
 					},
 				};
-			},
-			adjacency: function(engine, number) {
-				return 'NEAR/' + number;
 			},
 		},
 		// }}}
 		// Web of Science {{{
-		{
-			id: 'webofscience',
+		wos: {
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace(/"(.+?)"\[MESH\] (AND|OR) /ig, '')
-					.replace(/"(.+?)"\[MESH\]/ig, '')
-					.replaceSearchFields('', this, {})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+
+			/**
+			* Compile a tree structure to Web of Science output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'phrase':
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									break;
+								case 'joinAnd':
+								case 'joinNear':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'mesh':
+									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
@@ -410,7 +762,7 @@ return {
 						input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
 						sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
 						formUpdated: 'true',
-						'value(input1)': engine.query,
+						'value(input1)': query,
 						'value(select1)': 'TS',
 						x: '798',
 						y: '311',
@@ -433,42 +785,233 @@ return {
 					},
 				};
 			},
-			adjacency: function(engine, number) {
-				return '';
-			},
 		},
 		// }}}
 		// CINAHL {{{
-		{
-			id: 'cinahl',
+		cinahl: {
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
-			rewriter: function(q) {
-				return _(q)
-					.wrapLines()
-					.replaceJunk()
-					.replace("'", '')
-					.replaceMesh('(MH "$1+")', this)
-					// FIXME: TIAB =~ TI term AND AB term
-					.replaceSearchFields('$2 "$1"', this, {title: 'ti', abstract: 'ab', titleAbstract: ''})
-					.replaceAdjacency(this)
-					.replaceRedundentEncasing(this)
-					.value();
+
+			/**
+			* Compile a tree structure to CINAHL output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '?'},
+				]);
+
+				var compileWalker = function(tree) {
+					return tree
+						.map(function(branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'phrase':
+									if (branch.field && branch.field == 'title+abstract') {
+										buffer +=
+											'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											' ' +
+											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									} else if (branch.field) {
+										buffer +=
+											(
+												branch.field == 'title' ? 'TI' :
+												branch.field == 'abstract' ? 'AB' :
+												'??' // Unsupported field suffix for PubMed
+											)
+											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									} else {
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'N' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += '(MH "' + branch.content + '+")';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branchIndex == tree.length-1 || // or the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									? '' : ' '
+								);
+						})
+						.join('');
+				};
+				return compileWalker(tree);
 			},
-			linker: function(engine) {
+			open: function(query) {
 				return {
 					method: 'POST',
 					action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
 					fields: {
-						bquery: engine.query,
+						bquery: query,
 					},
 				};
 			},
-			adjacency: function(engine, number) {
-				return 'N' + number;
+		},
+		// }}}
+		// Lexical tree (JSON) {{{
+		lexicalTreeJSON: {
+			title: 'Lexical Tree (JSON)',
+			aliases: ['debug'],
+			debugging: true, // Mark this module for debugging only
+
+			/**
+			* Compile a tree structure to JSON output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					prettyPrint: true,
+				});
+
+				if (settings.prettyPrint) {
+					return JSON.stringify(tree, null, '\t');
+				} else {
+					return JSON.stringify(tree);
+				}
 			},
 		},
 		// }}}
-	],
+		// Lexical tree (Human Readable) {{{
+		lexicalTreeHuman: {
+			title: 'Lexical Tree (Human Readable)',
+			aliases: ['debug'],
+			debugging: true, // Mark this module for debugging only
+
+			/**
+			* Compile a tree structure to a passably human readable tree
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var compileWalker = function(tree, level) {
+					return tree
+						.map(function(branch) {
+							var buffer = _.repeat('  ', level) + '- ';
+							switch (branch.type) {
+								case 'group':
+									buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
+									buffer += compileWalker(branch.nodes, level +1);
+									break;
+								case 'phrase':
+									buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
+									break;
+								case 'joinNear':
+									buffer += 'NEAR' + branch.proximity;
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT'
+									break;
+								case 'mesh':
+									buffer += 'MESH("' + branch.content + '")';
+									break;
+								case 'raw':
+									buffer += 'RAW(' + branch.content.length + ' bytes)';
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer;
+						})
+						.join('\n');
+				};
+				return compileWalker(tree, 0);
+			},
+		},
+		// }}}
+	},
+
+
+	/**
+	* Collection of utility functions to apply common behaviour to a compiled tree
+	* @var {Object}
+	*/
+	tools: {
+		/**
+		* Apply a series of text replacements to every matching node object within a tree
+		* This function mutates tree
+		* @param {array} tree The tree sturcture to operate on
+		* @param {null|array} types Type filter to apply. If falsy all are used
+		* @param {array} replacements Array of replacements to apply. Each must be of the form `{subject: STRING|REGEXP, value: STRING|FUNCTION}`
+		* @return {array} The input tree element with the replacements applied
+		*/
+		replaceContent: function(tree, types, replacements) {
+			polyglot.tools.visit(tree, types, function(branch) {
+				if (!branch.content) return;
+				replacements.forEach(function(replacement) {
+					branch.content = branch.content.replace(replacement.subject, replacement.value);
+				});
+			});
+			return tree;
+		},
+
+		
+		/**
+		* Visit the given node types within a deeply nested tree and run a function
+		* This function may mutate the input tree depending on the actions of the callbacks
+		* @param {array} tree The tree sturcture to operate on
+		* @param {null|array} types Node filter to apply to (if falsy all are used)
+		* @param {function} callback The callback to call with each node
+		* @return {array} The input tree
+		*/
+		visit: function(tree, types, callback) {
+			var treeWalker = function(tree) {
+				tree.forEach(function(branch) {
+					// Fire callback if it matches
+					if (!types || _.includes(types, branch.type)) callback(branch);
+
+					// Walk down nodes if its a group
+					if (branch.type == 'group') treeWalker(branch.nodes);
+				});
+			};
+
+			treeWalker(tree);
+			return tree;
+		},
+	},
 };
 });
