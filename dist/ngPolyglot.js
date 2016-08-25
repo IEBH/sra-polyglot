@@ -9,7 +9,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
   * See tests/examples.js for the outputs in each case
   * @var {array}
   */
-		examples: [{ title: 'Failure of antibiotic prescribing for bacterial infections', query: '"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic' }, { title: 'Clinical prediction guides for whiplash', query: '"Neck"[Mesh] OR Neck OR Necks OR "Cervical Vertebrae"[Mesh] OR "Cervical Vertebrae" OR "Neck Muscles"[Mesh] OR "Neck Muscles" OR "Neck Injuries"[Mesh] OR "Whiplash Injuries"[Mesh] OR "Radiculopathy"[Mesh] OR "Neck Injuries" OR "Neck Injury" OR Whiplash OR Radiculopathies OR Radiculopathy\n\n AND\n\n "Pain"[Mesh] OR Pain OR Pains OR Aches OR Ache OR Sore\n\n AND\n\n "Decision Support Techniques"[Mesh] OR "Predictive Value of Tests"[Mesh] OR "Observer Variation"[Mesh] OR Decision Support OR Decision Aids OR Decision Aid OR Decision Analysis OR Decision Modeling OR Decision modelling OR Prediction OR Predictions OR Predictor OR Predicting OR Predicted' }, { title: 'Prevalence of Thyroid Disease in Australia', query: '"Thyroid Diseases"[Mesh] OR "Thyroid diseases" OR "Thyroid disease" OR "Thyroid disorder" OR "Thyroid disorders" OR Goiter OR Goitre OR Hypothyroidism OR Hyperthyroidism OR Thyroiditis OR "Graves disease" OR Hyperthyroxinemia OR Thyrotoxicosis OR  "Thyroid dysgenesis" OR "Thyroid cancer" OR "Thyroid cancers" OR "Thyroid neoplasm" OR "Thyroid neoplasms" OR "Thyroid nodule" OR "Thyroid nodules" OR "Thyroid tumor" OR "Thyroid tumour" OR "Thyroid tumors" OR "Thyroid tumours" OR "Thyroid cyst" OR "Thyroid cysts" OR "Cancer of the thyroid"\n\n AND\n\n "Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR "Prevalence" OR "Prevalences" OR Epidemiology OR Epidemiological\n\n AND\n\n "Australia"[Mesh] OR Australia OR Australian OR Australasian OR Australasia OR Queensland OR Victoria OR "New South Wales" OR "Northern Territory"' }, { title: 'Prevalence of incidental thyroid cancer: A systematic review of autopsy studies', query: '(("Thyroid Neoplasms"[Mesh] OR "Adenocarcinoma, Follicular"[Mesh] OR "Adenocarcinoma, Papillary"[Mesh] OR OPTC)) OR (((Thyroid OR Follicular OR Papillary OR hurtle cell)) AND (cancer OR cancers OR carcinoma OR carcinomas OR Adenocarcinoma OR Adenocarcinomas neoplasm OR neoplasms OR nodule OR nodules OR tumor OR tumour OR Tumors OR Tumours OR cyst OR cysts))\n\nAND\n\n"Autopsy"[Mesh] OR "Autopsy" OR "Autopsies" OR Postmortem OR Post-mortem OR (Post AND mortem)\n\nAND\n\n"Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR Prevalence OR Prevalences OR Epidemiology OR Epidemiological OR Frequency\n\nAND\n\n"Incidental Findings"[Mesh] OR Incidental OR Unsuspected OR Discovery OR Discoveries OR Findings OR Finding OR Occult OR Hidden' }, { title: 'Positioning for acute respiratory distress in hospitalised infants and children', query: 'exp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.\n\nAND\n\nexp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.\n\nAND\n\n((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)' }],
+		examples: [{ title: 'Failure of antibiotic prescribing for bacterial infections', query: '"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic' }, { title: 'Clinical prediction guides for whiplash', query: '"Neck"[Mesh] OR Neck OR Necks OR "Cervical Vertebrae"[Mesh] OR "Cervical Vertebrae" OR "Neck Muscles"[Mesh] OR "Neck Muscles" OR "Neck Injuries"[Mesh] OR "Whiplash Injuries"[Mesh] OR "Radiculopathy"[Mesh] OR "Neck Injuries" OR "Neck Injury" OR Whiplash OR Radiculopathies OR Radiculopathy\n\n AND\n\n "Pain"[Mesh] OR Pain OR Pains OR Aches OR Ache OR Sore\n\n AND\n\n "Decision Support Techniques"[Mesh] OR "Predictive Value of Tests"[Mesh] OR "Observer Variation"[Mesh] OR Decision Support OR Decision Aids OR Decision Aid OR Decision Analysis OR Decision Modeling OR Decision modelling OR Prediction OR Predictions OR Predictor OR Predicting OR Predicted' }, { title: 'Prevalence of Thyroid Disease in Australia', query: '"Thyroid Diseases"[Mesh] OR "Thyroid diseases" OR "Thyroid disease" OR "Thyroid disorder" OR "Thyroid disorders" OR Goiter OR Goitre OR Hypothyroidism OR Hyperthyroidism OR Thyroiditis OR "Graves disease" OR Hyperthyroxinemia OR Thyrotoxicosis OR  "Thyroid dysgenesis" OR "Thyroid cancer" OR "Thyroid cancers" OR "Thyroid neoplasm" OR "Thyroid neoplasms" OR "Thyroid nodule" OR "Thyroid nodules" OR "Thyroid tumor" OR "Thyroid tumour" OR "Thyroid tumors" OR "Thyroid tumours" OR "Thyroid cyst" OR "Thyroid cysts" OR "Cancer of the thyroid"\n\n AND\n\n "Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR "Prevalence" OR "Prevalences" OR Epidemiology OR Epidemiological\n\n AND\n\n "Australia"[Mesh] OR Australia OR Australian OR Australasian OR Australasia OR Queensland OR Victoria OR "New South Wales" OR "Northern Territory"' }, { title: 'Prevalence of incidental thyroid cancer: A systematic review of autopsy studies', query: '(("Thyroid Neoplasms"[Mesh] OR "Adenocarcinoma, Follicular"[Mesh] OR "Adenocarcinoma, Papillary"[Mesh] OR OPTC)) OR (((Thyroid OR Follicular OR Papillary OR hurtle cell)) AND (cancer OR cancers OR carcinoma OR carcinomas OR Adenocarcinoma OR Adenocarcinomas neoplasm OR neoplasms OR nodule OR nodules OR tumor OR tumour OR Tumors OR Tumours OR cyst OR cysts))\n\nAND\n\n"Autopsy"[Mesh] OR "Autopsy" OR "Autopsies" OR Postmortem OR Post-mortem OR (Post AND mortem)\n\nAND\n\n"Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR Prevalence OR Prevalences OR Epidemiology OR Epidemiological OR Frequency\n\nAND\n\n"Incidental Findings"[Mesh] OR Incidental OR Unsuspected OR Discovery OR Discoveries OR Findings OR Finding OR Occult OR Hidden' }, { title: 'Positioning for acute respiratory distress in hospitalised infants and children', query: '# Lung diseases or other infections\nexp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.\n\nAND\n\n# Posture\nexp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.\n\nAND\n\n# RCTs\n((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)' }],
 
 		/**
   * Translate the given query using the given engine ID
@@ -69,9 +69,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				var lines = q.split('\n');
 				if (settings.groupLinesAlways || lines.length > 1) {
 					q = lines
-					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves
+					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
 					.map(function (line) {
-						return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) ? '(' + line + ')' : line;
+						return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
 					}).join('\n');
 				}
 			}
@@ -121,7 +121,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^(near|adj|n)([0-9]+)/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)([0-9]+)/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNear', proximity: _.toNumber(match[2]) });
 					leaf = undefined;
@@ -212,6 +212,12 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							useLeaf.field = 'abstract';
 							break;
 					}
+					q = q.substr(match[0].length);
+					cropString = false;
+				} else if (match = /^#(.*?)[)\n]/.exec(q)) {
+					trimLastLeaf();
+					branch.nodes.push({ type: 'comment', content: _.trim(match[1]) });
+					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
 				} else {
@@ -309,6 +315,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								case 'raw':
 									buffer += branch.content;
 									break;
+								case 'comment':
+									// Do nothing
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
@@ -392,6 +401,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								case 'raw':
 									buffer += branch.content;
 									break;
+								case 'comment':
+									// Do nothing
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
@@ -474,6 +486,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'raw':
 									buffer += branch.content;
+									break;
+								case 'comment':
+									// Do nothing
 									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
@@ -567,7 +582,6 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									}
 									break;
 								case 'joinAnd':
-								case 'joinNear':
 									buffer += 'AND';
 									break;
 								case 'joinOr':
@@ -576,11 +590,17 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								case 'joinNot':
 									buffer += 'NOT';
 									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
+									break;
 								case 'mesh':
 									buffer += "'" + branch.content + "'/exp";
 									break;
 								case 'raw':
 									buffer += branch.content;
+									break;
+								case 'comment':
+									// Do nothing
 									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
@@ -639,7 +659,6 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
 									break;
 								case 'joinAnd':
-								case 'joinNear':
 									buffer += 'AND';
 									break;
 								case 'joinOr':
@@ -648,11 +667,17 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								case 'joinNot':
 									buffer += 'NOT';
 									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
+									break;
 								case 'mesh':
 									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
 									break;
 								case 'raw':
 									buffer += branch.content;
+									break;
+								case 'comment':
+									// Do nothing
 									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
@@ -765,6 +790,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								case 'raw':
 									buffer += branch.content;
 									break;
+								case 'comment':
+									// Do nothing
+									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
 							}
@@ -857,6 +885,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'raw':
 									buffer += 'RAW(' + branch.content.length + ' bytes)';
+									break;
+								case 'comment':
+									buffer += 'COMMENT("' + branch.content + '")';
 									break;
 								default:
 									throw new Error('Unsupported object tree type: ' + branch.type);
