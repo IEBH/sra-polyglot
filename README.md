@@ -4,6 +4,8 @@ This module is part of the [Bond University Centre for Research in Evidence-Base
 
 When given a complex search query in either PubMed or Ovid MEDLINE format it will attempt to translate it to any of the supported search engine formats.
 
+It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot) module of the [Systematic Review Accelerator](http://crebp-sra.com).
+
 
 ```javascript
 var polyglot = require('sra-polyglot');
@@ -29,10 +31,79 @@ Will output an object structure like:
 See the JSDoc of the [inline code](index.js) for more details on the supported APIs.
 
 
+Search Syntax
+=============
+A search query can be specified in either PubMed query format, Ovid MEDLINE format or a mix of the two. Most of the usual search query syntax will be supported by Polyglot by default.
+
+The following sub-headings break down each individual syntax.
+
+**General notes**:
+
+* Generally you can use either PubMed or Ovid MEDLINE query syntax without any issue
+* By default queries on their own line will be automatically enclosed in brackets
+* Multiple terms can be grouped using speachmarks but this is optional
+* [Comments](#comments) can be specified to make your search strategy easier to read in future
+
+
+Plain-text phrases
+------------------
+To search for basic phrases simply specify the words within the search term with or without being enclosed in speachmarks. Specific search fields can be specified by appending it to the term in any of the following supported formats:
+
+* `Term` (Generic search in all fields)
+* `Term[ti]` (PubMed field specification, also supported: `tiab`, `ti`, `ab`)
+* `Term.ti.` (Ovid MEDLINE field specification, also supported: `ti`, `ti,ab`, `tw`, `ab`, `pt`, `fs`, `sh`, `xm`)
+
+
+Mesh Headings
+-------------
+To search for a supported Mesh term use any of the following:
+
+* `Term[Mesh]` (exploded Mesh heading, PubMed format)
+* `Term[Mesh:NoExp]` (non-exploded Mesh heading, PubMed format)
+* `exp Term/` (exploded Mesh heading, Ovid MEDLINE format #1)
+* `Term/` (non-exploded Mesh heading, Ovid MEDLINE format #1)
+* `Term.xm.` (exploded Mesh heading, Ovid MEDLINE format #2)
+* `Term.sh.` (non-exploded Mesh heading, Ovid MEDLINE format #2)
+
+
+Logical Syntax
+--------------
+Any of the following keywords can be used to join multiple phrases together:
+
+* `Term1 AND Term2`
+* `Term1 OR Term2`
+* `Term1 NOT Term2`
+* `(Term1 OR Term2) AND (Term3 OR Term4)` (logical grouping using brackets)
+
+All keywords are case insensitive (i.e. `and` works the same as `AND` or `And`).
+
+
+Proximity searching
+-------------------
+Similar to [Logical Syntax](#logical-syntax), proximity searching allows the searching of a secondary term within the range of the primary:
+
+* `Term1 ADJ3 Term2` (Search for `Term2` within 3 words of `Term1`, Ovid MEDLINE format)
+* `Term1 NEAR3 Term2` (Search for `Term2` within 3 words of `Term1`, Cochrane CENTRAL format)
+* `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, CINAHL format)
+* `Term1 NEAR/3 Term2` (Search for `Term2` within 3 words of `Term1`, Embase and Web of Science formats)
+
+
+Comments
+--------
+Comments allow you to add notes within your search strategy which will be removed from the output.
+These allow you to write your query in a human-readable way without effecting the output in each search engine.
+
+To use comments simply add a hash character (`#`) anywhere on a line. Any text *after* that character will be ignored until the next line.
+
 
 Parsed Tree Object
 ==================
-Each of the following sub-sections describes a node which can be contained within the compiled tree.
+This section is only intended for people who are interested in the inner working of the parsing tree used by Polyglot.
+
+Each of the following sub-sections describes a node which can be contained within the compiled tree returned by `Polyglot.parse(query)`.
+
+The result tree can then be fed into `Polyglot.engines.ENGINE.compile(tree)` to return the translated search.
+
 
 group
 -----
@@ -88,7 +159,7 @@ A simple text phrase.
 raw
 ---
 A string of text that should be passed from the input to the output.
-This string can contain control characters line linefeeds.
+This string can contain control characters such as line-feeds.
 
 
 | Property | Type | Description |
