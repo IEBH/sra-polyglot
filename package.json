@@ -1,6 +1,6 @@
 {
   "name": "sra-polyglot",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "CREBP-SRA tool to convert between different medical database search formats",
   "main": "index.js",
   "directories": {
@@ -29,8 +29,11 @@
   },
   "homepage": "https://github.com/CREBP/polyglot#readme",
   "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-inject-string": "^1.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",

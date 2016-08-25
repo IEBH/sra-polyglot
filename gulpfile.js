@@ -1,3 +1,4 @@
+var babel = require('gulp-babel');
 var gulp = require('gulp');
 var inject = require('gulp-inject-string');
 var rename = require('gulp-rename');
@@ -11,5 +12,6 @@ gulp.task('build', function () {
 		.pipe(inject.wrap('angular.module(\'ngPolyglot\', []).service(\'Polyglot\', function() {\n', '});'))
 		.pipe(replace(/^.*require\(.*\);\s+$/gm, ''))
 		.pipe(replace(/^var polyglot = .+$/m, 'var polyglot;\nreturn polyglot = {'))
+		.pipe(babel({presets: ['es2015']}))
 		.pipe(gulp.dest('./dist'));
 });
