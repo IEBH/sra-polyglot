@@ -241,6 +241,7 @@ var polyglot = module.exports = {
 	*	aliases - Alternative names for each engine
 	*	compile() - function that takes a parsed tree array and returns a string
 	*	open() - optional function that takes a query and provides the direct searching method
+	*	debugging - optional boolean specifying that the engine is for debugging purposes only
 	*
 	* @var {array}
 	*/
@@ -877,6 +878,87 @@ var polyglot = module.exports = {
 						bquery: query,
 					},
 				};
+			},
+		},
+		// }}}
+		// Lexical tree (JSON) {{{
+		lexicalTreeJSON: {
+			title: 'Lexical Tree (JSON)',
+			aliases: ['debug'],
+			debugging: true, // Mark this module for debugging only
+
+			/**
+			* Compile a tree structure to JSON output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					prettyPrint: true,
+				});
+
+				if (settings.prettyPrint) {
+					return JSON.stringify(tree, null, '\t');
+				} else {
+					return JSON.stringify(tree);
+				}
+			},
+		},
+		// }}}
+		// Lexical tree (Human Readable) {{{
+		lexicalTreeHuman: {
+			title: 'Lexical Tree (Human Readable)',
+			aliases: ['debug'],
+			debugging: true, // Mark this module for debugging only
+
+			/**
+			* Compile a tree structure to a passably human readable tree
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @return {string} The compiled output
+			*/
+			compile: function(tree, options) {
+				var compileWalker = function(tree, level) {
+					return tree
+						.map(function(branch) {
+							var buffer = _.repeat('  ', level) + '- ';
+							switch (branch.type) {
+								case 'group':
+									buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
+									buffer += compileWalker(branch.nodes, level +1);
+									break;
+								case 'phrase':
+									buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
+									break;
+								case 'joinNear':
+									buffer += 'NEAR' + branch.proximity;
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT'
+									break;
+								case 'mesh':
+									buffer += 'MESH("' + branch.content + '")';
+									break;
+								case 'raw':
+									buffer += 'RAW(' + branch.content.length + ' bytes)';
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer;
+						})
+						.join('\n');
+				};
+				return compileWalker(tree, 0);
 			},
 		},
 		// }}}
