@@ -43,6 +43,7 @@ The following sub-headings break down each individual syntax.
 * By default queries on their own line will be automatically enclosed in brackets
 * Multiple terms can be grouped using speachmarks but this is optional
 * [Comments](#comments) can be specified to make your search strategy easier to read in future
+* [Templates](#templates) are supported allowing inserts of compound search terms which can be specific to different output engines
 
 
 Plain-text phrases
@@ -169,3 +170,17 @@ This string can contain control characters such as line-feeds.
 | Property  | Type   | Description                    |
 |-----------|--------|--------------------------------|
 | `content` | String | The string of text to preserve |
+
+
+template
+--------
+A meta template specified which Polyglot will insert into the output correctly based on the search engine.
+
+These are specified using the `<Template ID>` syntax.
+
+For example the "RCT Filter" template (specified via `<RCT Filter>` in Polglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the synax based on the output engine.
+
+
+| Property  | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| `content` | String | The lower-case version of the template ID to use |

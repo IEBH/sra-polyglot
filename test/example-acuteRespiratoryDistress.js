@@ -19,7 +19,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 		AND
 
 		# RCTs
-		((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)
+		<RCT Filter>
 		*/
 		// Tree structure {{{
 		var tree = [
@@ -679,84 +679,8 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 				type: 'group',
 				nodes: [
 					{
-						type: 'group',
-						nodes: [
-							{
-								type: 'group',
-								field: 'practiceGuideline',
-								nodes: [
-									{
-										type: 'phrase',
-										content: 'randomized controlled trial',
-									},
-									{type: 'joinOr'},
-									{
-										type: 'phrase',
-										content: 'controlled clinical trial',
-									},
-								],
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'randomized',
-								field: 'abstract',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'randomised',
-								field: 'abstract',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'placebo',
-								field: 'abstract',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'drug therapy',
-								field: 'floatingSubheading',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'randomly',
-								field: 'abstract',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'trial',
-								field: 'abstract',
-							},
-							{type: 'joinOr'},
-							{
-								type: 'phrase',
-								content: 'groups',
-								field: 'abstract',
-							},
-						],
-					},
-					// FIXME: Not (Not animals Not humans)?
-					{type: 'joinNot'},
-					{
-						type: 'group',
-						nodes: [
-							{
-								type: 'mesh',
-								recurse: true,
-								content: 'animals',
-							},
-							{type: 'joinNot'},
-							{
-								type: 'mesh',
-								recurse: false,
-								content: 'humans',
-							},
-						],
+						type: 'template',
+						content: 'rct filter',
 					},
 				],
 			},
