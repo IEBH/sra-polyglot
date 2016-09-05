@@ -872,7 +872,7 @@ var polyglot = module.exports = {
 									buffer += 'N' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += '(MH "' + branch.content + '+")';
+									buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
 									break;
 								case 'raw':
 									buffer += branch.content;
