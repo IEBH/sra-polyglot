@@ -528,7 +528,7 @@ var polyglot = module.exports = {
 									buffer += 'NEAR' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += '[mh ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									buffer += '[mh ' + (branch.recurse ? '' : '^') + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
 									break;
 								case 'raw':
 									buffer += branch.content;
