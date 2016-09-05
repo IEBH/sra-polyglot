@@ -659,7 +659,7 @@ var polyglot = module.exports = {
 									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += "'" + branch.content + "'/exp";
+									buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
 									break;
 								case 'raw':
 									buffer += branch.content;
