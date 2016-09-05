@@ -1105,6 +1105,7 @@ var polyglot = module.exports = {
 
 		/**
 		* Retrieve the contents of a template by its ID
+		* NOTE: If the specific engine definition is not found 'default' is used (and it will be pre-parsed via .translate())
 		* @param {string} template The template to resolve
 		* @param {string} engine The current engine (used to get the correct sub-templating string)
 		* @return {string} The resolved template
@@ -1112,7 +1113,7 @@ var polyglot = module.exports = {
 		resolveTemplate: function(template, engine) {
 			if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
 			if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-			return polyglot.templates[template].engines.default;
+			return polyglot.translate(polyglot.templates[template].engines.default, engine);
 		},
 	},
 };
