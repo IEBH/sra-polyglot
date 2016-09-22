@@ -19,8 +19,8 @@ describe('Translate title + abstract searches (PubMed -> *)', function() {
 		expect(polyglot.translate('term1[tiab]', 'embase')).to.equal('term1:ti,ab');
 	});
 
-	it('translate PM `term1[tiab]` -> CI `TI term1 AB term2`', function() {
-		expect(polyglot.translate('term1[tiab]', 'cinahl')).to.equal('TI term1 AB term1');
+	it('translate PM `term1[tiab]` -> CI `TI term1 OR AB term2`', function() {
+		expect(polyglot.translate('term1[tiab]', 'cinahl')).to.equal('TI term1 OR AB term1');
 	});
 
 	it('translate PM `term1[tiab]` -> WS `term1`', function() {
@@ -47,8 +47,8 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 		expect(polyglot.translate('term1:ti,ab', 'embase')).to.equal('term1:ti,ab');
 	});
 
-	it('translate OV `term1:ti,ab` -> CI `ti term1`', function() {
-		expect(polyglot.translate('term1:ti,ab', 'cinahl')).to.equal('TI term1 AB term1');
+	it('translate OV `term1:ti,ab` -> CI `TI term1 OR AB term1`', function() {
+		expect(polyglot.translate('term1:ti,ab', 'cinahl')).to.equal('TI term1 OR AB term1');
 	});
 
 	it('translate OV `term1:ti,ab` -> WS `term1`', function() {
@@ -75,8 +75,8 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', fu
 		expect(polyglot.translate('term1.tw.', 'embase')).to.equal('term1:ti,ab');
 	});
 
-	it('translate OV `term1.tw.` -> CI `TI term1 AB term1`', function() {
-		expect(polyglot.translate('term1.tw.', 'cinahl')).to.equal('TI term1 AB term1');
+	it('translate OV `term1.tw.` -> CI `TI term1 OR AB term1`', function() {
+		expect(polyglot.translate('term1.tw.', 'cinahl')).to.equal('TI term1 OR AB term1');
 	});
 
 	it('translate OV `term1.tw.` -> WS `term1`', function() {

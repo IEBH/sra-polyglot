@@ -898,7 +898,7 @@ var polyglot = module.exports = {
 									if (branch.field && branch.field == 'title+abstract') {
 										buffer +=
 											'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
-											' ' +
+											' OR ' +
 											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									} else if (branch.field) {
 										buffer +=
