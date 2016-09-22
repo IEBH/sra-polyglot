@@ -14,23 +14,33 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 		/**
   * List of templates
   * Each key is the (case insensitive; specify in lowercase) keyword used in angular brackets
-  * Each value is an object of each engine override with an additional 'default' key
-  * e.g. {rct: {default: 'foo', ovid: 'bar'}} // `<rct>` => 'foo' in most databases and 'bar' in Ovid MEDLINE
+  * Each value is an object containing 'name', 'description', 'debugging' and an engines object with an additional 'default' key
   * @var {Object}
+  * @example
+  * {rct: {engines: {default: 'foo', ovid: 'bar'}}} // `<rct>` => 'foo' in most databases and 'bar' in Ovid MEDLINE
   */
 		templates: {
 			// Meta `<engine>` template will output the current engine (useful for tests)
 			'engine': {
-				default: 'unknown',
-				pubmed: 'pubmed',
-				ovid: 'ovid',
-				cochrane: 'cochrane',
-				embase: 'embase',
-				wos: 'wos',
-				cinahl: 'cinahl'
+				name: 'Engine name',
+				debugging: true,
+				description: 'The current output engine',
+				engines: {
+					default: 'unknown',
+					pubmed: 'pubmed',
+					ovid: 'ovid',
+					cochrane: 'cochrane',
+					embase: 'embase',
+					wos: 'wos',
+					cinahl: 'cinahl'
+				}
 			},
 			'rct filter': {
-				default: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)'
+				name: 'RCT Filter',
+				description: 'Standard Cochrane RCT Filter',
+				engines: {
+					default: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)'
+				}
 			}
 		},
 
@@ -1003,8 +1013,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
    */
 			resolveTemplate: function resolveTemplate(template, engine) {
 				if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
-				if (polyglot.templates[template][engine]) return polyglot.templates[template][engine];
-				return polyglot.templates[template].default;
+				if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
+				return polyglot.templates[template].engines.default;
 			}
 		}
 	};
