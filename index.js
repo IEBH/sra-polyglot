@@ -165,7 +165,7 @@ var polyglot = module.exports = {
 			} else if (match = /^\[mesh(:NoExp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
 				leaf.type = 'mesh';
 				leaf.recurse = ! match[1];
-				if (/^".*"$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+				if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
@@ -257,7 +257,7 @@ var polyglot = module.exports = {
 			} else {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
-					if (nextChar == '"' && (match = /^"(.*?)"/.exec(q))) { // First character is a speachmark - slurp until we see the next one
+					if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
 						leaf = {type: 'phrase', content: match[1]};
 						branch.nodes.push(leaf);
 						q = q.substr(match[0].length);
