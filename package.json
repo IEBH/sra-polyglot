@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CREBP/polyglot.git"
+    "url": "git+https://github.com/CREBP/sra-polyglot.git"
   },
   "keywords": [
     "crebp",
@@ -28,9 +28,9 @@
   "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/CREBP/polyglot/issues"
+    "url": "https://github.com/CREBP/sra-polyglot/issues"
   },
-  "homepage": "https://github.com/CREBP/polyglot#readme",
+  "homepage": "https://github.com/CREBP/sra-polyglot#readme",
   "devDependencies": {
     "babel-core": "^6.14.0",
     "babel-preset-es2015": "^6.14.0",
