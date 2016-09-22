@@ -1117,7 +1117,8 @@ var polyglot = module.exports = {
 		resolveTemplate: function(template, engine) {
 			if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
 			if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-			return polyglot.translate(polyglot.templates[template].engines.default, engine);
+			if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
+			return '';
 		},
 	},
 };
