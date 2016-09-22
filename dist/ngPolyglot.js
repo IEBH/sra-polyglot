@@ -27,19 +27,23 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				description: 'The current output engine',
 				engines: {
 					default: 'unknown',
-					pubmed: 'pubmed',
-					ovid: 'ovid',
+					cinahl: 'cinahl',
 					cochrane: 'cochrane',
 					embase: 'embase',
-					wos: 'wos',
-					cinahl: 'cinahl'
+					ovid: 'ovid',
+					pubmed: 'pubmed',
+					wos: 'wos'
 				}
 			},
 			'rct filter': {
 				name: 'RCT Filter',
 				description: 'Standard Cochrane RCT Filter',
 				engines: {
-					default: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)'
+					cinahl: '(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial',
+					embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
+					ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
+					pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[MeSH] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
+					wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)'
 				}
 			}
 		},
@@ -164,7 +168,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					// Mesh term - PubMed syntax
 					leaf.type = 'mesh';
 					leaf.recurse = !match[1];
-					if (/^".*"$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+					if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 					q = q.substr(match[0].length);
 					cropString = false;
 				} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) {
@@ -261,7 +265,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					var nextChar = q.substr(0, 1);
 					if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
 						// Leaf pointing to array entity - probably not created fallback leaf to append to
-						if (nextChar == '"' && (match = /^"(.*?)"/.exec(q))) {
+						if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
 							// First character is a speachmark - slurp until we see the next one
 							leaf = { type: 'phrase', content: match[1] };
 							branch.nodes.push(leaf);
@@ -816,7 +820,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field && branch.field == 'title+abstract') {
-										buffer += 'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ' ' + 'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += 'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ' OR ' + 'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									} else if (branch.field) {
 										buffer += (branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : '??' // Unsupported field suffix for PubMed
 										) + ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
@@ -1007,6 +1011,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 
 			/**
    * Retrieve the contents of a template by its ID
+   * NOTE: If the specific engine definition is not found 'default' is used (and it will be pre-parsed via .translate())
    * @param {string} template The template to resolve
    * @param {string} engine The current engine (used to get the correct sub-templating string)
    * @return {string} The resolved template
@@ -1014,7 +1019,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			resolveTemplate: function resolveTemplate(template, engine) {
 				if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
 				if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-				return polyglot.templates[template].engines.default;
+				if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
+				return '';
 			}
 		}
 	};
