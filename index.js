@@ -49,6 +49,17 @@ var polyglot = module.exports = {
 				wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)',
 			},
 		},
+		'sr filter': {
+			name: 'SR Filter',
+			description: 'Standard Cochrane SR Filter',
+			engines: {
+				cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
+				embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
+				ovid: 'Medline.tw. OR Pubmed.tw. OR (systematic.tw. AND review.tw.) OR meta-analysis.pt. OR CDSR.jn.',
+				pubmed: 'Medline[tiab] OR Pubmed[tiab] OR (systematic[tiab] AND review[tiab]) OR meta-analysis[ptyp] OR CDSR[so]',
+				wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane',
+			},
+		},
 	},
 
 

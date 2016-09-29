@@ -58,3 +58,32 @@ describe('Translate the meta template `<rct filter>`', function() {
 	});
 
 });
+
+
+describe('Translate the meta template `<sr filter>`', function() {
+
+	it('translate `<SR Filter>` -> PM `pubmed`', function() {
+		expect(polyglot.translate('<SR Filter>', 'pubmed')).to.equal('Medline[tiab] OR Pubmed[tiab] OR (systematic[tiab] AND review[tiab]) OR meta-analysis[ptyp] OR CDSR[so]');
+	});
+
+	it('translate PM `<SR Filter>` -> OV `ovid`', function() {
+		expect(polyglot.translate('<SR Filter>', 'ovid')).to.equal('Medline.tw. OR Pubmed.tw. OR (systematic.tw. AND review.tw.) OR meta-analysis.pt. OR CDSR.jn.');
+	});
+
+	it('translate PM `<SR Filter>` -> CO `cochrane`', function() {
+		expect(polyglot.translate('<SR Filter>', 'cochrane')).to.equal('');
+	});
+
+	it('translate PM `<SR Filter>` -> EM `embase`', function() {
+		expect(polyglot.translate('<SR Filter>', 'embase')).to.equal('Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt');
+	});
+
+	it('translate PM `<SR Filter>` -> CI `cinahl`', function() {
+		expect(polyglot.translate('<SR Filter>', 'cinahl')).to.equal('TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis');
+	});
+
+	it('translate PM `<SR Filter>` -> WS `wos`', function() {
+		expect(polyglot.translate('<SR Filter>', 'wos')).to.equal('Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane');
+	});
+
+});
