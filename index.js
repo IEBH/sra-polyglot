@@ -907,6 +907,9 @@ var polyglot = module.exports = {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
+									if (branch.field) // If the group has a filter decorate all its children with that field
+										branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
@@ -1093,7 +1096,7 @@ var polyglot = module.exports = {
 			return tree;
 		},
 
-		
+
 		/**
 		* Visit the given node types within a deeply nested tree and run a function
 		* This function may mutate the input tree depending on the actions of the callbacks
