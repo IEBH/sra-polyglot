@@ -827,6 +827,11 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
+									if (branch.field) // If the group has a filter decorate all its children with that field
+										branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], function (b) {
+											return b.field = branch.field;
+										});
+
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
