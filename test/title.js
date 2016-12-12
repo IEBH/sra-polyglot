@@ -23,6 +23,14 @@ describe('Translate title searches (PubMed -> *)', function() {
 		expect(polyglot.translate('term1[ti]', 'cinahl')).to.equal('TI term1');
 	});
 
+	it('translate PM `term1[ab]` -> PY `AB term1`', function() {
+		expect(polyglot.translate('term1[ti]', 'psycinfo')).to.equal('term1.ti');
+	});
+
+	it('translate PM `term1[ab]` -> SC `AB term1`', function() {
+		expect(polyglot.translate('term1[ti]', 'scopus')).to.equal('TITLE(term1)');
+	});
+
 	it('translate PM `term1[ti]` -> WS `term1`', function() {
 		expect(polyglot.translate('term1[ti]', 'wos')).to.equal('term1');
 	});
@@ -49,6 +57,14 @@ describe('Translate title searches (Ovid -> *)', function() {
 
 	it('translate OV `term1:ti` -> CI `TI term1`', function() {
 		expect(polyglot.translate('term1:ti', 'cinahl')).to.equal('TI term1');
+	});
+
+	it('translate PM `term1:ti` -> PY `AB term1`', function() {
+		expect(polyglot.translate('term1:ti', 'psycinfo')).to.equal('term1.ti');
+	});
+
+	it('translate PM `term1:ti` -> SC `AB term1`', function() {
+		expect(polyglot.translate('term1:ti', 'scopus')).to.equal('TITLE(term1)');
 	});
 
 	it('translate OV `term1:ti` -> WS `term1`', function() {

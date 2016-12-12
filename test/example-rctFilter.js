@@ -127,8 +127,17 @@ describe('Example test "RCT Filter"', function() {
 
 	it('should compile correctly in CINAHL', function() {
 		expect(polyglot.translate(example, 'cinahl')).to.deep.equal(
-			'("randomized controlled trial" OR "controlled clinical trial") OR AB randomized OR AB randomised OR AB placebo OR ?? "drug therapy" OR AB randomly OR AB trial OR AB groups NOT ((MH "animals+") NOT (MH "humans"))'
+			'("randomized controlled trial" OR "controlled clinical trial") OR AB randomized OR AB randomised OR AB placebo OR "drug therapy" OR AB randomly OR AB trial OR AB groups NOT ((MH "animals+") NOT (MH "humans"))'
 		);
 	});
+
+	it('should compile correctly in PsycInfo', function() {
+		expect(polyglot.translate(example, 'psycinfo')).to.deep.equal('(randomized controlled trial OR controlled clinical trial) OR randomized.ab OR randomised.ab OR placebo.ab OR drug therapy OR randomly.ab OR trial.ab OR groups.ab NOT (animals NOT humans)');
+	});
+
+	it('should compile correctly in Scopus', function() {
+		expect(polyglot.translate(example, 'scopus')).to.deep.equal('(randomized controlled trial OR controlled clinical trial) OR ABS(randomized) OR ABS(randomised) OR ABS(placebo) OR drug therapy OR ABS(randomly) OR ABS(trial) OR ABS(groups) NOT (INDEXTERMS(animals) NOT INDEXTERMS(humans))');
+	});
+
 
 });

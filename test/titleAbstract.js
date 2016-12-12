@@ -23,6 +23,14 @@ describe('Translate title + abstract searches (PubMed -> *)', function() {
 		expect(polyglot.translate('term1[tiab]', 'cinahl')).to.equal('TI term1 OR AB term1');
 	});
 
+	it('translate PM `term1[tiab]` -> PY `term1.ti,ab`', function() {
+		expect(polyglot.translate('term1[tiab]', 'psycinfo')).to.equal('term1.ti,ab');
+	});
+
+	it('translate PM `term1[tiab]` -> SC `TITLE-ABS(term1)`', function() {
+		expect(polyglot.translate('term1[tiab]', 'scopus')).to.equal('TITLE-ABS(term1)');
+	});
+
 	it('translate PM `term1[tiab]` -> WS `term1`', function() {
 		expect(polyglot.translate('term1[tiab]', 'wos')).to.equal('term1');
 	});
@@ -51,6 +59,14 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 		expect(polyglot.translate('term1:ti,ab', 'cinahl')).to.equal('TI term1 OR AB term1');
 	});
 
+	it('translate PM `term1:ti,ab` -> PY `term1.ti,ab`', function() {
+		expect(polyglot.translate('term1:ti,ab', 'psycinfo')).to.equal('term1.ti,ab');
+	});
+
+	it('translate PM `term1:ti,ab` -> SC `TITLE-ABS(term1)`', function() {
+		expect(polyglot.translate('term1:ti,ab', 'scopus')).to.equal('TITLE-ABS(term1)');
+	});
+
 	it('translate OV `term1:ti,ab` -> WS `term1`', function() {
 		expect(polyglot.translate('term1:ti,ab', 'wos')).to.equal('term1');
 	});
@@ -77,6 +93,14 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', fu
 
 	it('translate OV `term1.tw.` -> CI `TI term1 OR AB term1`', function() {
 		expect(polyglot.translate('term1.tw.', 'cinahl')).to.equal('TI term1 OR AB term1');
+	});
+
+	it('translate PM `term1.tw.` -> PY `term1.ti,ab`', function() {
+		expect(polyglot.translate('term1.tw.', 'psycinfo')).to.equal('term1.ti,ab');
+	});
+
+	it('translate PM `term1.tw.` -> SC `TITLE-ABS(term1)`', function() {
+		expect(polyglot.translate('term1.tw.', 'scopus')).to.equal('TITLE-ABS(term1)');
 	});
 
 	it('translate OV `term1.tw.` -> WS `term1`', function() {

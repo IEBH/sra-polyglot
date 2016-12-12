@@ -23,6 +23,14 @@ describe('Translate multiple MESH terms (PubMed -> *)', function() {
 		expect(polyglot.translate('"term1 term2"[Mesh]', 'cinahl')).to.equal('(MH "term1 term2+")');
 	});
 
+	it('translate PM `"term1 term2"[Mesh]` -> PY `"term1 term2"`', function() {
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'psycinfo')).to.equal('"term1 term2"');
+	});
+
+	it('translate PM `"term1 term2"[Mesh]` -> SC `INDEXTERMS(term1 term2)`', function() {
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'scopus')).to.equal('INDEXTERMS(term1 term2)');
+	});
+
 	it('translate PM `"term1 term2"[Mesh]` -> WS `"term1 term2"`', function() {
 		expect(polyglot.translate('"term1 term2"[Mesh]', 'wos')).to.equal('"term1 term2"');
 	});
@@ -49,6 +57,14 @@ describe('Translate multiple MESH terms (Ovid -> *)', function() {
 
 	it('translate OV `exp term1 term2/` -> CI `(MH "term1 term2+")`', function() {
 		expect(polyglot.translate('exp term1 term2/', 'cinahl')).to.equal('(MH "term1 term2+")');
+	});
+
+	it('translate PM `exp term1 term2/` -> PY `"term1 term2"`', function() {
+		expect(polyglot.translate('exp term1 term2/', 'psycinfo')).to.equal('"term1 term2"');
+	});
+
+	it('translate PM `exp term1 term2/` -> SC `INDEXTERMS(term1 term2)`', function() {
+		expect(polyglot.translate('exp term1 term2/', 'scopus')).to.equal('INDEXTERMS(term1 term2)');
 	});
 
 	it('translate OV `exp term1 term2/` -> WS `"term1 term2"`', function() {

@@ -31,7 +31,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cochrane: 'cochrane',
 					embase: 'embase',
 					ovid: 'ovid',
+					psycinfo: 'psycinfo',
 					pubmed: 'pubmed',
+					scopus: 'scopus',
 					wos: 'wos'
 				}
 			},
@@ -838,8 +840,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									if (branch.field && branch.field == 'title+abstract') {
 										buffer += 'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ' OR ' + 'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
 									} else if (branch.field) {
-										buffer += (branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : '??' // Unsupported field suffix for PubMed
-										) + ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : '') + ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content));
 									} else {
 										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
 									}
@@ -888,6 +889,172 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 						action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
 						fields: {
 							bquery: query
+						}
+					};
+				}
+			},
+			// }}}
+			// PsycInfo {{{
+			psycinfo: {
+				title: 'PsycInfo',
+				aliases: ['p', 'pi'],
+
+				/**
+    * Compile a tree structure to PsycInfo output
+    * @param {array} tree The parsed tree to process
+    * @param {Object} [options] Optional options to use when compiling
+    * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+    * @return {string} The compiled output
+    */
+				compile: function compile(tree, options) {
+					var settings = _.defaults(options, {
+						replaceWildcards: true
+					});
+
+					// Apply wildcard replacements
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '?' }]);
+
+					var compileWalker = function compileWalker(tree) {
+						return tree.map(function (branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : '');
+									} else {
+										buffer += branch.content;
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'ADJ' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'psycinfo');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+							// Add spacing provided... its not a raw buffer or the last entity within the structure
+							+ (branch.type == 'raw' || // Its not a raw node
+							branchIndex == tree.length - 1 || // or the last item in the sequence
+							branchIndex < tree.length - 1 && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+							? '' : ' ');
+						}).join('');
+					};
+					return compileWalker(tree);
+				},
+				open: function open(query) {
+					return {
+						method: 'POST',
+						action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+						fields: {
+							textBox: query
+						}
+					};
+				}
+			},
+			// }}}
+			// Scopus {{{
+			scopus: {
+				title: 'scopus',
+				aliases: ['s', 'so'],
+
+				/**
+    * Compile a tree structure to Scopus output
+    * @param {array} tree The parsed tree to process
+    * @param {Object} [options] Optional options to use when compiling
+    * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+    * @return {string} The compiled output
+    */
+				compile: function compile(tree, options) {
+					var settings = _.defaults(options, {
+						replaceWildcards: true
+					});
+
+					// Apply wildcard replacements
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '?' }]);
+
+					var compileWalker = function compileWalker(tree) {
+						return tree.map(function (branch, branchIndex) {
+							var buffer = '';
+							switch (branch.type) {
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer += branch.field == 'title' ? 'TITLE(' + branch.content + ')' : branch.field == 'abstract' ? 'ABS(' + branch.content + ')' : branch.field == 'title+abstract' ? 'TITLE-ABS(' + branch.content + ')' : branch.content;
+									} else {
+										buffer += branch.content;
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'W/' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += 'INDEXTERMS(' + branch.content + ')';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'scopus');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer
+							// Add spacing provided... its not a raw buffer or the last entity within the structure
+							+ (branch.type == 'raw' || // Its not a raw node
+							branchIndex == tree.length - 1 || // or the last item in the sequence
+							branchIndex < tree.length - 1 && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+							? '' : ' ');
+						}).join('');
+					};
+					return compileWalker(tree);
+				},
+				open: function open(query) {
+					return {
+						method: 'POST',
+						action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+						fields: {
+							textBox: query
 						}
 					};
 				}
