@@ -33,6 +33,7 @@ var polyglot = module.exports = {
 				cinahl: 'cinahl',
 				cochrane: 'cochrane',
 				embase: 'embase',
+				mongodb: 'mongodb',
 				ovid: 'ovid',
 				psycinfo: 'psycinfo',
 				pubmed: 'pubmed',
@@ -1263,6 +1264,98 @@ var polyglot = module.exports = {
 						.join('\n');
 				};
 				return compileWalker(tree, 0);
+			},
+		},
+		// }}}
+		// MongoDB {{{
+		mongodb: {
+			title: 'MongoDB Query Format',
+			aliases: ['mongo'],
+			debugging: true, // Mark this module for debugging only
+
+			/**
+			* Compile a tree structure to a MongoDB query
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
+			* @return {Object} The compiled MongoDB query output
+			*/
+			compile: function(tree, options) {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+					translatePhraseField: t => ({'title': t}),
+					meshField: 'mesh',
+					translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
+				});
+
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '*'},
+				]);
+
+				var compileWalker = function(tree) {
+					return _(tree)
+						.map(function(branch, branchIndex) {
+							var buffer = {};
+							switch (branch.type) {
+								case 'group':
+									if (branch.field && branch.field == 'title+abstract') {
+										// FIXME: Not yet properly supported
+										buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+									} else if (branch.field) {
+										buffer[branch.field] = compileWalker(branch.nodes);
+									} else {
+										buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+									}
+									break;
+								case 'phrase':
+									if (branch.field && branch.field == 'title+abstract') {
+										buffer = settings.translateTitleAbstract(branch.content);
+									} else if (branch.field) {
+										buffer[branch.field] = branch.content;
+									} else {
+										buffer = settings.translatePhraseField(branch.content);
+									}
+									break;
+								case 'joinNear':
+								case 'joinAnd':
+									buffer = {$and: []};
+									break;
+								case 'joinOr':
+									buffer = {$or: []};
+									break;
+								case 'joinNot':
+									buffer = {$not: {}};
+									break;
+								case 'mesh':
+									// FIXME: No ability to recurse
+									buffer[settings.meshField] = {$in: [branch.content]};
+									break;
+								case 'raw':
+									buffer._raw = branch.content;
+									break;
+								case 'template':
+									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer;
+						})
+						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+						.thru(function(tree) {
+							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+							return tree;
+						})
+						// }}}
+						.value();
+
+				};
+				return compileWalker(tree);
 			},
 		},
 		// }}}
