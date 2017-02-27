@@ -30,6 +30,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cinahl: 'cinahl',
 					cochrane: 'cochrane',
 					embase: 'embase',
+					mongodb: 'mongodb',
 					ovid: 'ovid',
 					psycinfo: 'psycinfo',
 					pubmed: 'pubmed',
@@ -54,8 +55,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				engines: {
 					cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
 					embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
-					ovid: 'Medline.tw. OR Pubmed.tw. OR (systematic.tw. AND review.tw.) OR meta-analysis.pt. OR CDSR.jn.',
-					pubmed: 'Medline[tiab] OR Pubmed[tiab] OR (systematic[tiab] AND review[tiab]) OR meta-analysis[ptyp] OR CDSR[so]',
+					ovid: 'search:.tw.OR meta analysis.mp,pt.OR review.pt.OR di.xs. OR associated.tw.',
+					pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH Terms] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
 					wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane'
 				}
 			}
@@ -184,11 +185,12 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) {
+				} else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) {
 					// Mesh term - Ovid syntax (exploded)
-					leaf.type = 'mesh';
-					leaf.recurse = true;
-					leaf.content = leaf.content.substr(4); // Remove 'exp ' prefix
+					branch.nodes.push({ type: 'mesh', recurse: true, content: match[1] });
+					q = q.substr(match[0].length);
+					cropString = false;
+					afterWhitespace = true;
 				} else if (/^\//.test(q) && leaf.type == 'phrase') {
 					// Mesh term - Ovid syntax (non-exploded)
 					leaf.type = 'mesh';
@@ -1142,6 +1144,98 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 						}).join('\n');
 					};
 					return compileWalker(tree, 0);
+				}
+			},
+			// }}}
+			// MongoDB {{{
+			mongodb: {
+				title: 'MongoDB Query Format',
+				aliases: ['mongo'],
+				debugging: true, // Mark this module for debugging only
+
+				/**
+    * Compile a tree structure to a MongoDB query
+    * @param {array} tree The parsed tree to process
+    * @param {Object} [options] Optional options to use when compiling
+    * @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
+    * @return {Object} The compiled MongoDB query output
+    */
+				compile: function compile(tree, options) {
+					var settings = _.defaults(options, {
+						replaceWildcards: true,
+						translatePhraseField: function translatePhraseField(t) {
+							return { 'title': t };
+						},
+						meshField: 'mesh',
+						translateTitleAbstract: function translateTitleAbstract(t) {
+							return { $or: [{ title: t }, { abstract: t }] };
+						}
+					});
+
+					// Apply wildcard replacements
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '*' }]);
+
+					var compileWalker = function compileWalker(tree) {
+						return _(tree).map(function (branch, branchIndex) {
+							var buffer = {};
+							switch (branch.type) {
+								case 'group':
+									if (branch.field && branch.field == 'title+abstract') {
+										// FIXME: Not yet properly supported
+										buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+									} else if (branch.field) {
+										buffer[branch.field] = compileWalker(branch.nodes);
+									} else {
+										buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+									}
+									break;
+								case 'phrase':
+									if (branch.field && branch.field == 'title+abstract') {
+										buffer = settings.translateTitleAbstract(branch.content);
+									} else if (branch.field) {
+										buffer[branch.field] = branch.content;
+									} else {
+										buffer = settings.translatePhraseField(branch.content);
+									}
+									break;
+								case 'joinNear':
+								case 'joinAnd':
+									buffer = { $and: [] };
+									break;
+								case 'joinOr':
+									buffer = { $or: [] };
+									break;
+								case 'joinNot':
+									buffer = { $not: {} };
+									break;
+								case 'mesh':
+									// FIXME: No ability to recurse
+									buffer[settings.meshField] = { $in: [branch.content] };
+									break;
+								case 'raw':
+									buffer._raw = branch.content;
+									break;
+								case 'template':
+									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
+
+							return buffer;
+						})
+						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+						.thru(function (tree) {
+							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+							return tree;
+						})
+						// }}}
+						.value();
+					};
+					return compileWalker(tree);
 				}
 			}
 		},

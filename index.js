@@ -186,10 +186,11 @@ var polyglot = module.exports = {
 				if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (!afterWhitespace && /^\//.test(q) && leaf.type == 'phrase' && /^exp /i.test(leaf.content)) { // Mesh term - Ovid syntax (exploded)
-				leaf.type = 'mesh';
-				leaf.recurse = true;
-				leaf.content = leaf.content.substr(4); // Remove 'exp ' prefix
+			} else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
+				branch.nodes.push({type: 'mesh', recurse: true, content: match[1]});
+				q = q.substr(match[0].length);
+				cropString = false;
+				afterWhitespace = true;
 			} else if (/^\//.test(q) && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
 				leaf.type = 'mesh';
 				leaf.recurse = false;
