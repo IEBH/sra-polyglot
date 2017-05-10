@@ -28,7 +28,7 @@ describe('Translate abstract searches (PubMed -> *)', function() {
 	});
 
 	it('translate PM `term1[ab]` -> SC `AB term1`', function() {
-		expect(polyglot.translate('term1[ab]', 'scopus')).to.equal('ABS(term1)');
+		expect(polyglot.translate('term1[ab]', 'scopus')).to.equal('ABS("term1")');
 	});
 
 	it('translate PM `term1[ab]` -> WS `term1`', function() {
@@ -64,7 +64,7 @@ describe('Translate abstract searches (Ovid -> *)', function() {
 	});
 
 	it('translate PM `term1:ab` -> SC `AB term1`', function() {
-		expect(polyglot.translate('term1:ab', 'scopus')).to.equal('ABS(term1)');
+		expect(polyglot.translate('term1:ab', 'scopus')).to.equal('ABS("term1")');
 	});
 
 	it('translate OV `term1:ab` -> WS `term1`', function() {

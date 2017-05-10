@@ -28,7 +28,7 @@ describe('Translate wildcards searches (multiple character "*" style)', function
 	});
 
 	it('translate PM `term1*` -> SC `term1*`', function() {
-		expect(polyglot.translate('term1*', 'scopus')).to.equal('term1*');
+		expect(polyglot.translate('term1*', 'scopus')).to.equal('"term1*"');
 	});
 
 	it('translate PM `term1*` -> WS `term1*`', function() {
@@ -64,7 +64,7 @@ describe('Translate wildcards searches (single character PubMed "?" style)', fun
 	});
 
 	it('translate PM `term1?` -> SC `term1?`', function() {
-		expect(polyglot.translate('term1?', 'scopus')).to.equal('term1?');
+		expect(polyglot.translate('term1?', 'scopus')).to.equal('"term1?"');
 	});
 
 	it('translate PM `term1?` -> WS `term1?`', function() {
@@ -100,7 +100,7 @@ describe('Translate wildcards searches (single character Ovid "$" style)', funct
 	});
 
 	it('translate PM `term1$` -> SC `term1?`', function() {
-		expect(polyglot.translate('term1$', 'scopus')).to.equal('term1?');
+		expect(polyglot.translate('term1$', 'scopus')).to.equal('"term1?"');
 	});
 
 	it('translate PM `term1$` -> WS `term1?`', function() {

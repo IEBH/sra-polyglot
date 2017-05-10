@@ -34,8 +34,8 @@ describe('Translate multiple MESH terms (PubMed -> *)', function() {
 	});
 
 	it('translate PM `"term1 term2"[Mesh]` -> SC `INDEXTERMS(term1 term2)`', function() {
-		expect(polyglot.translate('"term1 term2"[Mesh]', 'scopus')).to.equal('INDEXTERMS(term1 term2)');
-		expect(polyglot.translate('"term1 and term2"[Mesh]', 'scopus')).to.equal('INDEXTERMS(term1 and term2)');
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'scopus')).to.equal('INDEXTERMS("term1 term2")');
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'scopus')).to.equal('INDEXTERMS("term1 and term2")');
 	});
 
 	it('translate PM `"term1 term2"[Mesh]` -> WS `"term1 term2"`', function() {
@@ -84,9 +84,9 @@ describe('Translate multiple MESH terms (Ovid -> *)', function() {
 	});
 
 	it('translate PM `exp term1 term2/` -> SC `INDEXTERMS(term1 term2)`', function() {
-		expect(polyglot.translate('exp term1 term2/', 'scopus')).to.equal('INDEXTERMS(term1 term2)');
-		expect(polyglot.translate('exp term1 and term2/', 'scopus')).to.equal('INDEXTERMS(term1 and term2)');
-		expect(polyglot.translate('exp "term1 and term2"/', 'scopus')).to.equal('INDEXTERMS(term1 and term2)');
+		expect(polyglot.translate('exp term1 term2/', 'scopus')).to.equal('INDEXTERMS("term1 term2")');
+		expect(polyglot.translate('exp term1 and term2/', 'scopus')).to.equal('INDEXTERMS("term1 and term2")');
+		expect(polyglot.translate('exp "term1 and term2"/', 'scopus')).to.equal('INDEXTERMS("term1 and term2")');
 	});
 
 	it('translate OV `exp term1 term2/` -> WS `"term1 term2"`', function() {

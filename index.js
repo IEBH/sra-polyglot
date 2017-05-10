@@ -1088,7 +1088,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Scopus {{{
 		scopus: {
-			title: 'scopus',
+			title: 'Scopus',
 			aliases: ['s', 'so'],
 
 			/**
@@ -1119,13 +1119,13 @@ var polyglot = module.exports = {
 								case 'phrase':
 									if (branch.field) {
 										buffer += (
-											branch.field == 'title' ? 'TITLE(' + branch.content + ')' :
-											branch.field == 'abstract' ? 'ABS(' + branch.content + ')' :
-											branch.field == 'title+abstract' ? 'TITLE-ABS(' + branch.content + ')' :
-											branch.content
+											branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
+											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
+											'"' + branch.content + '"'
 										);
 									} else {
-										buffer += branch.content;
+										buffer += '"' + branch.content + '"';
 									}
 									break;
 								case 'joinAnd':
@@ -1141,7 +1141,7 @@ var polyglot = module.exports = {
 									buffer += 'W/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += 'INDEXTERMS(' + branch.content + ')';
+									buffer += 'INDEXTERMS("' + branch.content + '")';
 									break;
 								case 'raw':
 									buffer += branch.content;

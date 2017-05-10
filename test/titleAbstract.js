@@ -28,7 +28,7 @@ describe('Translate title + abstract searches (PubMed -> *)', function() {
 	});
 
 	it('translate PM `term1[tiab]` -> SC `TITLE-ABS(term1)`', function() {
-		expect(polyglot.translate('term1[tiab]', 'scopus')).to.equal('TITLE-ABS(term1)');
+		expect(polyglot.translate('term1[tiab]', 'scopus')).to.equal('TITLE-ABS("term1")');
 	});
 
 	it('translate PM `term1[tiab]` -> WS `term1`', function() {
@@ -64,7 +64,7 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 	});
 
 	it('translate PM `term1:ti,ab` -> SC `TITLE-ABS(term1)`', function() {
-		expect(polyglot.translate('term1:ti,ab', 'scopus')).to.equal('TITLE-ABS(term1)');
+		expect(polyglot.translate('term1:ti,ab', 'scopus')).to.equal('TITLE-ABS("term1")');
 	});
 
 	it('translate OV `term1:ti,ab` -> WS `term1`', function() {
@@ -100,7 +100,7 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', fu
 	});
 
 	it('translate PM `term1.tw.` -> SC `TITLE-ABS(term1)`', function() {
-		expect(polyglot.translate('term1.tw.', 'scopus')).to.equal('TITLE-ABS(term1)');
+		expect(polyglot.translate('term1.tw.', 'scopus')).to.equal('TITLE-ABS("term1")');
 	});
 
 	it('translate OV `term1.tw.` -> WS `term1`', function() {

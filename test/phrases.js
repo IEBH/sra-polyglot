@@ -28,7 +28,7 @@ describe('Translate search phrases (PubMed -> *)', function() {
 	});
 
 	it('translate PM `"term1 term2"` -> SC `"term1 term2"`', function() {
-		expect(polyglot.translate('"term1 term2"', 'scopus')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'scopus')).to.equal('"term1 term2"');
 	});
 
 	it('translate PM `"term1 term2"` -> WS `"term1 term2"`', function() {
@@ -64,7 +64,7 @@ describe('Translate search phrases (Ovid -> *)', function() {
 	});
 
 	it('translate OV `"term1 term2"` -> SC `"term1 term2"`', function() {
-		expect(polyglot.translate('"term1 term2"', 'scopus')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'scopus')).to.equal('"term1 term2"');
 	});
 
 	it('translate OV `"term1 term2"` -> WS `"term1 term2"`', function() {
