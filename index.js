@@ -413,6 +413,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// Ovid Medline {{{
@@ -521,6 +522,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// Cochrane CENTRAL {{{
@@ -655,6 +657,7 @@ var polyglot = module.exports = {
 					}
 				};
 			},
+			openTerms: 'use search manager box',
 		},
 		// }}}
 		// Embase {{{
@@ -764,6 +767,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// Web of Science {{{
@@ -881,6 +885,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// CINAHL {{{
@@ -987,6 +992,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// PsycInfo {{{
@@ -1084,6 +1090,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// Scopus {{{
@@ -1179,6 +1186,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
+			openTerms: 'any search box',
 		},
 		// }}}
 		// Lexical tree (JSON) {{{
