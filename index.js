@@ -525,13 +525,13 @@ var polyglot = module.exports = {
 			openTerms: 'any search box',
 		},
 		// }}}
-		// Cochrane CENTRAL {{{
+		// Cochrane Library {{{
 		cochrane: {
-			title: 'Cochrane CENTRAL',
-			aliases: ['cochrane', 'c'],
+			title: 'Cochrane Library',
+			aliases: ['cochrane', 'c', 'cl'],
 
 			/**
-			* Compile a tree structure to Cochrane CENTRAL output
+			* Compile a tree structure to Cochrane Library output
 			* @param {array} tree The parsed tree to process
 			* @param {Object} [options] Optional options to use when compiling
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent

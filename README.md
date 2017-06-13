@@ -84,7 +84,7 @@ Proximity searching
 Similar to [Logical Syntax](#logical-syntax), proximity searching allows the searching of a secondary term within the range of the primary:
 
 * `Term1 ADJ3 Term2` (Search for `Term2` within 3 words of `Term1`, Ovid MEDLINE format)
-* `Term1 NEAR3 Term2` (Search for `Term2` within 3 words of `Term1`, Cochrane CENTRAL format)
+* `Term1 NEAR3 Term2` (Search for `Term2` within 3 words of `Term1`, Cochrane Library format)
 * `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, CINAHL format)
 * `Term1 NEAR/3 Term2` (Search for `Term2` within 3 words of `Term1`, Embase and Web of Science formats)
 
