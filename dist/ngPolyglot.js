@@ -399,7 +399,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							term: query
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// Ovid Medline {{{
@@ -488,16 +489,17 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							textBox: query
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
-			// Cochrane CENTRAL {{{
+			// Cochrane Library {{{
 			cochrane: {
-				title: 'Cochrane CENTRAL',
-				aliases: ['cochrane', 'c'],
+				title: 'Cochrane Library',
+				aliases: ['cochrane', 'c', 'cl'],
 
 				/**
-    * Compile a tree structure to Cochrane CENTRAL output
+    * Compile a tree structure to Cochrane Library output
     * @param {array} tree The parsed tree to process
     * @param {Object} [options] Optional options to use when compiling
     * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
@@ -603,7 +605,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true'
 						}
 					};
-				}
+				},
+				openTerms: 'use search manager box'
 			},
 			// }}}
 			// Embase {{{
@@ -693,7 +696,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							search_query: query.replace(/\n+/g, ' ')
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// Web of Science {{{
@@ -803,7 +807,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A'
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// CINAHL {{{
@@ -893,7 +898,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							bquery: query
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// PsycInfo {{{
@@ -976,12 +982,13 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							textBox: query
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// Scopus {{{
 			scopus: {
-				title: 'scopus',
+				title: 'Scopus',
 				aliases: ['s', 'so'],
 
 				/**
@@ -1008,9 +1015,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.field == 'title' ? 'TITLE(' + branch.content + ')' : branch.field == 'abstract' ? 'ABS(' + branch.content + ')' : branch.field == 'title+abstract' ? 'TITLE-ABS(' + branch.content + ')' : branch.content;
+										buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : '"' + branch.content + '"';
 									} else {
-										buffer += branch.content;
+										buffer += '"' + branch.content + '"';
 									}
 									break;
 								case 'joinAnd':
@@ -1026,7 +1033,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += 'W/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += 'INDEXTERMS(' + branch.content + ')';
+									buffer += 'INDEXTERMS("' + branch.content + '")';
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1059,7 +1066,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							textBox: query
 						}
 					};
-				}
+				},
+				openTerms: 'any search box'
 			},
 			// }}}
 			// Lexical tree (JSON) {{{
