@@ -1186,7 +1186,7 @@ var polyglot = module.exports = {
 					},
 				};
 			},
-			openTerms: 'any search box',
+			openTerms: 'use advanced search box',
 		},
 		// }}}
 		// Lexical tree (JSON) {{{
