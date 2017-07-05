@@ -74,6 +74,7 @@ var polyglot = module.exports = {
 	/**
 	* Translate the given query using the given engine ID
 	* This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
+	* Output will be run via postProcess()
 	* @param {string} query The query to translate
 	* @param {string} engine The ID of the engine to use
 	* @param {Object} options Optional options structure to pass to the engine
@@ -82,11 +83,12 @@ var polyglot = module.exports = {
 	translate: function(query, engine, options) {
 		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
 		var tree = this.parse(query, options);
-		return this.engines[engine].compile(tree, options);
+		return this.postProcess(this.engines[engine].compile(tree, options), options);
 	},
 
 	/**
 	* Translate the given query using all the supported engines
+	* Output will be run via postProcess()
 	* @param {string} query The query to translate
 	* @param {Object} options Optional options structure to pass to each engine
 	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
@@ -94,8 +96,43 @@ var polyglot = module.exports = {
 	translateAll: function(query, options) {
 		var output = {};
 		var tree = this.parse(query, options);
-		_.forEach(this.engines, (engine, id) => output[id] = engine.compile(tree, options));
+		_.forEach(this.engines, (engine, id) => output[id] = this.postProcess(engine.compile(tree, options), options));
 		return output;
+	},
+
+
+	/**
+	* Post process the data from an engine
+	* This function applies the following behaviours:
+	* - If HTML is true all `\n` characters are replaced with `<br/>`
+	* - If HTML is false all <span> item wrappers are removed
+	* @param {string} text The output from the engine - called from translate() / translateAll()
+	* @param {Object} options Options provided during post-processing - these are provided downstream from the parent functions
+	* @param {boolean} [options.html=true] Provide HTML output
+	* @param {boolean} [options.trim=true] Trim all output lines
+	* @returns {string} The post processed text
+	*/
+	postProcess: function(text, options) {
+		var settings = _.defaults(options, {
+			html: true,
+			trim: true,
+		});
+
+		if (settings.html) {
+			text = text.replace(/\n/g, '<br/>');
+		} else { // Flatten HTML - Yes this is a horrible method, but its quick
+			for (var i = 0; i < 10; i ++) {
+				text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
+			}
+		}
+
+		if (settings.trim) {
+			text = text
+				.replace(/^\s+/gm, '')
+				.replace(/\s*$/gm, '')
+		}
+
+		return text;
 	},
 
 
