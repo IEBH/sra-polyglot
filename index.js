@@ -907,7 +907,7 @@ var polyglot = module.exports = {
 
 				// Apply wildcard replacements
 				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-					{subject: /[\?\$]/g, value: '?'},
+					{subject: /[\?\$]/g, value: '#'},
 				]);
 
 				var compileWalker = function(tree) {

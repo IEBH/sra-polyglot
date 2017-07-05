@@ -55,8 +55,8 @@ describe('Translate wildcards searches (single character PubMed "?" style)', fun
 		expect(polyglot.translate('term1?', 'embase')).to.equal('term1?');
 	});
 
-	it('translate PM `term1?` -> CI `term1?`', function() {
-		expect(polyglot.translate('term1?', 'cinahl')).to.equal('term1?');
+	it('translate PM `term1?` -> CI `term1#`', function() {
+		expect(polyglot.translate('term1?', 'cinahl')).to.equal('term1#');
 	});
 
 	it('translate PM `term1?` -> PY `term1?`', function() {
@@ -91,8 +91,8 @@ describe('Translate wildcards searches (single character Ovid "$" style)', funct
 		expect(polyglot.translate('term1$', 'embase')).to.equal('term1?');
 	});
 
-	it('translate PM `term1$` -> CI `term1?`', function() {
-		expect(polyglot.translate('term1$', 'cinahl')).to.equal('term1?');
+	it('translate PM `term1$` -> CI `term1#`', function() {
+		expect(polyglot.translate('term1$', 'cinahl')).to.equal('term1#');
 	});
 
 	it('translate PM `term1$` -> PY `term1?`', function() {
