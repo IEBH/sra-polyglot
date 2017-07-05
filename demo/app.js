@@ -2,7 +2,7 @@ var app = angular.module("app", [
 	'ngPolyglot',
 ]);
 
-app.controller("polyglotExampleCtrl", function($scope, Polyglot) {
+app.controller("polyglotExampleCtrl", function($sce, $scope, Polyglot) {
 	$scope.query = '';
 	$scope.engines = _.map(Polyglot.engines, (engine, id) => { engine.id = id; return engine });
 
@@ -21,7 +21,9 @@ app.controller("polyglotExampleCtrl", function($scope, Polyglot) {
 	// Query watcher + refresher {{{
 	$scope.$watchGroup(['query', 'options.groupLines', 'options.groupLinesAlways', 'options.preserveNewLines', 'options.replaceWildcards'], function() {
 		var translations = Polyglot.translateAll($scope.query, $scope.options);
-		$scope.engines.forEach(engine => engine.translated = translations[engine.id]);
+		$scope.engines.forEach(engine => {
+			engine.translated = _.isString(translations[engine.id]) ? $sce.trustAsHtml(translations[engine.id]) : '';
+		});
 	});
 	// }}}
 

@@ -30,6 +30,8 @@ Will output an object structure like:
 
 See the JSDoc of the [inline code](index.js) for more details on the supported APIs.
 
+A demo is also available. To use this [follow the instructions in the demo directory](./demo/README.md).
+
 
 Search Syntax
 =============
