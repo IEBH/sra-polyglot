@@ -108,15 +108,19 @@ var polyglot = module.exports = {
 	* - If HTML is false all <span> item wrappers are removed
 	* @param {string} text The output from the engine - called from translate() / translateAll()
 	* @param {Object} options Options provided during post-processing - these are provided downstream from the parent functions
+	* @param {boolean} [options.forceString] Force the output to be a string even if the module returns something unusual (e.g. mongodb driver returns an object)
 	* @param {boolean} [options.html=true] Provide HTML output
 	* @param {boolean} [options.trim=true] Trim all output lines
 	* @returns {string} The post processed text
 	*/
 	postProcess: function(text, options) {
 		var settings = _.defaults(options, {
+			forceString: true,
 			html: true,
 			trim: true,
 		});
+
+		if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
 		if (settings.html) {
 			text = text.replace(/\n/g, '<br/>');
@@ -129,7 +133,7 @@ var polyglot = module.exports = {
 		if (settings.trim) {
 			text = text
 				.replace(/^\s+/gm, '')
-				.replace(/\s*$/gm, '')
+				.replace(/\s+$/gm, '')
 		}
 
 		return text;

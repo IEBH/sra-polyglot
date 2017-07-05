@@ -51,7 +51,7 @@
 			</div>
 
 			<div class="accordion-style1 panel-group">
-				<div ng-repeat="engine in engines track by engine.id" ng-if="!engine.debugging || showDebugging" class="panel panel-default">
+				<div ng-repeat="engine in engines track by engine.id" class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title">
 							<a ng-click="toggleExpandEngine(engine)" class="accordion-toggle collapsed">
