@@ -2,12 +2,12 @@ var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', function() {
+describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', ()=> {
 	var example = _.find(polyglot.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
 	expect(example).to.be.an.object;
 	expect(example).to.have.property('query');
 
-	it('should compile the object tree correctly', function() {
+	it('should compile the object tree correctly', ()=> {
 		/*
 		# Lung diseases or other infections
 		exp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.

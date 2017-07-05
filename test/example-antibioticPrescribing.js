@@ -2,12 +2,12 @@ var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe('Example test "Failure of antibiotic prescribing for bacterial infections"', function() {
+describe('Example test "Failure of antibiotic prescribing for bacterial infections"', ()=> {
 	var example = _.find(polyglot.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
 	expect(example).to.be.an.object;
 	expect(example).to.have.property('query');
 
-	it('should parse the object tree correctly', function() {
+	it('should parse the object tree correctly', ()=> {
 		/*
 			"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice
 			AND
@@ -151,7 +151,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		expect(polyglot.parse(example.query)).to.deep.equal(tree);
 	});
 
-	it('should translate the example into PubMed format', function() {
+	it('should translate the example into PubMed format', ()=> {
 		expect(polyglot.translate(example.query, 'pubmed')).to.equal(
 			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
@@ -163,7 +163,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Ovid format', function() {
+	it('should translate the example into Ovid format', ()=> {
 		expect(polyglot.translate(example.query, 'ovid')).to.equal(
 			'(exp Primary Health Care/ OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
 			'AND\n\n' +
@@ -175,7 +175,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Cochrane format', function() {
+	it('should translate the example into Cochrane format', ()=> {
 		expect(polyglot.translate(example.query, 'cochrane')).to.equal(
 			'([mh "Primary Health Care"] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
@@ -187,7 +187,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Embase format', function() {
+	it('should translate the example into Embase format', ()=> {
 		expect(polyglot.translate(example.query, 'embase')).to.equal(
 			'(\'Primary Health Care\'/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
@@ -199,7 +199,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into CINAHL format', function() {
+	it('should translate the example into CINAHL format', ()=> {
 		expect(polyglot.translate(example.query, 'cinahl')).to.equal(
 			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
@@ -211,7 +211,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into WoS format', function() {
+	it('should translate the example into WoS format', ()=> {
 		expect(polyglot.translate(example.query, 'wos')).to.equal(
 			'("Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
