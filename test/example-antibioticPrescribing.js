@@ -152,73 +152,73 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into PubMed format', ()=> {
-		expect(polyglot.translate(example.query, 'pubmed')).to.equal(
-			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'("Bacterial Infections"[Mesh] OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'pubmed', {html: false})).to.equal(
+			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n' +
+			'AND\n' +
+			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n' +
+			'AND\n' +
+			'("Bacterial Infections"[Mesh] OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'("Anti-Bacterial Agents"[Mesh] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	it('should translate the example into Ovid format', ()=> {
-		expect(polyglot.translate(example.query, 'ovid')).to.equal(
-			'(exp Primary Health Care/ OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
-			'AND\n\n' +
-			'(exp Treatment Failure/ OR Treatment failure OR Treatment failures)\n\n' +
-			'AND\n\n' +
-			'(exp Bacterial Infections/ OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'ovid', {html: false})).to.equal(
+			'(exp Primary Health Care/ OR Primary care OR Primary healthcare OR Family practice OR General practice)\n' +
+			'AND\n' +
+			'(exp Treatment Failure/ OR Treatment failure OR Treatment failures)\n' +
+			'AND\n' +
+			'(exp Bacterial Infections/ OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'(exp Anti-Bacterial Agents/ OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	it('should translate the example into Cochrane format', ()=> {
-		expect(polyglot.translate(example.query, 'cochrane')).to.equal(
-			'([mh "Primary Health Care"] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'([mh "Treatment Failure"] OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'([mh "Bacterial Infections"] OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'cochrane', {html: false})).to.equal(
+			'([mh "Primary Health Care"] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n' +
+			'AND\n' +
+			'([mh "Treatment Failure"] OR "Treatment failure" OR "Treatment failures")\n' +
+			'AND\n' +
+			'([mh "Bacterial Infections"] OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'([mh "Anti-Bacterial Agents"] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	it('should translate the example into Embase format', ()=> {
-		expect(polyglot.translate(example.query, 'embase')).to.equal(
-			'(\'Primary Health Care\'/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'(\'Treatment Failure\'/exp OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'(\'Bacterial Infections\'/exp OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'embase', {html: false})).to.equal(
+			'(\'Primary Health Care\'/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n' +
+			'AND\n' +
+			'(\'Treatment Failure\'/exp OR "Treatment failure" OR "Treatment failures")\n' +
+			'AND\n' +
+			'(\'Bacterial Infections\'/exp OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'(\'Anti-Bacterial Agents\'/exp OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	it('should translate the example into CINAHL format', ()=> {
-		expect(polyglot.translate(example.query, 'cinahl')).to.equal(
-			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'((MH "Bacterial Infections+") OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'cinahl', {html: false})).to.equal(
+			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n' +
+			'AND\n' +
+			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n' +
+			'AND\n' +
+			'((MH "Bacterial Infections+") OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'((MH "Anti-Bacterial Agents+") OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	it('should translate the example into WoS format', ()=> {
-		expect(polyglot.translate(example.query, 'wos')).to.equal(
-			'("Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'("Treatment Failure" OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'("Bacterial Infections" OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
+		expect(polyglot.translate(example.query, 'wos', {html: false})).to.equal(
+			'("Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n' +
+			'AND\n' +
+			'("Treatment Failure" OR "Treatment failure" OR "Treatment failures")\n' +
+			'AND\n' +
+			'("Bacterial Infections" OR Bacteria OR Bacterial)\n' +
+			'AND\n' +
 			'("Anti-Bacterial Agents" OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
