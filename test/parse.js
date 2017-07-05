@@ -173,7 +173,7 @@ describe('Parse', ()=> {
 			{type: 'joinAnd'},
 			{
 				type: 'phrase',
-				field: 'practiceGuideline',
+				field: 'publicationType',
 				content: 'bar baz',
 			},
 			{type: 'joinAnd'},

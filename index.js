@@ -232,12 +232,12 @@ var polyglot = module.exports = {
 					case 'ab':
 						useLeaf.field = 'abstract';
 						break;
-					case 'pt':
-						useLeaf.field = 'practiceGuideline';
-						break;
 					case 'fs':
 					case 'sh':
 						useLeaf.field = 'floatingSubheading';
+						break;
+					case 'pt':
+						useLeaf.field = 'publicationType';
 						break;
 					case 'xm':
 						useLeaf.type = 'mesh';
@@ -246,7 +246,7 @@ var polyglot = module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\[(tiab|ti|ab|sh)\]/i.exec(q)) { // Field specifier - PubMed syntax
+			} else if (match = /^\[(tiab|ti|ab|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -268,6 +268,9 @@ var polyglot = module.exports = {
 						break;
 					case 'sh':
 						useLeaf.field = 'floatingSubheading';
+						break;
+					case 'pt':
+						useLeaf.field = 'publicationType';
 						break;
 				}
 				q = q.substr(match[0].length);
@@ -350,6 +353,8 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'floatingSubheading' ? '[sh]' :
+												branch.field == 'publicationType' ? '[pt]' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -365,6 +370,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
+												branch.field == 'publicationType' ? '[pt]' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -459,6 +465,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -474,6 +481,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
 											)
 									} else {
@@ -571,6 +579,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -586,6 +595,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -709,6 +719,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
+												branch.field == 'publicationType' ? ':it' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -724,6 +735,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
+												branch.field == 'publicationType' ? ':it' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -950,6 +962,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? 'TI' :
 												branch.field == 'abstract' ? 'AB' :
 												branch.field == 'floatingSubheading' ? 'MW' :
+												branch.field == 'publicationType' ? 'PT' :
 												''
 											)
 											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
@@ -1052,6 +1065,7 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? '.ab' :
 												branch.field == 'title+abstract' ? '.ti,ab' :
 												branch.field == 'floatingSubheading' ? '.hw' :
+												branch.field == 'publicationType' ? '.pt' :
 												''
 											)
 									} else {
@@ -1150,6 +1164,7 @@ var polyglot = module.exports = {
 											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
 											branch.field == 'floatingSubheading' ? 'INDEXTERM("' + branch.content + '")' :
+											branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' :
 											'"' + branch.content + '"'
 										);
 									} else {

@@ -17,7 +17,7 @@ describe('Example test "RCT Filter"', ()=> {
 		var tree = [
 			{
 				type: 'group',
-				field: 'practiceGuideline',
+				field: 'publicationType',
 				nodes: [
 					{
 						type: 'phrase',
