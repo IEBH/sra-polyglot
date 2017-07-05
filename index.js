@@ -236,11 +236,8 @@ var polyglot = module.exports = {
 						useLeaf.field = 'practiceGuideline';
 						break;
 					case 'fs':
-						useLeaf.field = 'floatingSubheading';
-						break;
 					case 'sh':
-						useLeaf.type = 'mesh';
-						useLeaf.recurse = false;
+						useLeaf.field = 'floatingSubheading';
 						break;
 					case 'xm':
 						useLeaf.type = 'mesh';
@@ -249,7 +246,7 @@ var polyglot = module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\[(tiab|ti|ab)\]/i.exec(q)) { // Field specifier - PubMed syntax
+			} else if (match = /^\[(tiab|ti|ab|sh)\]/i.exec(q)) { // Field specifier - PubMed syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -268,6 +265,9 @@ var polyglot = module.exports = {
 						break;
 					case 'ab':
 						useLeaf.field = 'abstract';
+						break;
+					case 'sh':
+						useLeaf.field = 'floatingSubheading';
 						break;
 				}
 				q = q.substr(match[0].length);
@@ -364,6 +364,7 @@ var polyglot = module.exports = {
 												(branch.field == 'title') ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'floatingSubheading' ? '[sh]' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -457,6 +458,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':fs' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -471,6 +473,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':fs' :
 												'' // Unsupported field suffix for PubMed
 											)
 									} else {
@@ -567,6 +570,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':fs' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -581,6 +585,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':fs' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -703,6 +708,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':lnk' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -717,6 +723,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'floatingSubheading' ? ':lnk' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -942,6 +949,7 @@ var polyglot = module.exports = {
 											(
 												branch.field == 'title' ? 'TI' :
 												branch.field == 'abstract' ? 'AB' :
+												branch.field == 'floatingSubheading' ? 'MW' :
 												''
 											)
 											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
@@ -1043,6 +1051,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? '.ti' :
 												branch.field == 'abstract' ? '.ab' :
 												branch.field == 'title+abstract' ? '.ti,ab' :
+												branch.field == 'floatingSubheading' ? '.hw' :
 												''
 											)
 									} else {
@@ -1140,6 +1149,7 @@ var polyglot = module.exports = {
 											branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
 											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
+											branch.field == 'floatingSubheading' ? 'INDEXTERM("' + branch.content + '")' :
 											'"' + branch.content + '"'
 										);
 									} else {
