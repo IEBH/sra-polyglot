@@ -281,6 +281,9 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
+			} else if (match = /^\s*\d\.\s/.exec(q)) {
+				cropString = false;
+				q = q.substr(match[0].length);
 			} else {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
