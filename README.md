@@ -6,6 +6,8 @@ When given a complex search query in either PubMed or Ovid MEDLINE format it wil
 
 It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot) module of the [Systematic Review Accelerator](http://crebp-sra.com).
 
+[DEMO](https://crebp.github.io/sra-polyglot)
+
 
 ```javascript
 var polyglot = require('sra-polyglot');
