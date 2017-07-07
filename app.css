@@ -1,0 +1,11 @@
+a {
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.panel-title > a {
+	display: block;
+}
