@@ -7,8 +7,8 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[pt]', 'pubmed')).to.equal('term[pt]');
 	});
 
-	it('translate `term[pt]` -> OV `term:pt`', ()=> {
-		expect(polyglot.translate('term[pt]', 'ovid')).to.equal('term:pt');
+	it('translate `term[pt]` -> OV `term.pt`', ()=> {
+		expect(polyglot.translate('term[pt]', 'ovid')).to.equal('term.pt');
 	});
 
 	it('translate `term[pt]` -> CO `term:pt`', ()=> {
@@ -43,8 +43,8 @@ describe('Translate publication type searches (Ovid -> *)', ()=> {
 		expect(polyglot.translate('term:pt', 'pubmed')).to.equal('term[pt]');
 	});
 
-	it('translate `term:pt` -> OV `term:pt`', ()=> {
-		expect(polyglot.translate('term:pt', 'ovid')).to.equal('term:pt');
+	it('translate `term:pt` -> OV `term.pt`', ()=> {
+		expect(polyglot.translate('term.pt', 'ovid')).to.equal('term.pt');
 	});
 
 	it('translate `term:pt` -> CO `term:pt`', ()=> {

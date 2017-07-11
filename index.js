@@ -521,8 +521,8 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
-												branch.field == 'floatingSubheading' ? ':fs' :
-												branch.field == 'publicationType' ? ':pt' :
+												branch.field == 'floatingSubheading' ? '.fs' :
+												branch.field == 'publicationType' ? '.pt' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -538,8 +538,8 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
-												branch.field == 'floatingSubheading' ? ':fs' :
-												branch.field == 'publicationType' ? ':pt' :
+												branch.field == 'floatingSubheading' ? '.fs' :
+												branch.field == 'publicationType' ? '.pt' :
 												'' // Unsupported field suffix for PubMed
 											)
 									} else {
@@ -1227,7 +1227,7 @@ var polyglot = module.exports = {
 											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
-											branch.field == 'floatingSubheading' ? 'INDEXTERM("' + branch.content + '")' :
+											branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
 											branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' :
 											'"' + branch.content + '"'
 										);
