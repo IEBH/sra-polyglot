@@ -3,108 +3,108 @@ var polyglot = require('..');
 
 describe('Translate single MESH terms (PubMed -> *)', ()=> {
 
-	it('translate `term1[Mesh]` -> PM `term1[Mesh]`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'pubmed')).to.equal('term1[Mesh]');
+	it('translate `term[Mesh]` -> PM `term[Mesh]`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'pubmed')).to.equal('term[Mesh]');
 	});
 
-	it('translate `term1[Mesh]` -> OV `exp term1/`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'ovid')).to.equal('exp term1/');
+	it('translate `term[Mesh]` -> OV `exp term/`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'ovid')).to.equal('exp term/');
 	});
 
-	it('translate `term1[Mesh]` -> CO `[mh term1]`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'cochrane')).to.equal('[mh term1]');
+	it('translate `term[Mesh]` -> CO `[mh term]`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'cochrane')).to.equal('[mh term]');
 	});
 
-	it('translate `term1[Mesh]` -> EM `term1/exp`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'embase')).to.equal("'term1'/exp");
+	it('translate `term[Mesh]` -> EM `term/exp`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'embase')).to.equal("'term'/exp");
 	});
 
-	it('translate `term1[Mesh]` -> CI `(MH term1+)`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'cinahl')).to.equal('(MH "term1+")');
+	it('translate `term[Mesh]` -> CI `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'cinahl')).to.equal('(MH "term+")');
 	});
 
-	it('translate `term1[Mesh]` -> PY `term1`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'psycinfo')).to.equal('term1');
+	it('translate `term[Mesh]` -> PY `term`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'psycinfo')).to.equal('term');
 	});
 
-	it('translate `term1[Mesh]` -> SC `(MH term1+)`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'scopus')).to.equal('INDEXTERMS("term1")');
+	it('translate `term[Mesh]` -> SC `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'scopus')).to.equal('INDEXTERMS("term")');
 	});
 
-	it('translate `term1[Mesh]` -> WS `term1`', ()=> {
-		expect(polyglot.translate('term1[Mesh]', 'wos')).to.equal('term1');
+	it('translate `term[Mesh]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'wos')).to.equal('term');
 	});
 
 });
 
 describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 
-	it('translate `term1[mh]` -> PM `term1[Mesh]`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'pubmed')).to.equal('term1[Mesh]');
+	it('translate `term[mh]` -> PM `term[Mesh]`', ()=> {
+		expect(polyglot.translate('term[mh]', 'pubmed')).to.equal('term[Mesh]');
 	});
 
-	it('translate `term1[mh]` -> OV `exp term1/`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'ovid')).to.equal('exp term1/');
+	it('translate `term[mh]` -> OV `exp term/`', ()=> {
+		expect(polyglot.translate('term[mh]', 'ovid')).to.equal('exp term/');
 	});
 
-	it('translate `term1[mh]` -> CO `[mh term1]`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'cochrane')).to.equal('[mh term1]');
+	it('translate `term[mh]` -> CO `[mh term]`', ()=> {
+		expect(polyglot.translate('term[mh]', 'cochrane')).to.equal('[mh term]');
 	});
 
-	it('translate `term1[mh]` -> EM `term1/exp`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'embase')).to.equal("'term1'/exp");
+	it('translate `term[mh]` -> EM `term/exp`', ()=> {
+		expect(polyglot.translate('term[mh]', 'embase')).to.equal("'term'/exp");
 	});
 
-	it('translate `term1[mh]` -> CI `(MH term1+)`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'cinahl')).to.equal('(MH "term1+")');
+	it('translate `term[mh]` -> CI `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[mh]', 'cinahl')).to.equal('(MH "term+")');
 	});
 
-	it('translate `term1[mh]` -> PY `term1`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'psycinfo')).to.equal('term1');
+	it('translate `term[mh]` -> PY `term`', ()=> {
+		expect(polyglot.translate('term[mh]', 'psycinfo')).to.equal('term');
 	});
 
-	it('translate `term1[mh]` -> SC `(MH term1+)`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'scopus')).to.equal('INDEXTERMS("term1")');
+	it('translate `term[mh]` -> SC `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[mh]', 'scopus')).to.equal('INDEXTERMS("term")');
 	});
 
-	it('translate `term1[mh]` -> WS `term1`', ()=> {
-		expect(polyglot.translate('term1[mh]', 'wos')).to.equal('term1');
+	it('translate `term[mh]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term[mh]', 'wos')).to.equal('term');
 	});
 
 });
 
 describe('Translate single MESH terms (Ovid -> *)', ()=> {
 
-	it('translate `exp term1/` -> PM `term1[Mesh]`', ()=> {
-		expect(polyglot.translate('exp term1/', 'pubmed')).to.equal('term1[Mesh]');
+	it('translate `exp term/` -> PM `term[Mesh]`', ()=> {
+		expect(polyglot.translate('exp term/', 'pubmed')).to.equal('term[Mesh]');
 	});
 
-	it('translate `exp term1/` -> OV `exp term1/`', ()=> {
-		expect(polyglot.translate('exp term1/', 'ovid')).to.equal('exp term1/');
+	it('translate `exp term/` -> OV `exp term/`', ()=> {
+		expect(polyglot.translate('exp term/', 'ovid')).to.equal('exp term/');
 	});
 
-	it('translate `exp term1/` -> CO `[mh term1]`', ()=> {
-		expect(polyglot.translate('exp term1/', 'cochrane')).to.equal('[mh term1]');
+	it('translate `exp term/` -> CO `[mh term]`', ()=> {
+		expect(polyglot.translate('exp term/', 'cochrane')).to.equal('[mh term]');
 	});
 
-	it('translate `exp term1/` -> EM `term1/exp`', ()=> {
-		expect(polyglot.translate('exp term1/', 'embase')).to.equal("'term1'/exp");
+	it('translate `exp term/` -> EM `term/exp`', ()=> {
+		expect(polyglot.translate('exp term/', 'embase')).to.equal("'term'/exp");
 	});
 
-	it('translate `exp term1/` -> CI `(MH term1+)`', ()=> {
-		expect(polyglot.translate('exp term1/', 'cinahl')).to.equal('(MH "term1+")');
+	it('translate `exp term/` -> CI `(MH term+)`', ()=> {
+		expect(polyglot.translate('exp term/', 'cinahl')).to.equal('(MH "term+")');
 	});
 
-	it('translate `exp term1/` -> PY `term1`', ()=> {
-		expect(polyglot.translate('exp term1/', 'psycinfo')).to.equal('term1');
+	it('translate `exp term/` -> PY `term`', ()=> {
+		expect(polyglot.translate('exp term/', 'psycinfo')).to.equal('term');
 	});
 
-	it('translate `exp term1/` -> SC `(MH term1+)`', ()=> {
-		expect(polyglot.translate('exp term1/', 'scopus')).to.equal('INDEXTERMS("term1")');
+	it('translate `exp term/` -> SC `(MH term+)`', ()=> {
+		expect(polyglot.translate('exp term/', 'scopus')).to.equal('INDEXTERMS("term")');
 	});
 
-	it('translate `exp term1/` -> WS `term1`', ()=> {
-		expect(polyglot.translate('exp term1/', 'wos')).to.equal('term1');
+	it('translate `exp term/` -> WS `term`', ()=> {
+		expect(polyglot.translate('exp term/', 'wos')).to.equal('term');
 	});
 
 });

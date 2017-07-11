@@ -3,144 +3,144 @@ var polyglot = require('..');
 
 describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 
-	it('translate `term1*` -> PM `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'pubmed')).to.equal('term1*');
+	it('translate `term*` -> PM `term*`', ()=> {
+		expect(polyglot.translate('term*', 'pubmed')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> OV `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'ovid')).to.equal('term1*');
+	it('translate `term*` -> OV `term*`', ()=> {
+		expect(polyglot.translate('term*', 'ovid')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> CO `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'cochrane')).to.equal('term1*');
+	it('translate `term*` -> CO `term*`', ()=> {
+		expect(polyglot.translate('term*', 'cochrane')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> EM `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'embase')).to.equal('term1*');
+	it('translate `term*` -> EM `term*`', ()=> {
+		expect(polyglot.translate('term*', 'embase')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> CI `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'cinahl')).to.equal('term1*');
+	it('translate `term*` -> CI `term*`', ()=> {
+		expect(polyglot.translate('term*', 'cinahl')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> PY `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'psycinfo')).to.equal('term1*');
+	it('translate `term*` -> PY `term*`', ()=> {
+		expect(polyglot.translate('term*', 'psycinfo')).to.equal('term*');
 	});
 
-	it('translate `term1*` -> SC `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'scopus')).to.equal('"term1*"');
+	it('translate `term*` -> SC `term*`', ()=> {
+		expect(polyglot.translate('term*', 'scopus')).to.equal('"term*"');
 	});
 
-	it('translate `term1*` -> WS `term1*`', ()=> {
-		expect(polyglot.translate('term1*', 'wos')).to.equal('term1*');
+	it('translate `term*` -> WS `term*`', ()=> {
+		expect(polyglot.translate('term*', 'wos')).to.equal('term*');
 	});
 
 });
 
 describe('Translate wildcards searches (single character "#" style)', ()=> {
 
-	it('translate `term1#` -> PM `term1*`', ()=> {
-		expect(polyglot.translate('term1#', 'pubmed')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">*</span>"');
+	it('translate `term#` -> PM `term*`', ()=> {
+		expect(polyglot.translate('term#', 'pubmed')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">*</span>"');
 	});
 
-	it('translate `term1#` -> OV `term1#`', ()=> {
-		expect(polyglot.translate('term1#', 'ovid')).to.equal('term1#');
+	it('translate `term#` -> OV `term#`', ()=> {
+		expect(polyglot.translate('term#', 'ovid')).to.equal('term#');
 	});
 
-	it('translate `term1#` -> CO `term1*`', ()=> {
-		expect(polyglot.translate('term1#', 'cochrane')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">*</span>"');
+	it('translate `term#` -> CO `term*`', ()=> {
+		expect(polyglot.translate('term#', 'cochrane')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">*</span>"');
 	});
 
-	it('translate `term1#` -> EM `term1*`', ()=> {
-		expect(polyglot.translate('term1#', 'embase')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">*</span>"');
+	it('translate `term#` -> EM `term*`', ()=> {
+		expect(polyglot.translate('term#', 'embase')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">*</span>"');
 	});
 
-	it('translate `term1#` -> CI `term1*`', ()=> {
-		expect(polyglot.translate('term1#', 'cinahl')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">*</span>"');
+	it('translate `term#` -> CI `term*`', ()=> {
+		expect(polyglot.translate('term#', 'cinahl')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">*</span>"');
 	});
 
-	it('translate `term1#` -> PY `term1#`', ()=> {
-		expect(polyglot.translate('term1#', 'psycinfo')).to.equal('term1#');
+	it('translate `term#` -> PY `term#`', ()=> {
+		expect(polyglot.translate('term#', 'psycinfo')).to.equal('term#');
 	});
 
-	it('translate `term1#` -> SC `term1?`', ()=> {
-		expect(polyglot.translate('term1#', 'scopus')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">?</span>"');
+	it('translate `term#` -> SC `term?`', ()=> {
+		expect(polyglot.translate('term#', 'scopus')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1#` -> WS `term1*`', ()=> {
-		expect(polyglot.translate('term1#', 'wos')).to.equal('"term1<span msg="NO_SINGLE_WILDCARD">*</span>"');
+	it('translate `term#` -> WS `term*`', ()=> {
+		expect(polyglot.translate('term#', 'wos')).to.equal('"term<span msg="NO_SINGLE_WILDCARD">*</span>"');
 	});
 
 });
 
 describe('Translate wildcards searches (single character PubMed "?" style)', ()=> {
 
-	it('translate `term1?` -> PM `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'pubmed')).to.equal('term1?');
+	it('translate `term?` -> PM `term?`', ()=> {
+		expect(polyglot.translate('term?', 'pubmed')).to.equal('term?');
 	});
 
-	it('translate `term1?` -> OV `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'ovid')).to.equal('term1?');
+	it('translate `term?` -> OV `term?`', ()=> {
+		expect(polyglot.translate('term?', 'ovid')).to.equal('term?');
 	});
 
-	it('translate `term1?` -> CO `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'cochrane')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term?` -> CO `term?`', ()=> {
+		expect(polyglot.translate('term?', 'cochrane')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1?` -> EM `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'embase')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term?` -> EM `term?`', ()=> {
+		expect(polyglot.translate('term?', 'embase')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1?` -> CI `term1#`', ()=> {
-		expect(polyglot.translate('term1?', 'cinahl')).to.equal('term1#');
+	it('translate `term?` -> CI `term#`', ()=> {
+		expect(polyglot.translate('term?', 'cinahl')).to.equal('term#');
 	});
 
-	it('translate `term1?` -> PY `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'psycinfo')).to.equal('term1?');
+	it('translate `term?` -> PY `term?`', ()=> {
+		expect(polyglot.translate('term?', 'psycinfo')).to.equal('term?');
 	});
 
-	it('translate `term1?` -> SC `term1?`', ()=> {
-		expect(polyglot.translate('term1?', 'scopus')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term?` -> SC `term?`', ()=> {
+		expect(polyglot.translate('term?', 'scopus')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1?` -> WS `term1$`', ()=> {
-		expect(polyglot.translate('term1?', 'wos')).to.equal('term1$');
+	it('translate `term?` -> WS `term$`', ()=> {
+		expect(polyglot.translate('term?', 'wos')).to.equal('term$');
 	});
 
 });
 
 describe('Translate wildcards searches (single character Ovid "$" style)', ()=> {
 
-	it('translate `term1$` -> PM `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'pubmed')).to.equal('term1?');
+	it('translate `term$` -> PM `term?`', ()=> {
+		expect(polyglot.translate('term$', 'pubmed')).to.equal('term?');
 	});
 
-	it('translate `term1$` -> OV `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'ovid')).to.equal('term1?');
+	it('translate `term$` -> OV `term?`', ()=> {
+		expect(polyglot.translate('term$', 'ovid')).to.equal('term?');
 	});
 
-	it('translate `term1$` -> CO `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'cochrane')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> CO `term?`', ()=> {
+		expect(polyglot.translate('term$', 'cochrane')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1$` -> EM `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'embase')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> EM `term?`', ()=> {
+		expect(polyglot.translate('term$', 'embase')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1$` -> CI `term1#`', ()=> {
-		expect(polyglot.translate('term1$', 'cinahl')).to.equal('term1#');
+	it('translate `term$` -> CI `term#`', ()=> {
+		expect(polyglot.translate('term$', 'cinahl')).to.equal('term#');
 	});
 
-	it('translate `term1$` -> PY `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'psycinfo')).to.equal('term1?');
+	it('translate `term$` -> PY `term?`', ()=> {
+		expect(polyglot.translate('term$', 'psycinfo')).to.equal('term?');
 	});
 
-	it('translate `term1$` -> SC `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'scopus')).to.equal('"term1<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> SC `term?`', ()=> {
+		expect(polyglot.translate('term$', 'scopus')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term1$` -> WS `term1?`', ()=> {
-		expect(polyglot.translate('term1$', 'wos')).to.equal('term1$');
+	it('translate `term$` -> WS `term?`', ()=> {
+		expect(polyglot.translate('term$', 'wos')).to.equal('term$');
 	});
 
 });
