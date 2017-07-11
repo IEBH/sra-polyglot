@@ -253,43 +253,49 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					q = q.substr(match[0].length);
 					cropString = false;
 					afterWhitespace = true;
-				} else if ((match = /^\.(tw|ti|ab|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|pt|fs|sh|xm)/i.exec(q))) {
-					// Field specifier - Ovid syntax
-					// Figure out the leaf to use (usually the last one) or the previously used group {{{
-					var useLeaf;
-					if (_.isObject(leaf) && leaf.type == 'phrase') {
-						useLeaf = leaf;
-					} else if (_.isArray(leaf) && lastGroup) {
-						useLeaf = lastGroup;
-					}
-					// }}}
+				} else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
+				match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\./i.exec(q)) // term.INITIALS.
+				|| (match = /^:(tw|ti,ab|ti|ab|mp|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+				) {
+						// Field specifier - Ovid syntax
+						// Figure out the leaf to use (usually the last one) or the previously used group {{{
+						var useLeaf;
+						if (_.isObject(leaf) && leaf.type == 'phrase') {
+							useLeaf = leaf;
+						} else if (_.isArray(leaf) && lastGroup) {
+							useLeaf = lastGroup;
+						}
+						// }}}
 
-					switch (match[1].toLowerCase()) {
-						case 'ti':
-							useLeaf.field = 'title';
-							break;
-						case 'ti,ab':
-						case 'tw':
-							useLeaf.field = 'title+abstract';
-							break;
-						case 'ab':
-							useLeaf.field = 'abstract';
-							break;
-						case 'fs':
-						case 'sh':
-							useLeaf.field = 'floatingSubheading';
-							break;
-						case 'pt':
-							useLeaf.field = 'publicationType';
-							break;
-						case 'xm':
-							useLeaf.type = 'mesh';
-							useLeaf.recurse = true;
-							break;
-					}
-					q = q.substr(match[0].length);
-					cropString = false;
-				} else if (match = /^\[(tiab|ti|ab|sh|pt)\]/i.exec(q)) {
+						switch (match[1].toLowerCase()) {
+							case 'ti':
+								useLeaf.field = 'title';
+								break;
+							case 'ti,ab':
+							case 'tw':
+								useLeaf.field = 'title+abstract';
+								break;
+							case 'mp':
+								useLeaf.field = 'title+abstract+other';
+								break;
+							case 'ab':
+								useLeaf.field = 'abstract';
+								break;
+							case 'fs':
+							case 'sh':
+								useLeaf.field = 'floatingSubheading';
+								break;
+							case 'pt':
+								useLeaf.field = 'publicationType';
+								break;
+							case 'xm':
+								useLeaf.type = 'mesh';
+								useLeaf.recurse = true;
+								break;
+						}
+						q = q.substr(match[0].length);
+						cropString = false;
+					} else if (match = /^\[(tiab|ti|tw|ab|sh|pt)\]/i.exec(q)) {
 					// Field specifier - PubMed syntax
 					// Figure out the leaf to use (usually the last one) or the previously used group {{{
 					var useLeaf;
@@ -303,6 +309,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					switch (match[1].toLowerCase()) {
 						case 'tiab':
 							useLeaf.field = 'title+abstract';
+							break;
+						case 'tw':
+							useLeaf.field = 'title+abstract+other';
 							break;
 						case 'ti':
 							useLeaf.field = 'title';
@@ -393,7 +402,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -401,7 +410,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : '' // Unsupported field suffix for PubMed
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
@@ -481,7 +490,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs' : branch.field == 'publicationType' ? '.pt' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -489,7 +498,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.content + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
+										buffer += branch.content + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs' : branch.field == 'publicationType' ? '.pt' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += branch.content;
@@ -571,7 +580,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -579,7 +588,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
@@ -687,7 +696,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -695,7 +704,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : '' // Unsupported field suffix for PubMed
+										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
@@ -983,7 +992,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : '');
+										buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : '');
 									} else {
 										buffer += branch.content;
 									}
@@ -1067,7 +1076,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERM("' + branch.content + '")' : branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' : '"' + branch.content + '"';
+										buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' : '"' + branch.content + '"';
 									} else {
 										buffer += '"' + branch.content + '"';
 									}

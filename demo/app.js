@@ -22,7 +22,13 @@ app.controller("polyglotExampleCtrl", function($sce, $scope, Polyglot) {
 	$scope.$watchGroup(['query', 'options.groupLines', 'options.groupLinesAlways', 'options.preserveNewLines', 'options.replaceWildcards'], function() {
 		var translations = Polyglot.translateAll($scope.query, $scope.options);
 		$scope.engines.forEach(engine => {
-			engine.translated = _.isString(translations[engine.id]) ? $sce.trustAsHtml(translations[engine.id]) : '';
+			var html = _.isString(translations[engine.id]) ? translations[engine.id] : '';
+			html = $(`<div>${html}</div>`);
+			html.children('span[msg]').each(function() {
+				$(this).addClass('label label-info');
+			});
+
+			engine.translated = $sce.trustAsHtml(html.html());
 		});
 	});
 	// }}}
