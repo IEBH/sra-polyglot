@@ -254,7 +254,7 @@ var polyglot = module.exports = {
 				afterWhitespace = true;
 			} else if (
 				(match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-				|| (match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\./i.exec(q)) // term.INITIALS.
+				|| (match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
 				|| (match = /^:(tw|ti,ab|ti|ab|mp|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
 			) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
@@ -517,9 +517,9 @@ var polyglot = module.exports = {
 										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
-												branch.field == 'title' ? ':ti' :
-												branch.field == 'abstract' ? ':ab' :
-												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title' ? '.ti' :
+												branch.field == 'abstract' ? '.ab' :
+												branch.field == 'title+abstract' ? '.ti,ab' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? '.fs' :
 												branch.field == 'publicationType' ? '.pt' :
@@ -534,9 +534,9 @@ var polyglot = module.exports = {
 										buffer +=
 											branch.content +
 											(
-												branch.field == 'title' ? ':ti' :
-												branch.field == 'abstract' ? ':ab' :
-												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title' ? '.ti' :
+												branch.field == 'abstract' ? '.ab' :
+												branch.field == 'title+abstract' ? '.ti,ab' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? '.fs' :
 												branch.field == 'publicationType' ? '.pt' :
