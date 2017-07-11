@@ -72,3 +72,39 @@ describe('Translate title + abstract + other searches (Ovid -> *)', ()=> {
 	});
 
 });
+
+describe('Translate title + abstract + other searches, with automated gunk (Ovid -> *)', ()=> {
+
+	it('translate `term.mp. [...]` -> PM `term[tw]`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'pubmed')).to.equal('term[tw]');
+	});
+
+	it('translate `term.mp. [...]` -> OV `term.mp.`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'ovid')).to.equal('term.mp.');
+	});
+
+	it('translate `term.mp. [...]` -> CO `term:ti,ab,kw`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'cochrane')).to.equal('term:ti,ab,kw');
+	});
+
+	it('translate `term.mp. [...]` -> EM `term:ti,ab,de,tn`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'embase')).to.equal('term:ti,ab,de,tn');
+	});
+
+	it('translate `term.mp. [...]` -> CI `term`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'cinahl')).to.equal('term');
+	});
+
+	it('translate `term.mp. [...]` -> PY `term.mp.`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'psycinfo')).to.equal('term.mp.');
+	});
+
+	it('translate `term.mp. [...]` -> SC `TITLE-ABS-KEY(term)`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'scopus')).to.equal('TITLE-ABS-KEY("term")');
+	});
+
+	it('translate `term.mp. [...]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'wos')).to.equal('term');
+	});
+
+});

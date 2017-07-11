@@ -252,7 +252,11 @@ var polyglot = module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
-			} else if ((match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|mp|pt|fs|sh|xm)/i.exec(q))) { // Field specifier - Ovid syntax
+			} else if (
+				(match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
+				|| (match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\./i.exec(q)) // term.INITIALS.
+				|| (match = /^:(tw|ti,ab|ti|ab|mp|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+			) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
