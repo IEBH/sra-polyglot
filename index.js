@@ -252,7 +252,7 @@ var polyglot = module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
-			} else if ((match = /^\.(tw|ti|ab|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|pt|fs|sh|xm)/i.exec(q))) { // Field specifier - Ovid syntax
+			} else if ((match = /^\.(tw|ti|ab|mp|pt|fs|sh|xm)\./i.exec(q)) || (match = /^:(tw|ti,ab|ti|ab|mp|pt|fs|sh|xm)/i.exec(q))) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -269,6 +269,9 @@ var polyglot = module.exports = {
 					case 'ti,ab':
 					case 'tw':
 						useLeaf.field = 'title+abstract';
+						break;
+					case 'mp':
+						useLeaf.field = 'title+abstract+other';
 						break;
 					case 'ab':
 						useLeaf.field = 'abstract';
@@ -287,7 +290,7 @@ var polyglot = module.exports = {
 				}
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\[(tiab|ti|ab|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+			} else if (match = /^\[(tiab|ti|tw|ab|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
 				var useLeaf;
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -300,6 +303,9 @@ var polyglot = module.exports = {
 				switch (match[1].toLowerCase()) {
 					case 'tiab':
 						useLeaf.field = 'title+abstract';
+						break;
+					case 'tw':
+						useLeaf.field = 'title+abstract+other';
 						break;
 					case 'ti':
 						useLeaf.field = 'title';
@@ -397,6 +403,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'title+abstract+other' ? '[tw]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
 												branch.field == 'publicationType' ? '[pt]' :
 												'' // Unsupported field suffix for PubMed
@@ -413,6 +420,7 @@ var polyglot = module.exports = {
 												(branch.field == 'title') ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
 												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'title+abstract+other' ? '[tw]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
 												branch.field == 'publicationType' ? '[pt]' :
 												'' // Unsupported field suffix for PubMed
@@ -508,6 +516,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
@@ -524,6 +533,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
@@ -622,6 +632,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
@@ -638,6 +649,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
 												'' // Unsupported field suffix for PubMed
@@ -762,6 +774,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
 												branch.field == 'publicationType' ? ':it' :
 												'' // Unsupported field suffix for PubMed
@@ -778,6 +791,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
 												branch.field == 'publicationType' ? ':it' :
 												'' // Unsupported field suffix for PubMed
@@ -1108,6 +1122,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? '.ti' :
 												branch.field == 'abstract' ? '.ab' :
 												branch.field == 'title+abstract' ? '.ti,ab' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? '.hw' :
 												branch.field == 'publicationType' ? '.pt' :
 												''
@@ -1207,6 +1222,7 @@ var polyglot = module.exports = {
 											branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
 											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
 											branch.field == 'floatingSubheading' ? 'INDEXTERM("' + branch.content + '")' :
 											branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' :
 											'"' + branch.content + '"'
