@@ -1,8 +1,10 @@
 var babel = require('gulp-babel');
 var ghPages = require('gulp-gh-pages');
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var inject = require('gulp-inject-string');
 var nodemon = require('gulp-nodemon');
+var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var rimraf = require('rimraf');
 var replace = require('gulp-replace');
@@ -14,6 +16,13 @@ gulp.task('build', ['js']);
 
 gulp.task('js', function() {
 	gulp.src('./index.js')
+		.pipe(plumber({
+			errorHandler: function(err) {
+				gutil.log(gutil.colors.red('ERROR DURING JS BUILD'));
+				process.stdout.write(err.stack);
+				this.emit('end');
+			},
+		}))
 		.pipe(rename('ngPolyglot.js'))
 		.pipe(inject.wrap('angular.module(\'ngPolyglot\', []).service(\'Polyglot\', function() {\n', '});'))
 		.pipe(replace(/^.*require\(.*\);\s+$/gm, ''))
