@@ -1450,7 +1450,7 @@ var polyglot = module.exports = {
 									buffer[settings.meshField] = {$in: [branch.content]};
 									break;
 								case 'raw':
-									buffer._raw = branch.content;
+									// Do nothing
 									break;
 								case 'template':
 									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
@@ -1464,6 +1464,56 @@ var polyglot = module.exports = {
 
 							return buffer;
 						})
+						// Compress $or/$and conditions {{{
+						.thru(function(tree) {
+							if (!_.isArray(tree)) return tree; // Not an array - skip
+
+							// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
+							return tree.reduce((res, branch, index, arr) => {
+								var firstKey = _(branch).keys().first();
+								if (firstKey == '$or' || firstKey == '$and') { // Is a combinator
+									var expression = {};
+									expression[firstKey] = [
+										res.pop(), // Right side is the last thing we added to the buffer
+										arr.splice(index+1, 1)[0], // Left side is the next thing we're going to look at in the array
+									];
+									res.push(expression);
+								} else { // Unknown - just push to array and carry on processing
+									res.push(branch);
+								}
+
+								return res;
+							}, []);
+						})
+						// }}}
+						// Collapse multiple $or / $and trees {{{
+						.thru(function(tree) {
+							var collapses = [];
+							var traverseTree = (branch, path = []) => { // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
+								_.forEach(branch, (v, k) => { // Use _.map if its an array and _.mapValues if we're examining an object
+									if (_.isObject(v)) {
+										var firstKey = _(branch).keys().first();
+										if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) { // Mark for cleanup later (when we can do a bottom-up traversal)
+											collapses.push({key: firstKey, path: path});
+										}
+										traverseTree(v, path.concat([k]));
+									}
+								});
+							};
+							traverseTree(tree);
+
+							collapses.forEach(collapse => {
+								var parent = _.get(tree, collapse.path.slice(0, -1));
+								var child = _.get(tree, collapse.path.concat([collapse.key]));
+								var child2 = parent[1];
+
+								if (child2) child.push(child2);
+								_.set(tree, collapse.path.slice(0, -1), child);
+							});
+
+							return tree;
+						})
+						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
 						.thru(function(tree) {
 							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
@@ -1473,6 +1523,7 @@ var polyglot = module.exports = {
 						.value();
 
 				};
+
 				return compileWalker(tree);
 			},
 		},
