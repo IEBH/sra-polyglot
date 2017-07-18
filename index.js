@@ -123,8 +123,10 @@ var polyglot = module.exports = {
 		if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
 		if (settings.html) {
-			text = text.replace(/\n/g, '<br/>');
-		} else { // Flatten HTML - Yes this is a horrible method, but its quick
+			text = text
+				.replace(/\n/g, '<br/>')
+				.replace(/\t/g, '<span class="tab"></span>')
+		} else if (_.isString(text)) { // Flatten HTML - Yes this is a horrible method, but its quick
 			for (var i = 0; i < 10; i ++) {
 				text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
 			}
@@ -1316,19 +1318,10 @@ var polyglot = module.exports = {
 			* Compile a tree structure to JSON output
 			* @param {array} tree The parsed tree to process
 			* @param {Object} [options] Optional options to use when compiling
-			* @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
 			* @return {string} The compiled output
 			*/
 			compile: function(tree, options) {
-				var settings = _.defaults(options, {
-					prettyPrint: true,
-				});
-
-				if (settings.prettyPrint) {
-					return JSON.stringify(tree, null, '\t');
-				} else {
-					return JSON.stringify(tree);
-				}
+				return tree;
 			},
 		},
 		// }}}
@@ -1403,7 +1396,6 @@ var polyglot = module.exports = {
 			* Compile a tree structure to a MongoDB query
 			* @param {array} tree The parsed tree to process
 			* @param {Object} [options] Optional options to use when compiling
-			* @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
 			* @return {Object} The compiled MongoDB query output
 			*/
 			compile: function(tree, options) {

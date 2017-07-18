@@ -9,3 +9,8 @@ a:hover {
 .panel-title > a {
 	display: block;
 }
+
+.tab {
+	display: inline-block;
+	width: 20px;
+}
