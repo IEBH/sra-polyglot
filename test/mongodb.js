@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe('Translate searches (PubMed -> Mongo)', ()=> {
+describe.skip('Translate searches (PubMed -> Mongo)', ()=> {
 
 	var o = {
 		forceString: false,
@@ -36,6 +36,25 @@ describe('Translate searches (PubMed -> Mongo)', ()=> {
 					{title: 'term3'},
 					{title: 'term4'},
 				],
+			],
+		});
+	});
+
+	it('translate `(term1[ti] OR term2[ti]) AND (term3[ti] OR term4[ti])` -> MongoDB', ()=> {
+		expect(polyglot.translate('(term1[ti] OR term2[ti]) AND (term3[ti] OR term4[ti])', 'mongodb', o)).to.deep.equal({
+			$and: [
+				{
+					$or: [
+						{title: 'term1'},
+						{title: 'term2'},
+					],
+				},
+				{
+					$or: [
+						{title: 'term3'},
+						{title: 'term4'},
+					],
+				},
 			],
 		});
 	});
