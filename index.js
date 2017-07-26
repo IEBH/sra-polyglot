@@ -340,7 +340,7 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\s*\d\.\s/.exec(q)) {
+			} else if (match = /^\s*\d\.\s/.exec(q)) { // Remove numeric prefixes (usually the result of Ovid's rather silly export feature). e.g. `1. something\n2. something`
 				cropString = false;
 				q = q.substr(match[0].length);
 			} else {
@@ -358,7 +358,8 @@ var polyglot = module.exports = {
 				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
 					leaf.content += nextChar;
 				}
-				afterWhitespace = (!afterWhitespace && nextChar == ' ');
+
+				afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
 			}
 
 			if (cropString) q = q.substr(1); // Crop 1 character
