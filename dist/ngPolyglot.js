@@ -122,8 +122,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
 			if (settings.html) {
-				text = text.replace(/\n/g, '<br/>');
-			} else {
+				text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
+			} else if (_.isString(text)) {
 				// Flatten HTML - Yes this is a horrible method, but its quick
 				for (var i = 0; i < 10; i++) {
 					text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
@@ -341,6 +341,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					q = q.substr(match[0].length);
 					cropString = false;
 				} else if (match = /^\s*\d\.\s/.exec(q)) {
+					// Remove numeric prefixes (usually the result of Ovid's rather silly export feature). e.g. `1. something\n2. something`
 					cropString = false;
 					q = q.substr(match[0].length);
 				} else {
@@ -361,7 +362,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					} else if (_.isObject(leaf) && leaf.type == 'phrase') {
 						leaf.content += nextChar;
 					}
-					afterWhitespace = !afterWhitespace && nextChar == ' ';
+
+					afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
 				}
 
 				if (cropString) q = q.substr(1); // Crop 1 character
@@ -375,7 +377,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
   * Each engine should specify:
   *	title - Human readable name of the engine
   *	aliases - Alternative names for each engine
-  *	compile() - function that takes a parsed tree array and returns a string
+  *	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span msg=""></span> where @msg corresponds to an entry in messages
   *	open() - optional function that takes a query and provides the direct searching method
   *	debugging - optional boolean specifying that the engine is for debugging purposes only
   *
@@ -1147,19 +1149,10 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
     * Compile a tree structure to JSON output
     * @param {array} tree The parsed tree to process
     * @param {Object} [options] Optional options to use when compiling
-    * @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
     * @return {string} The compiled output
     */
 				compile: function compile(tree, options) {
-					var settings = _.defaults(options, {
-						prettyPrint: true
-					});
-
-					if (settings.prettyPrint) {
-						return JSON.stringify(tree, null, '\t');
-					} else {
-						return JSON.stringify(tree);
-					}
+					return tree;
 				}
 			},
 			// }}}
@@ -1232,7 +1225,6 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
     * Compile a tree structure to a MongoDB query
     * @param {array} tree The parsed tree to process
     * @param {Object} [options] Optional options to use when compiling
-    * @param {boolean} [options.prettyPrint=true] Whether to tidy up the JSON before output
     * @return {Object} The compiled MongoDB query output
     */
 				compile: function compile(tree, options) {
@@ -1288,7 +1280,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer[settings.meshField] = { $in: [branch.content] };
 									break;
 								case 'raw':
-									buffer._raw = branch.content;
+									// Do nothing
 									break;
 								case 'template':
 									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
@@ -1302,6 +1294,65 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 
 							return buffer;
 						})
+						// Compress $or/$and conditions {{{
+						.thru(function (tree) {
+							if (!_.isArray(tree)) return tree; // Not an array - skip
+
+							// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
+							return tree.reduce(function (res, branch, index, arr) {
+								var firstKey = _(branch).keys().first();
+								if (firstKey == '$or' || firstKey == '$and') {
+									// Is a combinator
+									var expression = {};
+									expression[firstKey] = [res.pop(), // Right side is the last thing we added to the buffer
+									arr.splice(index + 1, 1)[0]];
+									res.push(expression);
+								} else {
+									// Unknown - just push to array and carry on processing
+									res.push(branch);
+								}
+
+								return res;
+							}, []);
+						})
+						// }}}
+						// Collapse multiple $or / $and trees {{{
+						.thru(function (tree) {
+							var collapses = [];
+							var traverseTree = function traverseTree(branch) {
+								var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+								// Recurse into each tree node and make a bottom-up list of nodes we need to collapse
+								_.forEach(branch, function (v, k) {
+									// Use _.map if its an array and _.mapValues if we're examining an object
+									if (_.isObject(v)) {
+										var firstKey = _(branch).keys().first();
+										if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
+											// Mark for cleanup later (when we can do a bottom-up traversal)
+											var lastKey = _.findLast(collapses, function (i) {
+												return i.key == '$and' || i.key == '$or';
+											}); // Collapse only identical keys
+											if (lastKey == firstKey) {
+												collapses.push({ key: firstKey, path: path });
+											}
+										}
+										traverseTree(v, path.concat([k]));
+									}
+								});
+							};
+							traverseTree(tree);
+
+							collapses.forEach(function (collapse) {
+								var parent = _.get(tree, collapse.path.slice(0, -1));
+								var child = _.get(tree, collapse.path.concat([collapse.key]));
+								var child2 = parent[1];
+
+								if (child2) child.push(child2);
+								_.set(tree, collapse.path.slice(0, -1), child);
+							});
+
+							return tree;
+						})
+						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
 						.thru(function (tree) {
 							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
@@ -1310,9 +1361,11 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 						// }}}
 						.value();
 					};
+
 					return compileWalker(tree);
 				}
 			}
+			// }}}
 		},
 
 		/**
