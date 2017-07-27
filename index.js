@@ -373,7 +373,7 @@ var polyglot = module.exports = {
 	* Each engine should specify:
 	*	title - Human readable name of the engine
 	*	aliases - Alternative names for each engine
-	*	compile() - function that takes a parsed tree array and returns a string
+	*	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span msg=""></span> where @msg corresponds to an entry in messages
 	*	open() - optional function that takes a query and provides the direct searching method
 	*	debugging - optional boolean specifying that the engine is for debugging purposes only
 	*
@@ -1495,7 +1495,10 @@ var polyglot = module.exports = {
 									if (_.isObject(v)) {
 										var firstKey = _(branch).keys().first();
 										if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) { // Mark for cleanup later (when we can do a bottom-up traversal)
-											collapses.push({key: firstKey, path: path});
+											var lastKey = _.findLast(collapses, i => i.key == '$and' || i.key == '$or'); // Collapse only identical keys
+											if (lastKey == firstKey) {
+												collapses.push({key: firstKey, path: path});
+											}
 										}
 										traverseTree(v, path.concat([k]));
 									}
