@@ -74,7 +74,7 @@ var polyglot = module.exports = {
 	/**
 	* Translate the given query using the given engine ID
 	* This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
-	* Output will be run via postProcess()
+	* Output will be run via preProcess() + postProcess()
 	* @param {string} query The query to translate
 	* @param {string} engine The ID of the engine to use
 	* @param {Object} options Optional options structure to pass to the engine
@@ -83,12 +83,14 @@ var polyglot = module.exports = {
 	translate: function(query, engine, options) {
 		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
 		var tree = this.parse(query, options);
+		tree = this.preProcess(tree, options);
 		return this.postProcess(this.engines[engine].compile(tree, options), options);
 	},
 
 	/**
 	* Translate the given query using all the supported engines
-	* Output will be run via postProcess()
+	* Calling this function instead of individual 'translate()' calls is much more efficient as the tree needs to be compiled only once
+	* Output will be run via preProcess() + postProcess()
 	* @param {string} query The query to translate
 	* @param {Object} options Optional options structure to pass to each engine
 	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
@@ -96,8 +98,26 @@ var polyglot = module.exports = {
 	translateAll: function(query, options) {
 		var output = {};
 		var tree = this.parse(query, options);
+		tree = this.preProcess(tree, options);
 		_.forEach(this.engines, (engine, id) => output[id] = this.postProcess(engine.compile(tree, options), options));
 		return output;
+	},
+
+
+	/**
+	* Pre-proess the compile tree before it gets handed to each engines compile function
+	* @param {Object} tree The tree to compile
+	* @param {Object} [options] Additional options - these are provided downstream from the parent 'parse()' function
+	* @return {Object} The mutated tree
+	* @see parse()
+	*/
+	preProcess: function(tree, options) {
+		var settings = _.defaults(options, {
+		});
+
+		// NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
+
+		return tree;
 	},
 
 
@@ -107,11 +127,12 @@ var polyglot = module.exports = {
 	* - If HTML is true all `\n` characters are replaced with `<br/>`
 	* - If HTML is false all <span> item wrappers are removed
 	* @param {string} text The output from the engine - called from translate() / translateAll()
-	* @param {Object} options Options provided during post-processing - these are provided downstream from the parent functions
+	* @param {Object} options Options provided during post-processing - these are provided downstream from the parent 'parse()' function
 	* @param {boolean} [options.forceString] Force the output to be a string even if the module returns something unusual (e.g. mongodb driver returns an object)
 	* @param {boolean} [options.html=true] Provide HTML output
 	* @param {boolean} [options.trim=true] Trim all output lines
 	* @returns {string} The post processed text
+	* @see parse()
 	*/
 	postProcess: function(text, options) {
 		var settings = _.defaults(options, {
