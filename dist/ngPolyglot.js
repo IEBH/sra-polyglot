@@ -70,7 +70,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 		/**
   * Translate the given query using the given engine ID
   * This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
-  * Output will be run via postProcess()
+  * Output will be run via preProcess() + postProcess()
   * @param {string} query The query to translate
   * @param {string} engine The ID of the engine to use
   * @param {Object} options Optional options structure to pass to the engine
@@ -79,12 +79,14 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 		translate: function translate(query, engine, options) {
 			if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
 			var tree = this.parse(query, options);
+			tree = this.preProcess(tree, options);
 			return this.postProcess(this.engines[engine].compile(tree, options), options);
 		},
 
 		/**
   * Translate the given query using all the supported engines
-  * Output will be run via postProcess()
+  * Calling this function instead of individual 'translate()' calls is much more efficient as the tree needs to be compiled only once
+  * Output will be run via preProcess() + postProcess()
   * @param {string} query The query to translate
   * @param {Object} options Optional options structure to pass to each engine
   * @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
@@ -94,10 +96,26 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 
 			var output = {};
 			var tree = this.parse(query, options);
+			tree = this.preProcess(tree, options);
 			_.forEach(this.engines, function (engine, id) {
 				return output[id] = _this.postProcess(engine.compile(tree, options), options);
 			});
 			return output;
+		},
+
+		/**
+  * Pre-proess the compile tree before it gets handed to each engines compile function
+  * @param {Object} tree The tree to compile
+  * @param {Object} [options] Additional options - these are provided downstream from the parent 'parse()' function
+  * @return {Object} The mutated tree
+  * @see parse()
+  */
+		preProcess: function preProcess(tree, options) {
+			var settings = _.defaults(options, {});
+
+			// NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
+
+			return tree;
 		},
 
 		/**
@@ -106,11 +124,12 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
   * - If HTML is true all `\n` characters are replaced with `<br/>`
   * - If HTML is false all <span> item wrappers are removed
   * @param {string} text The output from the engine - called from translate() / translateAll()
-  * @param {Object} options Options provided during post-processing - these are provided downstream from the parent functions
+  * @param {Object} options Options provided during post-processing - these are provided downstream from the parent 'parse()' function
   * @param {boolean} [options.forceString] Force the output to be a string even if the module returns something unusual (e.g. mongodb driver returns an object)
   * @param {boolean} [options.html=true] Provide HTML output
   * @param {boolean} [options.trim=true] Trim all output lines
   * @returns {string} The post processed text
+  * @see parse()
   */
 		postProcess: function postProcess(text, options) {
 			var settings = _.defaults(options, {
@@ -418,10 +437,10 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+										buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
-										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+										buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
 									}
 									break;
 								case 'joinNear':
@@ -435,7 +454,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += 'NOT';
 									break;
 								case 'mesh':
-									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -596,10 +616,10 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+										buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
-										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+										buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
 									}
 									break;
 								case 'joinAnd':
@@ -615,7 +635,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += 'NEAR' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += '[mh ' + (branch.recurse ? '' : '^') + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -712,10 +732,10 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+										buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
-										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+										buffer += polyglot.tools.quotePhrase(branch, 'embase');
 									}
 									break;
 								case 'joinAnd':
@@ -797,7 +817,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
-									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
 									break;
 								case 'joinAnd':
 									buffer += 'AND';
@@ -812,7 +832,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -914,11 +934,11 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field && branch.field == 'title+abstract') {
-										buffer += 'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ' OR ' + 'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
 									} else if (branch.field) {
-										buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content));
+										buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl'));
 									} else {
-										buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+										buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
 									}
 									break;
 								case 'joinAnd':
@@ -1018,7 +1038,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									buffer += 'ADJ' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += /\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content;
+									buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1426,6 +1446,19 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
 				if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
 				return '';
+			},
+
+			/**
+   * Determine if a phrase needs to be enclosed within speachmarks and return the result
+   * @param {Object} branch Phrase branch to examine
+   * @param {string} engine Optional engine ID to examine for other enclose methods
+   * @return {string} The phrase enclosed as needed
+   */
+			quotePhrase: function quotePhrase(branch, engine) {
+				var text = _.trimEnd(branch.content);
+
+				return (/\s/.test(text) ? '"' + text + '"' : text
+				);
 			}
 		}
 	};
