@@ -450,7 +450,7 @@ var polyglot = module.exports = {
 								case 'phrase':
 									if (branch.field) {
 										buffer +=
-											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											polyglot.tools.quotePhrase(branch, 'pubmed') +
 											(
 												(branch.field == 'title') ? '[ti]' :
 												branch.field == 'abstract' ? '[ab]' :
@@ -462,7 +462,7 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
 									}
 									break;
 								case 'joinNear':
@@ -476,7 +476,8 @@ var polyglot = module.exports = {
 									buffer += 'NOT';
 									break;
 								case 'mesh':
-									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -683,7 +684,7 @@ var polyglot = module.exports = {
 								case 'phrase':
 									if (branch.field) {
 										buffer +=
-											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											polyglot.tools.quotePhrase(branch, 'cochrane') +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
@@ -695,7 +696,7 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
 									}
 									break;
 								case 'joinAnd':
@@ -711,7 +712,7 @@ var polyglot = module.exports = {
 									buffer += 'NEAR' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += '[mh ' + (branch.recurse ? '' : '^') + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) + ']';
+									buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -827,7 +828,7 @@ var polyglot = module.exports = {
 								case 'phrase':
 									if (branch.field) {
 										buffer +=
-											(/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											polyglot.tools.quotePhrase(branch, 'embase') +
 											(
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
@@ -839,7 +840,7 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += polyglot.tools.quotePhrase(branch, 'embase');
 									}
 									break;
 								case 'joinAnd':
@@ -929,7 +930,7 @@ var polyglot = module.exports = {
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
-									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
 									break;
 								case 'joinAnd':
 									buffer += 'AND';
@@ -944,7 +945,7 @@ var polyglot = module.exports = {
 									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1053,9 +1054,9 @@ var polyglot = module.exports = {
 								case 'phrase':
 									if (branch.field && branch.field == 'title+abstract') {
 										buffer +=
-											'TI ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content) +
+											'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') +
 											' OR ' +
-											'AB ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+											'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
 									} else if (branch.field) {
 										buffer += _.trimStart(
 											(
@@ -1066,11 +1067,11 @@ var polyglot = module.exports = {
 												branch.field == 'substance' ? 'MW' :
 												''
 											)
-											+ ' ' + (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content)
+											+ ' ' + polyglot.tools.quotePhrase(branch, 'cinahl')
 										);
 
 									} else {
-										buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+										buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
 									}
 									break;
 								case 'joinAnd':
@@ -1188,7 +1189,7 @@ var polyglot = module.exports = {
 									buffer += 'ADJ' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += (/\s/.test(branch.content) ? '"' + branch.content + '"' : branch.content);
+									buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1616,6 +1617,23 @@ var polyglot = module.exports = {
 			if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
 			if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
 			return '';
+		},
+
+
+		/**
+		* Determine if a phrase needs to be enclosed within speachmarks and return the result
+		* @param {Object} branch Phrase branch to examine
+		* @param {string} engine Optional engine ID to examine for other enclose methods
+		* @return {string} The phrase enclosed as needed
+		*/
+		quotePhrase: function(branch, engine) {
+			var text = _.trimEnd(branch.content);
+
+			return (
+				/\s/.test(text)
+				? '"' + text  + '"'
+				: text
+			);
 		},
 	},
 };
