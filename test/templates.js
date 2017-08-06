@@ -61,8 +61,8 @@ describe('Translate the meta template `<rct filter>`', ()=> {
 		expect(polyglot.translate('<RCT Filter>', 'cinahl')).to.equal('(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial');
 	});
 
-	it.skip('translate `<RCT Filter>` -> PY', ()=> {
-		expect(polyglot.translate('<RCT Filter>', 'psycinfo')).to.equal('FIXME');
+	it('translate `<RCT Filter>` -> PY', ()=> {
+		expect(polyglot.translate('<RCT Filter>', 'psycinfo')).to.equal('SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)');
 	});
 
 	it.skip('translate `<RCT Filter>` -> SC', ()=> {
