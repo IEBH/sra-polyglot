@@ -1488,58 +1488,9 @@ var polyglot = module.exports = {
 
 							return buffer;
 						})
-						// Compress $or/$and conditions {{{
-						.thru(function(tree) {
-							if (!_.isArray(tree)) return tree; // Not an array - skip
-
-							// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
-							return tree.reduce((res, branch, index, arr) => {
-								var firstKey = _(branch).keys().first();
-								if (firstKey == '$or' || firstKey == '$and') { // Is a combinator
-									var expression = {};
-									expression[firstKey] = [
-										res.pop(), // Right side is the last thing we added to the buffer
-										arr.splice(index+1, 1)[0], // Left side is the next thing we're going to look at in the array
-									];
-									res.push(expression);
-								} else { // Unknown - just push to array and carry on processing
-									res.push(branch);
-								}
-
-								return res;
-							}, []);
-						})
-						// }}}
-						// Collapse multiple $or / $and trees {{{
-						.thru(function(tree) {
-							var collapses = [];
-							var traverseTree = (branch, path = []) => { // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
-								_.forEach(branch, (v, k) => { // Use _.map if its an array and _.mapValues if we're examining an object
-									if (_.isObject(v)) {
-										var firstKey = _(branch).keys().first();
-										if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) { // Mark for cleanup later (when we can do a bottom-up traversal)
-											var lastKey = _.findLast(collapses, i => i.key == '$and' || i.key == '$or'); // Collapse only identical keys
-											if (lastKey == firstKey) {
-												collapses.push({key: firstKey, path: path});
-											}
-										}
-										traverseTree(v, path.concat([k]));
-									}
-								});
-							};
-							traverseTree(tree);
-
-							collapses.forEach(collapse => {
-								var parent = _.get(tree, collapse.path.slice(0, -1));
-								var child = _.get(tree, collapse.path.concat([collapse.key]));
-								var child2 = parent[1];
-
-								if (child2) child.push(child2);
-								_.set(tree, collapse.path.slice(0, -1), child);
-							});
-
-							return tree;
-						})
+						// Renest + combine $or/$and conditions {{{
+						.thru(tree => polyglot.tools.renestConditions(tree))
+						.thru(tree => polyglot.tools.combineConditions(tree))
 						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
 						.thru(function(tree) {
@@ -1635,6 +1586,79 @@ var polyglot = module.exports = {
 				? '"' + text  + '"'
 				: text
 			);
+		},
+
+
+		/**
+		* Convert the '$or' / '$and' nodes within a tree into a nested structure
+		* This function will also flatten identical branches (i.e. run-on multiple $and / $or into one array)
+		* @param {Object} tree The object tree to recombine
+		* @returns {Object} The recombined tree
+		*/
+		renestConditions: function(tree) {
+			if (!_.isArray(tree)) return tree; // Not an array - skip
+
+			// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
+			return tree.reduce((res, branch, index, arr) => {
+				var firstKey = _(branch).keys().first();
+				if (firstKey == '$or' || firstKey == '$and') { // Is a combinator
+					var expression = {};
+					expression[firstKey] = [
+						res.pop(), // Right side is the last thing we added to the buffer
+						arr.splice(index+1, 1)[0], // Left side is the next thing we're going to look at in the array
+					];
+					res.push(expression);
+				} else { // Unknown - just push to array and carry on processing
+					res.push(branch);
+				}
+
+				return res;
+			}, []);
+		},
+
+
+		/**
+		* Combine multiple run-on $and / $or conditional branches into one branch
+		* This function is a companion function to renestConditions and should be called directly afterwards if needed
+		* @example
+		* {left, joinAnd, right} => {joinAnd: [left, right]}
+		* @example
+		* {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
+		*/
+		combineConditions: function(tree) {
+			var collapses = [];
+			var traverseTree = (branch, path = []) => { // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
+				_.forEach(branch, (v, k) => { // Use _.map if its an array and _.mapValues if we're examining an object
+					if (_.isObject(v)) {
+						var firstKey = _(branch).keys().first();
+						if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) { // Mark for cleanup later (when we can do a bottom-up traversal)
+							var lastKey = _.findLast(collapses, i => i.key == '$and' || i.key == '$or'); // Collapse only identical keys
+							if (!lastKey || lastKey.key == firstKey) {
+								collapses.push({key: firstKey, path: path});
+							}
+						}
+						traverseTree(v, path.concat([k]));
+					}
+				});
+			};
+			traverseTree(tree);
+
+			collapses.forEach(collapse => {
+				var parent = _.get(tree, collapse.path.slice(0, -1));
+				var child = _.get(tree, collapse.path.concat([collapse.key]));
+				var child2 = parent[1];
+
+				if (child2) child.push(child2);
+
+				// Wrap $or conditions (that have an '$and' parent) in an object {{{
+				var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
+				if (lastParent && lastParent == '$and' && collapse.key == '$or') child = {$or: child};
+				// }}}
+
+				_.set(tree, collapse.path.slice(0, -1), child);
+			});
+
+			return tree;
 		},
 	},
 };

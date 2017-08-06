@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var polyglot = require('..');
 
-describe.skip('Translate searches (PubMed -> Mongo)', ()=> {
+describe('Translate searches (PubMed -> Mongo)', ()=> {
 
 	var o = {
 		forceString: false,
