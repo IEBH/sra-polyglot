@@ -50,7 +50,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cinahl: '(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial',
 					embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
 					ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
-					psychinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
+					psycinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
 					pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[MeSH] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
 					wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)'
 				}
@@ -1315,63 +1315,11 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 
 							return buffer;
 						})
-						// Compress $or/$and conditions {{{
+						// Renest + combine $or/$and conditions {{{
 						.thru(function (tree) {
-							if (!_.isArray(tree)) return tree; // Not an array - skip
-
-							// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
-							return tree.reduce(function (res, branch, index, arr) {
-								var firstKey = _(branch).keys().first();
-								if (firstKey == '$or' || firstKey == '$and') {
-									// Is a combinator
-									var expression = {};
-									expression[firstKey] = [res.pop(), // Right side is the last thing we added to the buffer
-									arr.splice(index + 1, 1)[0]];
-									res.push(expression);
-								} else {
-									// Unknown - just push to array and carry on processing
-									res.push(branch);
-								}
-
-								return res;
-							}, []);
-						})
-						// }}}
-						// Collapse multiple $or / $and trees {{{
-						.thru(function (tree) {
-							var collapses = [];
-							var traverseTree = function traverseTree(branch) {
-								var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-								// Recurse into each tree node and make a bottom-up list of nodes we need to collapse
-								_.forEach(branch, function (v, k) {
-									// Use _.map if its an array and _.mapValues if we're examining an object
-									if (_.isObject(v)) {
-										var firstKey = _(branch).keys().first();
-										if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
-											// Mark for cleanup later (when we can do a bottom-up traversal)
-											var lastKey = _.findLast(collapses, function (i) {
-												return i.key == '$and' || i.key == '$or';
-											}); // Collapse only identical keys
-											if (lastKey == firstKey) {
-												collapses.push({ key: firstKey, path: path });
-											}
-										}
-										traverseTree(v, path.concat([k]));
-									}
-								});
-							};
-							traverseTree(tree);
-
-							collapses.forEach(function (collapse) {
-								var parent = _.get(tree, collapse.path.slice(0, -1));
-								var child = _.get(tree, collapse.path.concat([collapse.key]));
-								var child2 = parent[1];
-
-								if (child2) child.push(child2);
-								_.set(tree, collapse.path.slice(0, -1), child);
-							});
-
-							return tree;
+							return polyglot.tools.renestConditions(tree);
+						}).thru(function (tree) {
+							return polyglot.tools.combineConditions(tree);
 						})
 						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
@@ -1460,6 +1408,83 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 
 				return (/\s/.test(text) ? '"' + text + '"' : text
 				);
+			},
+
+			/**
+   * Convert the '$or' / '$and' nodes within a tree into a nested structure
+   * This function will also flatten identical branches (i.e. run-on multiple $and / $or into one array)
+   * @param {Object} tree The object tree to recombine
+   * @returns {Object} The recombined tree
+   */
+			renestConditions: function renestConditions(tree) {
+				if (!_.isArray(tree)) return tree; // Not an array - skip
+
+				// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
+				return tree.reduce(function (res, branch, index, arr) {
+					var firstKey = _(branch).keys().first();
+					if (firstKey == '$or' || firstKey == '$and') {
+						// Is a combinator
+						var expression = {};
+						expression[firstKey] = [res.pop(), // Right side is the last thing we added to the buffer
+						arr.splice(index + 1, 1)[0]];
+						res.push(expression);
+					} else {
+						// Unknown - just push to array and carry on processing
+						res.push(branch);
+					}
+
+					return res;
+				}, []);
+			},
+
+			/**
+   * Combine multiple run-on $and / $or conditional branches into one branch
+   * This function is a companion function to renestConditions and should be called directly afterwards if needed
+   * @example
+   * {left, joinAnd, right} => {joinAnd: [left, right]}
+   * @example
+   * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
+   */
+			combineConditions: function combineConditions(tree) {
+				var collapses = [];
+				var traverseTree = function traverseTree(branch) {
+					var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+					// Recurse into each tree node and make a bottom-up list of nodes we need to collapse
+					_.forEach(branch, function (v, k) {
+						// Use _.map if its an array and _.mapValues if we're examining an object
+						if (_.isObject(v)) {
+							var firstKey = _(branch).keys().first();
+							if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
+								// Mark for cleanup later (when we can do a bottom-up traversal)
+								var lastKey = _.findLast(collapses, function (i) {
+									return i.key == '$and' || i.key == '$or';
+								}); // Collapse only identical keys
+								if (!lastKey || lastKey.key == firstKey) {
+									collapses.push({ key: firstKey, path: path });
+								}
+							}
+							traverseTree(v, path.concat([k]));
+						}
+					});
+				};
+				traverseTree(tree);
+
+				collapses.forEach(function (collapse) {
+					var parent = _.get(tree, collapse.path.slice(0, -1));
+					var child = _.get(tree, collapse.path.concat([collapse.key]));
+					var child2 = parent[1];
+
+					if (child2) child.push(child2);
+
+					// Wrap $or conditions (that have an '$and' parent) in an object {{{
+					var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
+					if (lastParent && lastParent == '$and' && collapse.key == '$or') child = { $or: child };
+					// }}}
+
+					_.set(tree, collapse.path.slice(0, -1), child);
+				});
+
+				return tree;
 			}
 		}
 	};
