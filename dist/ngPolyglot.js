@@ -274,7 +274,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cropString = false;
 					afterWhitespace = true;
 				} else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
-				match = /^\.(tw|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+				match = /^\.(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
 				|| (match = /^:(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
 				) {
 						// Field specifier - Ovid syntax

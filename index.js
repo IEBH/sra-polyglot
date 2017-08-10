@@ -278,7 +278,7 @@ var polyglot = module.exports = {
 				afterWhitespace = true;
 			} else if (
 				(match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-				|| (match = /^\.(tw|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+				|| (match = /^\.(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
 				|| (match = /^:(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
 			) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
