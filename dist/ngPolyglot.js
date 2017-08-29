@@ -278,7 +278,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					q = q.substr(match[0].length);
 					cropString = false;
 					afterWhitespace = true;
-				} else if (/^\//.test(q) && leaf.type && leaf.type == 'phrase') {
+				} else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') {
 					// Mesh term - Ovid syntax (non-exploded)
 					leaf.type = 'mesh';
 					leaf.recurse = false;
