@@ -163,6 +163,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
   * @param {string} query The query string to compile. This can be multiline
   * @param {Object} [options] Optional options to use when parsing
   * @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
+  * @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
   * @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
   * @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
   * @return {array} Array representing the parsed tree nodes
@@ -171,6 +172,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			var settings = _.defaults(options, {
 				groupLines: true,
 				groupLinesAlways: false,
+				removeNumbering: true,
 				preserveNewlines: true
 			});
 
@@ -182,16 +184,35 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
 			var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
 
-			if (settings.groupLines) {
+			// Operate in line-by-line mode? {{{
+			if (settings.groupLines || settings.removeNumbering) {
 				var lines = q.split('\n');
-				if (settings.groupLinesAlways || lines.length > 1) {
-					q = lines
-					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
-					.map(function (line) {
-						return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
-					}).join('\n');
+
+				// Remove numbering {{{
+				if (settings.removeNumbering) {
+					var match;
+					lines = lines.map(function (line) {
+						if (match = /^\s*\d\.?\s(.*)$/.exec(line)) {
+							return match[1];
+						} else {
+							return line;
+						}
+					});
 				}
+				// }}}
+
+				// Group line content {{{
+				if (settings.groupLines && (settings.groupLinesAlways || lines.length > 1)) {
+					// Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
+					lines = lines.map(function (line) {
+						return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
+					});
+				}
+				// }}}
+
+				q = lines.join('\n'); // Join up lines again
 			}
+			// }}}
 
 			// Utility functions {{{
 			/**
@@ -238,7 +259,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)([0-9]+)/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNear', proximity: _.toNumber(match[2]) });
 					leaf = undefined;
@@ -360,10 +381,6 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (match = /^\s*\d\.\s/.exec(q)) {
-					// Remove numeric prefixes (usually the result of Ovid's rather silly export feature). e.g. `1. something\n2. something`
-					cropString = false;
-					q = q.substr(match[0].length);
 				} else {
 					var nextChar = q.substr(0, 1);
 					if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
