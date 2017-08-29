@@ -199,7 +199,7 @@ var polyglot = module.exports = {
 			if (settings.removeNumbering) {
 				var match;
 				lines = lines.map(line => {
-					if (match = /^\s*\d\.?\s(.*)$/.exec(line)) {
+					if (match = /^\s*\d+\.?\s(.*)$/.exec(line)) {
 						return match[1];
 					} else {
 						return line;
