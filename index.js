@@ -1506,8 +1506,10 @@ var polyglot = module.exports = {
 							return buffer;
 						})
 						// Renest + combine $or/$and conditions {{{
+						/* NOTE: Highly experimental - causes bugs under some circumstances
 						.thru(tree => polyglot.tools.renestConditions(tree))
 						.thru(tree => polyglot.tools.combineConditions(tree))
+						*/
 						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
 						.thru(function(tree) {
