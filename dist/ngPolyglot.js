@@ -192,7 +192,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				if (settings.removeNumbering) {
 					var match;
 					lines = lines.map(function (line) {
-						if (match = /^\s*\d\.?\s(.*)$/.exec(line)) {
+						if (match = /^\s*\d+\.?\s(.*)$/.exec(line)) {
 							return match[1];
 						} else {
 							return line;
@@ -1333,11 +1333,10 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							return buffer;
 						})
 						// Renest + combine $or/$and conditions {{{
-						.thru(function (tree) {
-							return polyglot.tools.renestConditions(tree);
-						}).thru(function (tree) {
-							return polyglot.tools.combineConditions(tree);
-						})
+						/* NOTE: Highly experimental - causes bugs under some circumstances
+      .thru(tree => polyglot.tools.renestConditions(tree))
+      .thru(tree => polyglot.tools.combineConditions(tree))
+      */
 						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
 						.thru(function (tree) {
@@ -1457,12 +1456,20 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			/**
    * Combine multiple run-on $and / $or conditional branches into one branch
    * This function is a companion function to renestConditions and should be called directly afterwards if needed
+   * @param {Object} tree The tree to traverse
+   * @param {Object} [options] Additional options to accept
+   * @param {number} [options.depth=10] The maximum depth to traverse before giving up, set to 0 to infinitely recurse
+   * @return {Object} The collapsed tree
    * @example
    * {left, joinAnd, right} => {joinAnd: [left, right]}
    * @example
    * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
    */
-			combineConditions: function combineConditions(tree) {
+			combineConditions: function combineConditions(tree, options) {
+				var settings = _.defaults(options, {
+					depth: 10
+				});
+
 				var collapses = [];
 				var traverseTree = function traverseTree(branch) {
 					var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
@@ -1480,6 +1487,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									collapses.push({ key: firstKey, path: path });
 								}
 							}
+							if (settings.depth && path.length > settings.depth) return; // Stop recursing after depth has been reached
 							traverseTree(v, path.concat([k]));
 						}
 					});
@@ -1489,6 +1497,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 				collapses.forEach(function (collapse) {
 					var parent = _.get(tree, collapse.path.slice(0, -1));
 					var child = _.get(tree, collapse.path.concat([collapse.key]));
+					if (!child || !parent || !parent.length) return;
 					var child2 = parent[1];
 
 					if (child2) child.push(child2);
