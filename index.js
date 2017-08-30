@@ -1637,12 +1637,20 @@ var polyglot = module.exports = {
 		/**
 		* Combine multiple run-on $and / $or conditional branches into one branch
 		* This function is a companion function to renestConditions and should be called directly afterwards if needed
+		* @param {Object} tree The tree to traverse
+		* @param {Object} [options] Additional options to accept
+		* @param {number} [options.depth=10] The maximum depth to traverse before giving up, set to 0 to infinitely recurse
+		* @return {Object} The collapsed tree
 		* @example
 		* {left, joinAnd, right} => {joinAnd: [left, right]}
 		* @example
 		* {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
 		*/
-		combineConditions: function(tree) {
+		combineConditions: function(tree, options) {
+			var settings = _.defaults(options, {
+				depth: 10,
+			});
+
 			var collapses = [];
 			var traverseTree = (branch, path = []) => { // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
 				_.forEach(branch, (v, k) => { // Use _.map if its an array and _.mapValues if we're examining an object
@@ -1654,6 +1662,7 @@ var polyglot = module.exports = {
 								collapses.push({key: firstKey, path: path});
 							}
 						}
+						if (settings.depth && path.length > settings.depth) return; // Stop recursing after depth has been reached
 						traverseTree(v, path.concat([k]));
 					}
 				});
