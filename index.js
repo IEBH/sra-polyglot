@@ -281,7 +281,7 @@ var polyglot = module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
-			} else if (/^\//.test(q) && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
+			} else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
 				leaf.type = 'mesh';
 				leaf.recurse = false;
 			} else if (match = /^<(.*?)>/.exec(q)) {
@@ -1663,6 +1663,7 @@ var polyglot = module.exports = {
 			collapses.forEach(collapse => {
 				var parent = _.get(tree, collapse.path.slice(0, -1));
 				var child = _.get(tree, collapse.path.concat([collapse.key]));
+				if (!child || !parent || !parent.length) return;
 				var child2 = parent[1];
 
 				if (child2) child.push(child2);
