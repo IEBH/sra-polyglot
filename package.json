@@ -7,7 +7,6 @@
     "test": "test"
   },
   "scripts": {
-    "prepublish": "gulp build",
     "serve": "gulp serve",
     "test": "mocha"
   },
