@@ -512,7 +512,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 			// }}}
 			// Ovid Medline {{{
 			ovid: {
-				title: 'Ovid Medline',
+				title: 'Ovid Medline / Ovid Embase',
 				aliases: ['ovid', 'o', 'ov'],
 
 				/**
