@@ -246,25 +246,25 @@ var polyglot = module.exports = {
 				lastGroup = branch;
 				branch = branchStack.pop();
 				leaf = branch.nodes;
-			} else if (afterWhitespace && (match = /^and/i.exec(q))) {
+			} else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinAnd'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (afterWhitespace && (match = /^or/i.exec(q))) {
+			} else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinOr'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (afterWhitespace && (match = /^not/i.exec(q))) {
+			} else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinNot'});
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)/i.exec(q))) {
+			} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;

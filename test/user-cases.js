@@ -7,7 +7,7 @@ var polyglot = require('..');
 
 describe('User edge cases', ()=> {
 
-	// Issue - a running series of 'whitespace' doesnt get closed off properly. So a mesh term + closing brackets cancels the next whitespace character
+	// Issue - a running series of 'whitespace' doesn't get closed off properly. So a mesh term + closing brackets cancels the next whitespace character
 	it('Running whitespace - mesh + brackets + real whitespace', ()=> {
 		expect(polyglot.translate('(exp term1/) and (term2)', 'pubmed')).to.equal('(term1[Mesh]) AND (term2)');
 		expect(polyglot.translate('respiratory', 'pubmed')).to.equal('respiratory');
@@ -24,4 +24,15 @@ describe('User edge cases', ()=> {
 		expect(polyglot.translate('hello world.tw.  ', 'pubmed')).to.equal('"hello world"[tiab]');
 	});
 
+	// Issue 'or' and 'and' occurring at the start of words gets interpreted as the meta conditions 'OR' / 'AND'
+	it('Boolean meta-terms within text should not get interpreted (AND / OR / NOT / ADJ / NEAR)', ()=> {
+		expect(polyglot.translate('ornamental androids', 'pubmed')).to.equal('"ornamental androids"');
+		expect(polyglot.translate('"parkland subcontractor"', 'pubmed')).to.equal('"parkland subcontractor"');
+		expect(polyglot.translate('androgynous orchestra', 'pubmed')).to.equal('"androgynous orchestra"');
+		expect(polyglot.translate('notational origins', 'pubmed')).to.equal('"notational origins"');
+		expect(polyglot.translate('"worship sandwiches"', 'pubmed')).to.equal('"worship sandwiches"');
+		expect(polyglot.translate('sandlewood deodorant', 'pubmed')).to.equal('"sandlewood deodorant"');
+		expect(polyglot.translate('"notionally nearsighted"', 'pubmed')).to.equal('"notionally nearsighted"');
+		expect(polyglot.translate('"adjust knot"', 'pubmed')).to.equal('"adjust knot"');
+	});
 });
