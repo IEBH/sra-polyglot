@@ -241,31 +241,31 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					lastGroup = branch;
 					branch = branchStack.pop();
 					leaf = branch.nodes;
-				} else if (afterWhitespace && (match = /^and/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinAnd' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^or/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinOr' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^not/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNot' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNear', proximity: _.toNumber(match[2]) });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (match = /^\[(mesh|mh)(:NoExp)?\]/i.exec(q)) {
+				} else if (match = /^\[(mesh term|mesh|mh)(:NoExp)?\]/i.exec(q)) {
 					// Mesh term - PubMed syntax
 					leaf.type = 'mesh';
 					leaf.recurse = !match[2];
@@ -331,6 +331,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								break;
 							case 'pt':
 								useLeaf.field = 'publicationType';
+								break;
+							case 'kf':
+								useLeaf.field = 'author';
 								break;
 							case 'xm':
 								useLeaf.type = 'mesh';
