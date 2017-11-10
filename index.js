@@ -270,7 +270,7 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^\[(mesh|mh)(:NoExp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
+			} else if (match = /^\[(mesh term|mesh|mh)(:NoExp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
 				leaf.type = 'mesh';
 				leaf.recurse = ! match[2];
 				if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
@@ -333,6 +333,9 @@ var polyglot = module.exports = {
 						break;
 					case 'pt':
 						useLeaf.field = 'publicationType';
+						break;
+					case 'kf':
+						useLeaf.field = 'author';
 						break;
 					case 'xm':
 						useLeaf.type = 'mesh';
