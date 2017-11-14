@@ -91,44 +91,44 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 
 describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> PM `"term1 term2"[Mesh]`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'pubmed')).to.equal('"term1 term2"[Mesh]');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'pubmed')).to.equal('"term1 and term2"[Mesh]');
+	it('translate `"term1 term2"[MeSH Terms]` -> PM `"term1 term2"[Mesh]`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'pubmed')).to.equal('"term1 term2"[Mesh]');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'pubmed')).to.equal('"term1 and term2"[Mesh]');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> OV `exp term1 term2/`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'ovid')).to.equal('exp term1 term2/');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'ovid')).to.equal('exp term1 and term2/');
+	it('translate `"term1 term2"[MeSH Terms]` -> OV `exp term1 term2/`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'ovid')).to.equal('exp term1 term2/');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'ovid')).to.equal('exp term1 and term2/');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> CO `[mh "term1 term2"]`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'cochrane')).to.equal('[mh "term1 term2"]');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'cochrane')).to.equal('[mh "term1 and term2"]');
+	it('translate `"term1 term2"[MeSH Terms]` -> CO `[mh "term1 term2"]`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'cochrane')).to.equal('[mh "term1 term2"]');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'cochrane')).to.equal('[mh "term1 and term2"]');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> EM `"term1 term2"/exp`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'embase')).to.equal("'term1 term2'/exp");
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'embase')).to.equal("'term1 and term2'/exp");
+	it('translate `"term1 term2"[MeSH Terms]` -> EM `"term1 term2"/exp`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'embase')).to.equal("'term1 term2'/exp");
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'embase')).to.equal("'term1 and term2'/exp");
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> CI `(MH "term1 term2+")`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'cinahl')).to.equal('(MH "term1 term2+")');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'cinahl')).to.equal('(MH "term1 and term2+")');
+	it('translate `"term1 term2"[MeSH Terms]` -> CI `(MH "term1 term2+")`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'cinahl')).to.equal('(MH "term1 term2+")');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'cinahl')).to.equal('(MH "term1 and term2+")');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> PY `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'psycinfo')).to.equal('"term1 term2"');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'psycinfo')).to.equal('"term1 and term2"');
+	it('translate `"term1 term2"[MeSH Terms]` -> PY `"term1 term2"`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'psycinfo')).to.equal('"term1 term2"');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'psycinfo')).to.equal('"term1 and term2"');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> SC `INDEXTERMS(term1 term2)`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'scopus')).to.equal('INDEXTERMS("term1 term2")');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'scopus')).to.equal('INDEXTERMS("term1 and term2")');
+	it('translate `"term1 term2"[MeSH Terms]` -> SC `INDEXTERMS(term1 term2)`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'scopus')).to.equal('INDEXTERMS("term1 term2")');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'scopus')).to.equal('INDEXTERMS("term1 and term2")');
 	});
 
-	it('translate `"term1 term2"[MeSH Terms] ` -> WS `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms] ', 'wos')).to.equal('"term1 term2"');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms] ', 'wos')).to.equal('"term1 and term2"');
+	it('translate `"term1 term2"[MeSH Terms]` -> WS `"term1 term2"`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'wos')).to.equal('"term1 term2"');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'wos')).to.equal('"term1 and term2"');
 	});
 	
 });
