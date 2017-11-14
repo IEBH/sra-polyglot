@@ -70,6 +70,42 @@ describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 	it('translate `term[mh]` -> WS `term`', ()=> {
 		expect(polyglot.translate('term[mh]', 'wos')).to.equal('term');
 	});
+	
+});
+
+describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
+
+	it('translate `term[MeSH Terms]` -> PM `term[Mesh]`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'pubmed')).to.equal('term[Mesh]');
+	});
+
+	it('translate `term[MeSH Terms]` -> OV `exp term/`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'ovid')).to.equal('exp term/');
+	});
+
+	it('translate `term[MeSH Terms]` -> CO `[mh term]`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'cochrane')).to.equal('[mh term]');
+	});
+
+	it('translate `term[MeSH Terms]` -> EM `term/exp`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'embase')).to.equal("'term'/exp");
+	});
+
+	it('translate `term[MeSH Terms]` -> CI `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'cinahl')).to.equal('(MH "term+")');
+	});
+
+	it('translate `term[MeSH Terms]` -> PY `term`', ()=> {
+		expect(polyglot.translate('term[mh]', 'psycinfo')).to.equal('term');
+	});
+
+	it('translate `term[mh]` -> SC `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'scopus')).to.equal('INDEXTERMS("term")');
+	});
+
+	it('translate `term[MeSH Terms]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'wos')).to.equal('term');
+	});
 
 });
 
