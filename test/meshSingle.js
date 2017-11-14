@@ -99,7 +99,7 @@ describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
 		expect(polyglot.translate('term[mh]', 'psycinfo')).to.equal('term');
 	});
 
-	it('translate `term[mh]` -> SC `(MH term+)`', ()=> {
+	it('translate `term[MeSH Terms]` -> SC `(MH term+)`', ()=> {
 		expect(polyglot.translate('term[MeSH Terms]', 'scopus')).to.equal('INDEXTERMS("term")');
 	});
 
