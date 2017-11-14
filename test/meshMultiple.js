@@ -130,7 +130,7 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'wos')).to.equal('"term1 term2"');
 		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'wos')).to.equal('"term1 and term2"');
 	});
-	
+
 });
 
 describe('Translate multiple MESH terms (Ovid -> *)', ()=> {

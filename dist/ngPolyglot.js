@@ -62,7 +62,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
 					embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
 					ovid: 'search:.tw.OR meta analysis.mp,pt.OR review.pt.OR di.xs. OR associated.tw.',
-					pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH Terms] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
+					pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
 					wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane'
 				}
 			}
@@ -265,7 +265,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (match = /^\[(mesh term|mesh|mh)(:NoExp)?\]/i.exec(q)) {
+				} else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
 					// Mesh term - PubMed syntax
 					leaf.type = 'mesh';
 					leaf.recurse = !match[2];
