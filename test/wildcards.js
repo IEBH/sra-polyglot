@@ -111,36 +111,36 @@ describe('Translate wildcards searches (single character PubMed "?" style)', ()=
 
 describe('Translate wildcards searches (single character Ovid "$" style)', ()=> {
 
-	it('translate `term$` -> PM `term?`', ()=> {
-		expect(polyglot.translate('term$', 'pubmed')).to.equal('term?');
+	it('translate `term$` -> PM `term*`', ()=> {
+		expect(polyglot.translate('term$', 'pubmed')).to.equal('term*');
 	});
 
-	it('translate `term$` -> OV `term?`', ()=> {
-		expect(polyglot.translate('term$', 'ovid')).to.equal('term?');
+	it('translate `term$` -> OV `term$`', ()=> {
+		expect(polyglot.translate('term$', 'ovid')).to.equal('term$');
 	});
 
-	it('translate `term$` -> CO `term?`', ()=> {
-		expect(polyglot.translate('term$', 'cochrane')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> CO `term*`', ()=> {
+		expect(polyglot.translate('term$', 'cochrane')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">*</span>"');
 	});
 
-	it('translate `term$` -> EM `term?`', ()=> {
-		expect(polyglot.translate('term$', 'embase')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> EM `term*`', ()=> {
+		expect(polyglot.translate('term$', 'embase')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">*</span>"');
 	});
 
-	it('translate `term$` -> CI `term#`', ()=> {
-		expect(polyglot.translate('term$', 'cinahl')).to.equal('term#');
+	it('translate `term$` -> CI `term*`', ()=> {
+		expect(polyglot.translate('term$', 'cinahl')).to.equal('term*');
 	});
 
-	it('translate `term$` -> PY `term?`', ()=> {
-		expect(polyglot.translate('term$', 'psycinfo')).to.equal('term?');
+	it('translate `term$` -> PY `term*`', ()=> {
+		expect(polyglot.translate('term$', 'psycinfo')).to.equal('term*');
 	});
 
-	it('translate `term$` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term$', 'scopus')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
+	it('translate `term$` -> SC `term*`', ()=> {
+		expect(polyglot.translate('term$', 'scopus')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">*</span>"');
 	});
 
-	it('translate `term$` -> WS `term?`', ()=> {
-		expect(polyglot.translate('term$', 'wos')).to.equal('term$');
+	it('translate `term$` -> WS `term*`', ()=> {
+		expect(polyglot.translate('term$', 'wos')).to.equal('term*');
 	});
 
 });
