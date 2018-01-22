@@ -3,8 +3,8 @@ var polyglot = require('..');
 
 describe('Translate abstract searches (PubMed -> *)', ()=> {
 
-	it('translate `term[ab]` -> PM `term[ab]`', ()=> {
-		expect(polyglot.translate('term[ab]', 'pubmed')).to.equal('term[ab]');
+	it('translate `term[ab]` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('term[ab]', 'pubmed')).to.equal('term[tiab]');
 	});
 
 	it('translate `term[ab]` -> OV `term.ab`', ()=> {
@@ -39,8 +39,8 @@ describe('Translate abstract searches (PubMed -> *)', ()=> {
 
 describe('Translate abstract searches (Ovid -> *)', ()=> {
 
-	it('translate `term:ab` -> PM `term[ab]`', ()=> {
-		expect(polyglot.translate('term:ab', 'pubmed')).to.equal('term[ab]');
+	it('translate `term:ab` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('term:ab', 'pubmed')).to.equal('term[tiab]');
 	});
 
 	it('translate `term:ab` -> OV `term.ab`', ()=> {
