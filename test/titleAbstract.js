@@ -144,3 +144,75 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', ()
 	});
 
 });
+
+describe('Translate abstract + title searches (Ovid `term.ab,ti` format) -> *)', ()=> {
+
+	it('translate `.ab,ti` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('.ab,ti', 'pubmed')).to.equal('term[tiab]');
+	});
+
+	it('translate `.ab,ti` -> OV `term.ab,ti`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'ovid')).to.equal('term.ab,ti');
+	});
+
+	it('translate `term.ab,ti` -> CO `term.tw.`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'cochrane')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term.ab,ti` -> EM `term.tw.`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'embase')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term.ab,ti` -> CI `TI term OR AB term`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'cinahl')).to.equal('TI term OR AB term');
+	});
+
+	it('translate `term.ab,ti` -> PY `term.ti,ab`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'psycinfo')).to.equal('term.ti,ab');
+	});
+
+	it('translate `term.ab,ti` -> SC `TITLE-ABS(term)`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'scopus')).to.equal('TITLE-ABS("term")');
+	});
+
+	it('translate `term.ab,ti` -> WS `term`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'wos')).to.equal('term');
+	});
+
+});
+
+describe('Translate abstract + title searches (Ovid `term.ab,ti.` format) -> *)', ()=> {
+
+	it('translate `.ab,ti.` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('.ab,ti.', 'pubmed')).to.equal('term[tiab]');
+	});
+
+	it('translate `.ab,ti.` -> OV `term.ab,ti`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'ovid')).to.equal('term.ab,ti.');
+	});
+
+	it('translate `term.ab,ti.` -> CO `term.tw.`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'cochrane')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term.ab,ti.` -> EM `term.tw.`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'embase')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term.ab,ti.` -> CI `TI term OR AB term`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'cinahl')).to.equal('TI term OR AB term');
+	});
+
+	it('translate `term.ab,ti.` -> PY `term.ti,ab`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'psycinfo')).to.equal('term.ti,ab');
+	});
+
+	it('translate `term.ab,ti.` -> SC `TITLE-ABS(term)`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'scopus')).to.equal('TITLE-ABS("term")');
+	});
+
+	it('translate `term.ab,ti.` -> WS `term`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'wos')).to.equal('term');
+	});
+
+});
