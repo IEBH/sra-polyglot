@@ -103,8 +103,8 @@ describe('Translate wildcards searches (single character PubMed "?" style)', ()=
 		expect(polyglot.translate('term?', 'scopus')).to.equal('"term<span msg="NO_OPTIONAL_WILDCARD">?</span>"');
 	});
 
-	it('translate `term?` -> WS `term$`', ()=> {
-		expect(polyglot.translate('term?', 'wos')).to.equal('term$');
+	it('translate `term?` -> WS `term*`', ()=> {
+		expect(polyglot.translate('term?', 'wos')).to.equal('term*');
 	});
 
 });
