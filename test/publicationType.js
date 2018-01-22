@@ -27,8 +27,8 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[pt]', 'psycinfo')).to.equal('term.pt');
 	});
 
-	it('translate `term[ab]` -> SC `SRCTYPE("term")`', ()=> {
-		expect(polyglot.translate('term[pt]', 'scopus')).to.equal('SRCTYPE("term")');
+	it('translate `term[ab]` -> SC `DOCTYPE("term")`', ()=> {
+		expect(polyglot.translate('term[pt]', 'scopus')).to.equal('DOCTYPE("term")');
 	});
 
 	it('translate `term[pt]` -> WS `term`', ()=> {
@@ -63,8 +63,8 @@ describe('Translate publication type searches (Ovid -> *)', ()=> {
 		expect(polyglot.translate('term:pt', 'psycinfo')).to.equal('term.pt');
 	});
 
-	it('translate `term:pt` -> SC `SRCTYPE("term")`', ()=> {
-		expect(polyglot.translate('term:pt', 'scopus')).to.equal('SRCTYPE("term")');
+	it('translate `term:pt` -> SC `DOCTYPE("term")`', ()=> {
+		expect(polyglot.translate('term:pt', 'scopus')).to.equal('DOCTYPE("term")');
 	});
 
 	it('translate `term:pt` -> WS `term`', ()=> {
