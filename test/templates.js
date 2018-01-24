@@ -42,7 +42,7 @@ describe('Translate the meta template `<engine>`', ()=> {
 describe('Translate the meta template `<rct filter>`', ()=> {
 
 	it('translate `<RCT Filter>` -> PM', ()=> {
-		expect(polyglot.translate('<RCT Filter>', 'pubmed')).to.equal('randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[MeSH] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))');
+		expect(polyglot.translate('<RCT Filter>', 'pubmed')).to.equal('randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))');
 	});
 
 	it('translate `<RCT Filter>` -> OV', ()=> {
