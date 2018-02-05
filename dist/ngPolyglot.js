@@ -51,7 +51,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
 					ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
 					psycinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
-					pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[MeSH] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
+					pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
 					wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)'
 				}
 			},
@@ -62,7 +62,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
 					embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
 					ovid: 'search:.tw.OR meta analysis.mp,pt.OR review.pt.OR di.xs. OR associated.tw.',
-					pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH Terms] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
+					pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
 					wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane'
 				}
 			}
@@ -241,31 +241,31 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					lastGroup = branch;
 					branch = branchStack.pop();
 					leaf = branch.nodes;
-				} else if (afterWhitespace && (match = /^and/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinAnd' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^or/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinOr' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^not/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNot' });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)/i.exec(q))) {
+				} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
 					trimLastLeaf();
 					branch.nodes.push({ type: 'joinNear', proximity: _.toNumber(match[2]) });
 					leaf = undefined;
 					q = q.substr(match[0].length);
 					cropString = false;
-				} else if (match = /^\[(mesh|mh)(:NoExp)?\]/i.exec(q)) {
+				} else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
 					// Mesh term - PubMed syntax
 					leaf.type = 'mesh';
 					leaf.recurse = !match[2];
@@ -295,12 +295,12 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					cropString = false;
 					afterWhitespace = true;
 				} else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
-				match = /^\.(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-				|| (match = /^:(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+				match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+				|| (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
 				) {
 						// Field specifier - Ovid syntax
 						// Figure out the leaf to use (usually the last one) or the previously used group {{{
-						var useLeaf;
+						var useLeaf = {};
 						if (_.isObject(leaf) && leaf.type == 'phrase') {
 							useLeaf = leaf;
 						} else if (_.isArray(leaf) && lastGroup) {
@@ -312,6 +312,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							case 'ti':
 								useLeaf.field = 'title';
 								break;
+							case 'ab,ti':
 							case 'ti,ab':
 							case 'tw':
 								useLeaf.field = 'title+abstract';
@@ -331,6 +332,9 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 								break;
 							case 'pt':
 								useLeaf.field = 'publicationType';
+								break;
+							case 'kf':
+								useLeaf.field = 'author';
 								break;
 							case 'xm':
 								useLeaf.type = 'mesh';
@@ -439,7 +443,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '?' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '?' }, { subject: /\$/g, value: '*' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -447,7 +451,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
+										branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -455,7 +460,8 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[ab]' : branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+										buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
+										branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
@@ -528,7 +534,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '?' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '?' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -536,7 +542,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.nm' : '' // Unsupported field suffix for PubMed
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -544,7 +550,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.nm' : '' // Unsupported field suffix for PubMed
+										buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += branch.content;
@@ -618,22 +624,26 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									if (branch.field) {
-										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field) {
+										buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
 									break;
 								case 'phrase':
-									if (branch.field) {
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field) {
 										buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
 										);
 									} else {
@@ -734,7 +744,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -825,7 +835,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '$' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '$' }, { subject: /\$/g, value: '*' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -936,7 +946,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }, { subject: /[\?\$]/g, value: '#' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>' }, { subject: /\?/g, value: '#' }, { subject: /\$/g, value: '*' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -1027,7 +1037,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '?' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '?' }, { subject: /\$/g, value: '*' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -1111,7 +1121,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 					});
 
 					// Apply wildcard replacements
-					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /[\?\$]/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>' }]);
+					if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{ subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>' }, { subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>' }, { subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>' }]);
 
 					var compileWalker = function compileWalker(tree) {
 						return tree.map(function (branch, branchIndex) {
@@ -1122,7 +1132,7 @@ angular.module('ngPolyglot', []).service('Polyglot', function () {
 									break;
 								case 'phrase':
 									if (branch.field) {
-										buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
+										buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
 									} else {
 										buffer += '"' + branch.content + '"';
 									}
