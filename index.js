@@ -54,7 +54,7 @@ var polyglot = module.exports = {
 				embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
 				ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
 				psycinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
-				pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[MeSH] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
+				pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
 				wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)',
 			},
 		},
@@ -298,11 +298,11 @@ var polyglot = module.exports = {
 				afterWhitespace = true;
 			} else if (
 				(match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-				|| (match = /^\.(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-				|| (match = /^:(tw|ti,ab|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+				|| (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+				|| (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
 			) { // Field specifier - Ovid syntax
 				// Figure out the leaf to use (usually the last one) or the previously used group {{{
-				var useLeaf;
+				var useLeaf = {};
 				if (_.isObject(leaf) && leaf.type == 'phrase') {
 					useLeaf = leaf;
 				} else if (_.isArray(leaf) && lastGroup) {
@@ -314,6 +314,7 @@ var polyglot = module.exports = {
 					case 'ti':
 						useLeaf.field = 'title';
 						break;
+					case 'ab,ti':
 					case 'ti,ab':
 					case 'tw':
 						useLeaf.field = 'title+abstract';
@@ -457,7 +458,7 @@ var polyglot = module.exports = {
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
 												branch.field == 'title' ? '[ti]' :
-												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
 												branch.field == 'title+abstract' ? '[tiab]' :
 												branch.field == 'title+abstract+other' ? '[tw]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
@@ -475,7 +476,7 @@ var polyglot = module.exports = {
 											polyglot.tools.quotePhrase(branch, 'pubmed') +
 											(
 												(branch.field == 'title') ? '[ti]' :
-												branch.field == 'abstract' ? '[ab]' :
+												branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
 												branch.field == 'title+abstract' ? '[tiab]' :
 												branch.field == 'title+abstract+other' ? '[tw]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
@@ -572,13 +573,13 @@ var polyglot = module.exports = {
 										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
-												branch.field == 'title' ? '.ti' :
-												branch.field == 'abstract' ? '.ab' :
-												branch.field == 'title+abstract' ? '.ti,ab' :
+												branch.field == 'title' ? '.ti.' :
+												branch.field == 'abstract' ? '.ab.' :
+												branch.field == 'title+abstract' ? '.ti,ab.' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
-												branch.field == 'floatingSubheading' ? '.fs' :
-												branch.field == 'publicationType' ? '.pt' :
-												branch.field == 'substance' ? '.nm' :
+												branch.field == 'floatingSubheading' ? '.fs.' :
+												branch.field == 'publicationType' ? '.pt.' :
+												branch.field == 'substance' ? '.nm.' :
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
@@ -590,13 +591,13 @@ var polyglot = module.exports = {
 										buffer +=
 											branch.content +
 											(
-												branch.field == 'title' ? '.ti' :
-												branch.field == 'abstract' ? '.ab' :
-												branch.field == 'title+abstract' ? '.ti,ab' :
+												branch.field == 'title' ? '.ti.' :
+												branch.field == 'abstract' ? '.ab.' :
+												branch.field == 'title+abstract' ? '.ti,ab.' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
-												branch.field == 'floatingSubheading' ? '.fs' :
-												branch.field == 'publicationType' ? '.pt' :
-												branch.field == 'substance' ? '.nm' :
+												branch.field == 'floatingSubheading' ? '.fs.' :
+												branch.field == 'publicationType' ? '.pt.' :
+												branch.field == 'substance' ? '.nm.' :
 												'' // Unsupported field suffix for PubMed
 											)
 									} else {
@@ -687,7 +688,9 @@ var polyglot = module.exports = {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									if (branch.field) {
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field) {
 										buffer +=
 											'(' + compileWalker(branch.nodes) + ')' +
 											(
@@ -695,7 +698,6 @@ var polyglot = module.exports = {
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
-												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
 												branch.field == 'substance' ? ':kw' :
 												'' // Unsupported field suffix for PubMed
@@ -705,7 +707,9 @@ var polyglot = module.exports = {
 									}
 									break;
 								case 'phrase':
-									if (branch.field) {
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field) {
 										buffer +=
 											polyglot.tools.quotePhrase(branch, 'cochrane') +
 											(
@@ -1297,7 +1301,7 @@ var polyglot = module.exports = {
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
 											branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
-											branch.field == 'publicationType' ? 'SRCTYPE("' + branch.content + '")' :
+											branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
 											branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
 											'"' + branch.content + '"'
 										);

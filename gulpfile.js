@@ -11,7 +11,7 @@ var replace = require('gulp-replace');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
-gulp.task('default', ['build']);
+gulp.task('default', ['serve']);
 gulp.task('build', ['js']);
 
 gulp.task('js', function() {

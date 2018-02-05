@@ -8,7 +8,7 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[nm]` -> OV `term.nm`', ()=> {
-		expect(polyglot.translate('term[nm]', 'ovid')).to.equal('term.nm');
+		expect(polyglot.translate('term[nm]', 'ovid')).to.equal('term.nm.');
 	});
 
 	it('translate `term[nm]` -> CO `term:ti`', ()=> {
@@ -44,7 +44,7 @@ describe('Translate substance searches (Ovid -> *)', ()=> {
 	});
 
 	it('translate `term.nm` -> OV `term.nm`', ()=> {
-		expect(polyglot.translate('term.nm', 'ovid')).to.equal('term.nm');
+		expect(polyglot.translate('term.nm', 'ovid')).to.equal('term.nm.');
 	});
 
 	it('translate `term.nm` -> CO `term:ti`', ()=> {

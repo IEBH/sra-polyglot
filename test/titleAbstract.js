@@ -8,7 +8,7 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[tiab]` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translate('term[tiab]', 'ovid')).to.equal('term.ti,ab');
+		expect(polyglot.translate('term[tiab]', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term[tiab]` -> CO `term:ti,ab`', ()=> {
@@ -44,7 +44,7 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 	});
 
 	it('translate `term:ti,ab` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translate('term:ti,ab', 'ovid')).to.equal('term.ti,ab');
+		expect(polyglot.translate('term:ti,ab', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term:ti,ab` -> CO `term:ti,ab`', ()=> {
@@ -80,7 +80,7 @@ describe('Translate title + abstract searches (Ovid `term.ti,ab` format) -> *)',
 	});
 
 	it('translate `term.ti,ab` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translate('term.ti,ab', 'ovid')).to.equal('term.ti,ab');
+		expect(polyglot.translate('term.ti,ab', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ti,ab` -> CO `term.ti,ab`', ()=> {
@@ -116,7 +116,7 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', ()
 	});
 
 	it('translate `term.tw.` -> OV `term:ti,ab`', ()=> {
-		expect(polyglot.translate('term.tw.', 'ovid')).to.equal('term.ti,ab');
+		expect(polyglot.translate('term.tw.', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.tw.` -> CO `term.tw.`', ()=> {
@@ -147,12 +147,12 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', ()
 
 describe('Translate abstract + title searches (Ovid `term.ab,ti` format) -> *)', ()=> {
 
-	it('translate `.ab,ti` -> PM `term[tiab]`', ()=> {
-		expect(polyglot.translate('.ab,ti', 'pubmed')).to.equal('term[tiab]');
+	it('translate `term.ab,ti` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'pubmed')).to.equal('term[tiab]');
 	});
 
-	it('translate `.ab,ti` -> OV `term.ab,ti`', ()=> {
-		expect(polyglot.translate('term.ab,ti', 'ovid')).to.equal('term.ab,ti');
+	it('translate `term.ab,ti` -> OV `term.ti,ab`', ()=> {
+		expect(polyglot.translate('term.ab,ti', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ab,ti` -> CO `term.tw.`', ()=> {
@@ -183,12 +183,12 @@ describe('Translate abstract + title searches (Ovid `term.ab,ti` format) -> *)',
 
 describe('Translate abstract + title searches (Ovid `term.ab,ti.` format) -> *)', ()=> {
 
-	it('translate `.ab,ti.` -> PM `term[tiab]`', ()=> {
-		expect(polyglot.translate('.ab,ti.', 'pubmed')).to.equal('term[tiab]');
+	it('translate `term.ab,ti.` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'pubmed')).to.equal('term[tiab]');
 	});
 
-	it('translate `.ab,ti.` -> OV `term.ab,ti`', ()=> {
-		expect(polyglot.translate('term.ab,ti.', 'ovid')).to.equal('term.ab,ti.');
+	it('translate `term.ab,ti.` -> OV `term.ab,ti`', ()=> {
+		expect(polyglot.translate('term.ab,ti.', 'ovid')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ab,ti.` -> CO `term.tw.`', ()=> {
