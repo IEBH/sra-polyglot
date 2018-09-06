@@ -11,8 +11,8 @@ describe('Translate adjacency searches (ADJ format)', ()=> {
 		expect(polyglot.translate('term1 ADJ3 term2', 'ovid')).to.equal('term1 ADJ3 term2');
 	});
 
-	it('translate `term1 ADJ3 term2` -> CO `term1 NEAR3 term2`', ()=> {
-		expect(polyglot.translate('term1 ADJ3 term2', 'cochrane')).to.equal('term1 NEAR3 term2');
+	it('translate `term1 ADJ3 term2` -> CO `term1 NEAR/3 term2`', ()=> {
+		expect(polyglot.translate('term1 ADJ3 term2', 'cochrane')).to.equal('term1 NEAR/3 term2');
 	});
 
 	it('translate `term1 ADJ3 term2` -> EM `term1 NEAR/3 term2`', ()=> {
