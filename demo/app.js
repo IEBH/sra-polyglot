@@ -1,5 +1,6 @@
 var app = angular.module("app", [
 	'ngPolyglot',
+	'ui.ace',
 ]);
 
 app.controller("polyglotExampleCtrl", function($sce, $scope, Polyglot) {
@@ -33,7 +34,23 @@ app.controller("polyglotExampleCtrl", function($sce, $scope, Polyglot) {
 	});
 	// }}}
 
+	// ACE editor {{{
+	window.ace.config.set('themePath', 'node_modules/ace-builds/src-min-noconflict')
+	window.ace.config.set('modePath', 'syntax/ace')
+	window.ace.config.set('workerPath', 'syntax/ace')
+
+	$scope.aceOptions = {
+		mode: 'polyglot',
+		theme: 'chrome',
+		showPrintMargin: false,
+		useWrapMode: true,
+	};
+	// }}}
+
 	$scope.clear = () => $scope.query = '';
 
 	$scope.toggleExpandEngine = engine => engine.expanded = !engine.expanded;
+
+	// FIXME: Remove this
+	$scope.showExample();
 });

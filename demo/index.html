@@ -14,9 +14,14 @@
 		<!-- Bootstrap -->
 		<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
 
 		<!-- Angular -->
 		<script src="node_modules/angular/angular.min.js"></script>
+
+		<!-- Ace -->
+		<script src="node_modules/ace-builds/src-min/ace.js"></script>
+		<script src="node_modules/angular-ui-ace/src/ui-ace.js"></script>
 
 		<!-- Polyglot -->
 		<script src="dist/ngPolyglot.js"></script>
@@ -46,8 +51,15 @@
 							<a ng-click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" tooltip="Show a random example"></i></a>
 						</div>
 					</div>
-					<div class="card-body form-horizontal">
+					<div class="card-body p-0">
+						<!--
 						<textarea class="form-control" rows="12" id="query" ng-model="query" ng-trim="false" placeholder="Enter your search query here..."></textarea>
+						-->
+						<ui-ace
+							ui-ace="aceOptions"
+							ng-model="query"
+							style="height: 300px; width: 100%; display: block"
+						></ui-ace>
 					</div>
 				</div>
 			</div>

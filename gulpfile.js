@@ -75,6 +75,7 @@ gulp.task('gh-pages', ['build'], function() {
 		'./node_modules/font-awesome/fonts/fontawesome-webfont.ttf',
 		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff',
 		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
+		'./node_modules/popper.js/dist/umd/popper.min.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
 			if (path.dirname == 'demo') { // Move all demo files into root

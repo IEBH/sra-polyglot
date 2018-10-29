@@ -9,3 +9,7 @@ a, [ng-click] {
 a:hover {
 	text-decoration: none;
 }
+
+.ace_editor {
+	font-size: 16px;
+}
