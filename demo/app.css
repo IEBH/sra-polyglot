@@ -1,16 +1,11 @@
-a {
+body {
+	padding-top: 40px;
+}
+
+a, [ng-click] {
 	cursor: pointer;
 }
 
 a:hover {
 	text-decoration: none;
-}
-
-.panel-title > a {
-	display: block;
-}
-
-.tab {
-	display: inline-block;
-	width: 20px;
 }

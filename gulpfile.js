@@ -28,7 +28,7 @@ gulp.task('js', function() {
 		.pipe(replace(/^.*require\(.*\);\s+$/gm, ''))
 		.pipe(replace(/^var polyglot = .+$/m, 'var polyglot;\nreturn polyglot = {'))
 		.pipe(babel({
-			presets: ['es2015'],
+			presets: ['@babel/env'],
 			plugins: ['angularjs-annotate'],
 		}))
 		.pipe(gulp.dest('./dist'))
@@ -53,11 +53,6 @@ gulp.task('serve', ['build'], function() {
 	watch(['./index.js', 'demo/**/*.js', 'src/**/*.js'], function() {
 		console.log('Rebuild client-side JS files...');
 		gulp.start('js');
-	});
-
-	watch(['demo/**/*.css', 'src/**/*.css'], function() {
-		console.log('Rebuild client-side CSS files...');
-		gulp.start('css');
 	});
 });
 
