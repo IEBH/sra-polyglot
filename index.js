@@ -132,7 +132,6 @@ var polyglot = module.exports = {
 	* @param {boolean} [options.forceString] Force the output to be a string even if the module returns something unusual (e.g. mongodb driver returns an object)
 	* @param {boolean} [options.html=true] Provide HTML output
 	* @param {boolean} [options.trim=true] Trim all output lines
-	* @param {boolean} [options.transposeLines=true] Insert all line references where needed (e.g. `1 - 3/OR`)
 	* @returns {string} The post processed text
 	* @see parse()
 	*/
@@ -145,10 +144,6 @@ var polyglot = module.exports = {
 		});
 
 		if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
-
-		if (settings.transposeLines) {
-			text = polyglot.tools.transposeLines(text);
-		}
 
 		if (settings.html) {
 			text = text
@@ -177,6 +172,7 @@ var polyglot = module.exports = {
 	* @param {Object} [options] Optional options to use when parsing
 	* @param {boolean} [options.groupLines=false] Wrap lines inside their own groups (only applies if multiple lines are present)
 	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
+	* @param {boolean} [options.transposeLines=true] Insert all line references where needed (e.g. `1 - 3/OR`)
 	* @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
 	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
 	* @return {array} Array representing the parsed tree nodes
@@ -187,6 +183,7 @@ var polyglot = module.exports = {
 			groupLinesAlways: false,
 			removeNumbering: true,
 			preserveNewlines: true,
+			transposeLines: true,
 		});
 
 		var q = query + ''; // Clone query
@@ -196,10 +193,47 @@ var polyglot = module.exports = {
 		var lastGroup; // Optional reference to the previously created group (used to pin things)
 		var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
 		var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
+		var lineRefs = {}; // Object lookup for line references (usually something like `1. Foo`), only populated if `transposeLines` is true
 
 		// Operate in line-by-line mode? {{{
-		if (settings.groupLines || settings.removeNumbering) {
+		if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
 			var lines = q.split('\n');
+
+			// Transpose lines {{{
+			if (settings.transposeLines) {
+				// Compute array of line references
+				lineRefs = _(lines)
+					.filter(line => !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line)) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
+					.map(line => {
+						var bits = /^\s*(\d+)\.?\s(.*)$/.exec(line);
+						if (bits) return [bits[1], bits[2]];
+					})
+					.filter()
+					.mapKeys(i => i[0])
+					.mapValues(i => _.trim(i[1]))
+					.value();
+
+				/*
+				lines = lines
+					.map((line, lineOffset) => {
+						line = line
+							.replace(/([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i, (match, from, to, cond) =>
+								_.range(Number(from), Number(to) + 1)
+									.map(ref => {
+										if (!lineRefs[ref]) throw new Error(`Reference "${ref}" not found (required on line ${lineOffset})`);
+										return lineRefs[ref];
+									})
+									.join(' ' + cond + ' ')
+							)
+							.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p2, cond, p2) => {
+								if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
+								if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
+								return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
+							})
+					})
+				*/
+			}
+			// }}}
 
 			// Remove numbering {{{
 			if (settings.removeNumbering) {
@@ -287,7 +321,7 @@ var polyglot = module.exports = {
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
-			} else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
+			} else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) { // Mesh term - Ovid syntax (non-exploded)
 				leaf.type = 'mesh';
 				leaf.recurse = false;
 			} else if (match = /^<(.*?)>/.exec(q)) {
@@ -392,6 +426,12 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
+				branch.nodes.push({type: 'ref', ref: _.range(match[1], match[2]+1), cond: match[3]});
+				q = q.substr(match[0].length);
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
+				branch.nodes.push({type: 'ref', ref: [match[1]]});
+				q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 			} else {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
@@ -412,6 +452,14 @@ var polyglot = module.exports = {
 			}
 
 			if (cropString) q = q.substr(1); // Crop 1 character
+		}
+
+		if (settings.transposeLines) {
+			polyglot.tools.visit(tree.nodes, ['ref'], (node, path) => {
+				// FIXME: Do a line transposition here
+				node.type = 'phrase';
+				node.content = 'REF(' + node.ref.join(',') + ')';
+			});
 		}
 
 		return tree.nodes;
@@ -526,8 +574,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -640,8 +688,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -759,8 +807,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -901,8 +949,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -988,8 +1036,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -1128,8 +1176,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -1228,8 +1276,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -1327,8 +1375,8 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
+									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -1546,23 +1594,41 @@ var polyglot = module.exports = {
 		/**
 		* Visit the given node types within a deeply nested tree and run a function
 		* This function may mutate the input tree depending on the actions of the callbacks
+		* NOTE: If the return value of the callback is `"DEL"` the node is deleted
 		* @param {array} tree The tree sturcture to operate on
 		* @param {null|array} types Node filter to apply to (if falsy all are used)
-		* @param {function} callback The callback to call with each node
+		* @param {function} callback The callback to call with each node. Called as (node, path)
 		* @return {array} The input tree
 		*/
 		visit: (tree, types, callback) => {
-			var treeWalker = tree => {
-				tree.forEach(branch => {
+			var removals = []; // Stack of removal paths we are performing when done
+
+			var treeWalker = (tree, path) => {
+				tree.forEach((branch, branchKey) => {
+					var nodePath = path.concat(branchKey);
+
 					// Fire callback if it matches
-					if (!types || _.includes(types, branch.type)) callback(branch);
+					if (!types || _.includes(types, branch.type)) {
+						var result = callback(branch, nodePath);
+						if (result === 'DEL') removals.push(nodePath);
+					}
 
 					// Walk down nodes if its a group
-					if (branch.type == 'group') treeWalker(branch.nodes);
+					if (branch.type == 'group') treeWalker(branch.nodes, nodePath.concat(['nodes']));
 				});
 			};
 
-			treeWalker(tree);
+			treeWalker(tree, []);
+
+			// Crop all items marked as removals
+			removals
+				.reverse() // Walk in reverse order so we don't screw up arrays
+				.forEach(path => {
+					var nodeName = path.pop();
+					var parent = path.length ? _.get(tree, path) : tree;
+					delete parent[nodeName];
+				});
+
 			return tree;
 		},
 
@@ -1679,11 +1745,6 @@ var polyglot = module.exports = {
 			});
 
 			return tree;
-		},
-
-		transposeLines: text => {
-			// BUGFIX: Currently just a stub
-			return text;
 		},
 	},
 };
