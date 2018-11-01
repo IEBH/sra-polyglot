@@ -81,11 +81,11 @@ var polyglot = module.exports = {
 	* @param {Object} options Optional options structure to pass to the engine
 	* @return {string} The translated search query
 	*/
-	translate: function(query, engine, options) {
-		if (!this.engines[engine]) throw new Error('Engine not found: ' + engine);
-		var tree = this.parse(query, options);
-		tree = this.preProcess(tree, options);
-		return this.postProcess(this.engines[engine].compile(tree, options), options);
+	translate: (query, engine, options) => {
+		if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
+		var tree = polyglot.parse(query, options);
+		tree = polyglot.preProcess(tree, options);
+		return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
 	},
 
 	/**
@@ -96,11 +96,11 @@ var polyglot = module.exports = {
 	* @param {Object} options Optional options structure to pass to each engine
 	* @return {Object} The translated search query in each case where the engine ID is the key of the object and the value is the translated string
 	*/
-	translateAll: function(query, options) {
+	translateAll: (query, options) => {
 		var output = {};
-		var tree = this.parse(query, options);
-		tree = this.preProcess(tree, options);
-		_.forEach(this.engines, (engine, id) => output[id] = this.postProcess(engine.compile(tree, options), options));
+		var tree = polyglot.parse(query, options);
+		tree = polyglot.preProcess(tree, options);
+		_.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
 		return output;
 	},
 
@@ -112,7 +112,7 @@ var polyglot = module.exports = {
 	* @return {Object} The mutated tree
 	* @see parse()
 	*/
-	preProcess: function(tree, options) {
+	preProcess: (tree, options) => {
 		var settings = _.defaults(options, {
 		});
 
@@ -132,17 +132,23 @@ var polyglot = module.exports = {
 	* @param {boolean} [options.forceString] Force the output to be a string even if the module returns something unusual (e.g. mongodb driver returns an object)
 	* @param {boolean} [options.html=true] Provide HTML output
 	* @param {boolean} [options.trim=true] Trim all output lines
+	* @param {boolean} [options.transposeLines=true] Insert all line references where needed (e.g. `1 - 3/OR`)
 	* @returns {string} The post processed text
 	* @see parse()
 	*/
-	postProcess: function(text, options) {
+	postProcess: (text, options) => {
 		var settings = _.defaults(options, {
 			forceString: true,
 			html: true,
 			trim: true,
+			transposeLines: true,
 		});
 
 		if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
+
+		if (settings.transposeLines) {
+			text = polyglot.tools.transposeLines(text);
+		}
 
 		if (settings.html) {
 			text = text
@@ -175,7 +181,7 @@ var polyglot = module.exports = {
 	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
 	* @return {array} Array representing the parsed tree nodes
 	*/
-	parse: function(query, options) {
+	parse: (query, options) => {
 		var settings = _.defaults(options, {
 			groupLines: true,
 			groupLinesAlways: false,
@@ -435,7 +441,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -447,9 +453,9 @@ var polyglot = module.exports = {
 					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -526,18 +532,15 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'GET',
-					action: 'https://www.ncbi.nlm.nih.gov/pubmed',
-					fields: {
-						term: query,
-					},
-				};
-			},
+			open: query => ({
+				method: 'GET',
+				action: 'https://www.ncbi.nlm.nih.gov/pubmed',
+				fields: {
+					term: query,
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -553,7 +556,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -563,9 +566,9 @@ var polyglot = module.exports = {
 					{subject: /\?/g, value: '?'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -643,18 +646,15 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-					fields: {
-						textBox: query,
-					},
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -670,7 +670,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -682,9 +682,9 @@ var polyglot = module.exports = {
 					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -765,44 +765,41 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
-					fields: {
-						'submitSearch': 'Go',
-						'searchRows[0].searchCriterias[0].fieldRestriction': null,
-						'searchRows[0].searchCriterias[0].term': query,
-						'searchRows[0].searchOptions.searchProducts': null,
-						'searchRows[0].searchOptions.searchStatuses': null,
-						'searchRows[0].searchOptions.searchType': 'All',
-						'searchRows[0].searchOptions.publicationStartYear': null,
-						'searchRows[0].searchOptions.publicationEndYear': null,
-						'searchRows[0].searchOptions.disableAutoStemming': null,
-						'searchRows[0].searchOptions.reviewGroupIds': null,
-						'searchRows[0].searchOptions.onlinePublicationStartYear': null,
-						'searchRows[0].searchOptions.onlinePublicationEndYear': null,
-						'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
-						'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
-						'searchRows[0].searchOptions.dateType:pubAllYears': null,
-						'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
-						'searchRow.ordinal': 0,
-						'hiddenFields.currentPage': 1,
-						'hiddenFields.strategySortBy': 'last-modified-date;desc',
-						'hiddenFields.showStrategies': 'false',
-						'hiddenFields.containerId': null,
-						'hiddenFields.etag': null,
-						'hiddenFields.originalContainerId': null,
-						'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
-						'hiddenFields.searchFilters.filterByIssue': 'all',
-						'hiddenFields.searchFilters.filterByType': 'All',
-						'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true',
-					}
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
+				fields: {
+					'submitSearch': 'Go',
+					'searchRows[0].searchCriterias[0].fieldRestriction': null,
+					'searchRows[0].searchCriterias[0].term': query,
+					'searchRows[0].searchOptions.searchProducts': null,
+					'searchRows[0].searchOptions.searchStatuses': null,
+					'searchRows[0].searchOptions.searchType': 'All',
+					'searchRows[0].searchOptions.publicationStartYear': null,
+					'searchRows[0].searchOptions.publicationEndYear': null,
+					'searchRows[0].searchOptions.disableAutoStemming': null,
+					'searchRows[0].searchOptions.reviewGroupIds': null,
+					'searchRows[0].searchOptions.onlinePublicationStartYear': null,
+					'searchRows[0].searchOptions.onlinePublicationEndYear': null,
+					'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
+					'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
+					'searchRows[0].searchOptions.dateType:pubAllYears': null,
+					'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
+					'searchRow.ordinal': 0,
+					'hiddenFields.currentPage': 1,
+					'hiddenFields.strategySortBy': 'last-modified-date;desc',
+					'hiddenFields.showStrategies': 'false',
+					'hiddenFields.containerId': null,
+					'hiddenFields.etag': null,
+					'hiddenFields.originalContainerId': null,
+					'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
+					'hiddenFields.searchFilters.filterByIssue': 'all',
+					'hiddenFields.searchFilters.filterByType': 'All',
+					'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true',
+				}
+			}),
 			openTerms: 'use search manager box',
 		},
 		// }}}
@@ -818,7 +815,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -830,9 +827,9 @@ var polyglot = module.exports = {
 					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -910,19 +907,16 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'GET',
-					action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
-					fields: {
-						sb: 'y',
-						search_query: query.replace(/\n+/g, ' '),
-					},
-				};
-			},
+			open: query => ({
+				method: 'GET',
+				action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
+				fields: {
+					sb: 'y',
+					search_query: query.replace(/\n+/g, ' '),
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -938,7 +932,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -950,9 +944,9 @@ var polyglot = module.exports = {
 					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -1000,49 +994,46 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
-					fields: {
-						fieldCount: '1',
-						action: 'search',
-						product: 'UA',
-						search_mode: 'GeneralSearch',
-						SID: 'W15WDD6M2xkKPbfGfGY',
-						max_field_count: '25',
-						max_field_notice: 'Notice: You cannot add another field.',
-						input_invalid_notice: 'Search Error: Please enter a search term.',
-						exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
-						input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
-						sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
-						formUpdated: 'true',
-						'value(input1)': query,
-						'value(select1)': 'TS',
-						x: '798',
-						y: '311',
-						'value(hidInput1)': null,
-						limitStatus: 'collapsed',
-						ss_lemmatization: 'On',
-						ss_spellchecking: 'Suggest',
-						SinceLastVisit_UTC: null,
-						SinceLastVisit_DATE: null,
-						period: 'Range Selection',
-						range: 'ALL',
-						startYear: '1900',
-						endYear: (new Date()).getYear(),
-						update_back2search_link_param: 'yes',
-						ssStatus: 'display:none',
-						ss_showsuggestions: 'ON',
-						ss_query_language: 'auto',
-						ss_numDefaultGeneralSearchFields: '1',
-						rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A',
-					},
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
+				fields: {
+					fieldCount: '1',
+					action: 'search',
+					product: 'UA',
+					search_mode: 'GeneralSearch',
+					SID: 'W15WDD6M2xkKPbfGfGY',
+					max_field_count: '25',
+					max_field_notice: 'Notice: You cannot add another field.',
+					input_invalid_notice: 'Search Error: Please enter a search term.',
+					exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
+					input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
+					sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
+					formUpdated: 'true',
+					'value(input1)': query,
+					'value(select1)': 'TS',
+					x: '798',
+					y: '311',
+					'value(hidInput1)': null,
+					limitStatus: 'collapsed',
+					ss_lemmatization: 'On',
+					ss_spellchecking: 'Suggest',
+					SinceLastVisit_UTC: null,
+					SinceLastVisit_DATE: null,
+					period: 'Range Selection',
+					range: 'ALL',
+					startYear: '1900',
+					endYear: (new Date()).getYear(),
+					update_back2search_link_param: 'yes',
+					ssStatus: 'display:none',
+					ss_showsuggestions: 'ON',
+					ss_query_language: 'auto',
+					ss_numDefaultGeneralSearchFields: '1',
+					rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A',
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -1058,7 +1049,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -1070,9 +1061,9 @@ var polyglot = module.exports = {
 					{subject: /\$/g, value: '*'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -1143,18 +1134,15 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
-					fields: {
-						bquery: query,
-					},
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
+				fields: {
+					bquery: query,
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -1170,7 +1158,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -1181,9 +1169,9 @@ var polyglot = module.exports = {
 					{subject: /\$/g, value: '*'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -1246,18 +1234,15 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-					fields: {
-						textBox: query,
-					},
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
 			openTerms: 'any search box',
 		},
 		// }}}
@@ -1273,7 +1258,7 @@ var polyglot = module.exports = {
 			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 				});
@@ -1285,9 +1270,9 @@ var polyglot = module.exports = {
 					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>'},
 				]);
 
-				var compileWalker = function(tree) {
-					return tree
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
@@ -1348,18 +1333,15 @@ var polyglot = module.exports = {
 								);
 						})
 						.join('');
-				};
 				return compileWalker(tree);
 			},
-			open: function(query) {
-				return {
-					method: 'POST',
-					action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-					fields: {
-						textBox: query,
-					},
-				};
-			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
 			openTerms: 'use advanced search box',
 		},
 		// }}}
@@ -1375,9 +1357,7 @@ var polyglot = module.exports = {
 			* @param {Object} [options] Optional options to use when compiling
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
-				return tree;
-			},
+			compile: (tree, options) => tree,
 		},
 		// }}}
 		// Lexical tree (Human Readable) {{{
@@ -1392,10 +1372,10 @@ var polyglot = module.exports = {
 			* @param {Object} [options] Optional options to use when compiling
 			* @return {string} The compiled output
 			*/
-			compile: function(tree, options) {
-				var compileWalker = function(tree, level) {
-					return tree
-						.map(function(branch) {
+			compile: (tree, options) => {
+				var compileWalker = (tree, level) =>
+					tree
+						.map(branch => {
 							var buffer = _.repeat('  ', level) + '- ';
 							switch (branch.type) {
 								case 'group':
@@ -1436,7 +1416,6 @@ var polyglot = module.exports = {
 							return buffer;
 						})
 						.join('\n');
-				};
 				return compileWalker(tree, 0);
 			},
 		},
@@ -1453,7 +1432,7 @@ var polyglot = module.exports = {
 			* @param {Object} [options] Optional options to use when compiling
 			* @return {Object} The compiled MongoDB query output
 			*/
-			compile: function(tree, options) {
+			compile: (tree, options) => {
 				var settings = _.defaults(options, {
 					replaceWildcards: true,
 					translatePhraseField: t => ({'title': t}),
@@ -1466,9 +1445,9 @@ var polyglot = module.exports = {
 					{subject: /[\?\$]/g, value: '*'},
 				]);
 
-				var compileWalker = function(tree) {
-					return _(tree)
-						.map(function(branch, branchIndex) {
+				var compileWalker = tree =>
+					_(tree)
+						.map((branch, branchIndex) => {
 							var buffer = {};
 							switch (branch.type) {
 								case 'group':
@@ -1526,14 +1505,12 @@ var polyglot = module.exports = {
 						*/
 						// }}}
 						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-						.thru(function(tree) {
+						.thru(tree => {
 							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
 							return tree;
 						})
 						// }}}
 						.value();
-
-				};
 
 				return compileWalker(tree);
 			},
@@ -1555,10 +1532,10 @@ var polyglot = module.exports = {
 		* @param {array} replacements Array of replacements to apply. Each must be of the form `{subject: STRING|REGEXP, value: STRING|FUNCTION}`
 		* @return {array} The input tree element with the replacements applied
 		*/
-		replaceContent: function(tree, types, replacements) {
-			polyglot.tools.visit(tree, types, function(branch) {
+		replaceContent: (tree, types, replacements) => {
+			polyglot.tools.visit(tree, types, branch => {
 				if (!branch.content) return;
-				replacements.forEach(function(replacement) {
+				replacements.forEach(replacement => {
 					branch.content = branch.content.replace(replacement.subject, replacement.value);
 				});
 			});
@@ -1574,9 +1551,9 @@ var polyglot = module.exports = {
 		* @param {function} callback The callback to call with each node
 		* @return {array} The input tree
 		*/
-		visit: function(tree, types, callback) {
-			var treeWalker = function(tree) {
-				tree.forEach(function(branch) {
+		visit: (tree, types, callback) => {
+			var treeWalker = tree => {
+				tree.forEach(branch => {
 					// Fire callback if it matches
 					if (!types || _.includes(types, branch.type)) callback(branch);
 
@@ -1597,7 +1574,7 @@ var polyglot = module.exports = {
 		* @param {string} engine The current engine (used to get the correct sub-templating string)
 		* @return {string} The resolved template
 		*/
-		resolveTemplate: function(template, engine) {
+		resolveTemplate: (template, engine) => {
 			if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
 			if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
 			if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
@@ -1611,7 +1588,7 @@ var polyglot = module.exports = {
 		* @param {string} engine Optional engine ID to examine for other enclose methods
 		* @return {string} The phrase enclosed as needed
 		*/
-		quotePhrase: function(branch, engine) {
+		quotePhrase: (branch, engine) => {
 			var text = _.trimEnd(branch.content);
 
 			return (
@@ -1628,7 +1605,7 @@ var polyglot = module.exports = {
 		* @param {Object} tree The object tree to recombine
 		* @returns {Object} The recombined tree
 		*/
-		renestConditions: function(tree) {
+		renestConditions: tree => {
 			if (!_.isArray(tree)) return tree; // Not an array - skip
 
 			// Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
@@ -1662,7 +1639,7 @@ var polyglot = module.exports = {
 		* @example
 		* {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
 		*/
-		combineConditions: function(tree, options) {
+		combineConditions: (tree, options) => {
 			var settings = _.defaults(options, {
 				depth: 10,
 			});
@@ -1702,6 +1679,11 @@ var polyglot = module.exports = {
 			});
 
 			return tree;
+		},
+
+		transposeLines: text => {
+			// BUGFIX: Currently just a stub
+			return text;
 		},
 	},
 };
