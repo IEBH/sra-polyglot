@@ -50,7 +50,4 @@ app.controller("polyglotExampleCtrl", function($sce, $scope, Polyglot) {
 	$scope.clear = () => $scope.query = '';
 
 	$scope.toggleExpandEngine = engine => engine.expanded = !engine.expanded;
-
-	// FIXME: Remove this
-	$scope.showExample();
 });
