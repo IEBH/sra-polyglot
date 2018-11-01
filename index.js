@@ -736,7 +736,7 @@ var polyglot = module.exports = {
 									buffer += 'NOT';
 									break;
 								case 'joinNear':
-									buffer += 'NEAR' + branch.proximity;
+									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
 									buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
