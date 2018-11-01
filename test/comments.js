@@ -4,7 +4,7 @@ var polyglot = require('..');
 describe('Check that comments are ignored', ()=> {
 
 	it('should parse comments as a logical node', ()=> {
-		expect(polyglot.parse('term1 OR term2\n#Comment1\n\n#Comment2\n\nAND\n\nterm3 or term4 #Comment3')).to.deep.equal([
+		expect(polyglot.parse('term1 OR term2\n#Comment1\n\n#Comment2\n\nAND\n\nterm3 or term4 #Comment3', {groupLines: true})).to.deep.equal([
 			{
 				type: 'group',
 				nodes: [

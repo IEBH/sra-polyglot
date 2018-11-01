@@ -202,7 +202,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should wrap lines as groups and preserve linefeeds', ()=> {
-		expect(polyglot.parse('foo near3 bar\n\nand\n\nbaz not quz')).to.deep.equal([
+		expect(polyglot.parse('foo near3 bar\n\nand\n\nbaz not quz', {groupLines: true})).to.deep.equal([
 			{
 				type: 'group',
 				nodes: [

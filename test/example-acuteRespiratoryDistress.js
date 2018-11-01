@@ -687,7 +687,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 			// }}}
 		];
 		// }}}
-		expect(polyglot.parse(example.query)).to.deep.equal(tree);
+		expect(polyglot.parse(example.query, {groupLines: true})).to.deep.equal(tree);
 	});
 
 });

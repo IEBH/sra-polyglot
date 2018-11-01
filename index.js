@@ -175,15 +175,15 @@ var polyglot = module.exports = {
 	* This tree can then be recompiled via each engines compile()
 	* @param {string} query The query string to compile. This can be multiline
 	* @param {Object} [options] Optional options to use when parsing
-	* @param {boolean} [options.groupLines=true] Wrap lines inside their own groups (only applies if multiple lines are present)
-	* @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
+	* @param {boolean} [options.groupLines=false] Wrap lines inside their own groups (only applies if multiple lines are present)
 	* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
+	* @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
 	* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
 	* @return {array} Array representing the parsed tree nodes
 	*/
 	parse: (query, options) => {
 		var settings = _.defaults(options, {
-			groupLines: true,
+			groupLines: false,
 			groupLinesAlways: false,
 			removeNumbering: true,
 			preserveNewlines: true,
