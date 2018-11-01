@@ -52,13 +52,10 @@
 						</div>
 					</div>
 					<div class="card-body p-0">
-						<!--
-						<textarea class="form-control" rows="12" id="query" ng-model="query" ng-trim="false" placeholder="Enter your search query here..."></textarea>
-						-->
 						<ui-ace
 							ui-ace="aceOptions"
 							ng-model="query"
-							style="height: 300px; width: 100%; display: block"
+							style="height: 380px; width: 100%; display: block"
 						></ui-ace>
 					</div>
 				</div>
@@ -75,7 +72,7 @@
 						</a>
 					</div>
 					<div class="card-body collapse" ng-class="engine.expanded && 'show'">
-						<div ng-bind-html="engine.translated"></div>
+						<pre ng-bind-html="engine.translated"></pre>
 					</div>
 				</div>
 			</div>

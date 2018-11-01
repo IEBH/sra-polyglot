@@ -13,3 +13,8 @@ a:hover {
 .ace_editor {
 	font-size: 16px;
 }
+
+.tab {
+	display: inline-block;
+	width: 20px;
+}
