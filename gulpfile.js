@@ -13,9 +13,9 @@ var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
 gulp.task('default', ['serve']);
-gulp.task('build', ['js', 'js:demo']);
+gulp.task('build', ['css:demo', 'js:demo', 'js:lib']);
 
-gulp.task('js', function() {
+gulp.task('js:lib', function() {
 	gulp.src('./index.js')
 		.pipe(plumber({
 			errorHandler: function(err) {
@@ -34,7 +34,7 @@ gulp.task('js', function() {
 		.pipe(gulp.dest('./dist'))
 });
 
-gulp.task('js:demo', ()=>
+gulp.task('js:demo', ['js:lib'], ()=>
 	Promise.resolve()
 		.then(()=> rollup.rollup({
 			input: './demo/app.js',
@@ -42,16 +42,14 @@ gulp.task('js:demo', ()=>
 				format: 'umd',
 			},
 			plugins: [
-				require('rollup-plugin-alias')({
-					vue$: 'vue/dist/vue.common.js',
+				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
+					include: ['node_modules/**/*', 'dist/**/*'],
 				}),
-				require('rollup-plugin-inject')({
-					include: '**/*.js',
-					exclude: 'node_modules/**',
-					jQuery: 'jquery',
+				require('rollup-plugin-vue').default(),
+				require('rollup-plugin-includepaths')({
+					paths: ['dist'],
 				}),
-				// require('rollup-plugin-vue').default(),
-				require('rollup-plugin-node-resolve')(), // Allow Node style module resolution
+				require('rollup-plugin-node-resolve')({jsnext: true}), // Allow Node style module resolution
 				require('rollup-plugin-node-globals')({ // Inject global Node module shivs
 					baseDir: false,
 					buffer: false,
@@ -60,8 +58,10 @@ gulp.task('js:demo', ()=>
 					global: false,
 					process: true,
 				}),
-				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files
-					include: 'node_modules/**/*',
+				require('rollup-plugin-inject')({
+					include: '**/*.js',
+					exclude: 'node_modules/**',
+					jQuery: 'jquery',
 				}),
 				require('rollup-plugin-babel')({
 					presets: ['@babel/env'],
@@ -76,6 +76,12 @@ gulp.task('js:demo', ()=>
 			sourcemap: true,
 		}))
 );
+
+gulp.task('css:demo', ()=>
+	gulp.src('./demo/app.css')
+		.pipe(rename('demoApp.css'))
+		.pipe(gulp.dest('./dist'))
+)
 
 gulp.task('serve', ['build'], function() {
 	var monitor = nodemon({
