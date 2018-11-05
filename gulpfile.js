@@ -45,6 +45,11 @@ gulp.task('js:demo', ()=>
 				require('rollup-plugin-alias')({
 					vue$: 'vue/dist/vue.common.js',
 				}),
+				require('rollup-plugin-inject')({
+					include: '**/*.js',
+					exclude: 'node_modules/**',
+					jQuery: 'jquery',
+				}),
 				// require('rollup-plugin-vue').default(),
 				require('rollup-plugin-node-resolve')(), // Allow Node style module resolution
 				require('rollup-plugin-node-globals')({ // Inject global Node module shivs
@@ -57,6 +62,10 @@ gulp.task('js:demo', ()=>
 				}),
 				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files
 					include: 'node_modules/**/*',
+				}),
+				require('rollup-plugin-babel')({
+					presets: ['@babel/env'],
+					exclude: 'node_modules/**',
 				}),
 			],
 		}))
