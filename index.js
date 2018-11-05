@@ -479,6 +479,7 @@ var polyglot = module.exports = {
 	engines: {
 		// PubMed {{{
 		pubmed: {
+			id: 'pubmed',
 			title: 'PubMed',
 			aliases: ['pubmed', 'p', 'pm', 'pubm'],
 
@@ -594,6 +595,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Ovid Medline {{{
 		ovid: {
+			id: 'ovid',
 			title: 'Ovid Medline / Ovid Embase',
 			aliases: ['ovid', 'o', 'ov'],
 
@@ -708,6 +710,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Cochrane Library {{{
 		cochrane: {
+			id: 'cochrane',
 			title: 'Cochrane Library',
 			aliases: ['cochrane', 'c', 'cl'],
 
@@ -853,6 +856,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Embase {{{
 		embase: {
+			id: 'embase',
 			title: 'Embase',
 			aliases: ['embase', 'e', 'eb'],
 
@@ -970,6 +974,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Web of Science {{{
 		wos: {
+			id: 'wos',
 			title: 'Web of Science',
 			aliases: ['webofscience', 'w', 'wos', 'websci'],
 
@@ -1087,6 +1092,7 @@ var polyglot = module.exports = {
 		// }}}
 		// CINAHL {{{
 		cinahl: {
+			id: 'cinahl',
 			title: 'CINAHL',
 			aliases: ['cinahl', 'ci', 'cnal'],
 
@@ -1196,6 +1202,7 @@ var polyglot = module.exports = {
 		// }}}
 		// PsycInfo {{{
 		psycinfo: {
+			id: 'psycinfo',
 			title: 'PsycInfo',
 			aliases: ['p', 'pi'],
 
@@ -1296,6 +1303,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Scopus {{{
 		scopus: {
+			id: 'scopus',
 			title: 'Scopus',
 			aliases: ['s', 'so'],
 
@@ -1395,6 +1403,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Lexical tree (JSON) {{{
 		lexicalTreeJSON: {
+			id: 'lexicalTreeJSON',
 			title: 'Lexical Tree (JSON)',
 			aliases: ['debug'],
 			debugging: true, // Mark this module for debugging only
@@ -1410,6 +1419,7 @@ var polyglot = module.exports = {
 		// }}}
 		// Lexical tree (Human Readable) {{{
 		lexicalTreeHuman: {
+			id: 'lexicalTreeHuman',
 			title: 'Lexical Tree (Human Readable)',
 			aliases: ['debug'],
 			debugging: true, // Mark this module for debugging only
@@ -1470,6 +1480,7 @@ var polyglot = module.exports = {
 		// }}}
 		// MongoDB {{{
 		mongodb: {
+			id: 'mongodb',
 			title: 'MongoDB Query Format',
 			aliases: ['mongo'],
 			debugging: true, // Mark this module for debugging only
