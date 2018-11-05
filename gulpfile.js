@@ -8,11 +8,12 @@ var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var rimraf = require('rimraf');
 var replace = require('gulp-replace');
+var rollup = require('rollup');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
 gulp.task('default', ['serve']);
-gulp.task('build', ['js']);
+gulp.task('build', ['js', 'js:demo']);
 
 gulp.task('js', function() {
 	gulp.src('./index.js')
@@ -23,19 +24,49 @@ gulp.task('js', function() {
 				this.emit('end');
 			},
 		}))
-		.pipe(rename('ngPolyglot.js'))
-		.pipe(inject.wrap('angular.module(\'ngPolyglot\', []).service(\'Polyglot\', function() {\n', '});'))
-		.pipe(replace(/^.*require\(.*\);\s+$/gm, ''))
-		.pipe(replace(/^var polyglot = .+$/m, 'var polyglot;\nreturn polyglot = {'))
+		.pipe(rename('polyglot.js'))
 		.pipe(babel({
 			presets: ['@babel/env'],
-			plugins: ['angularjs-annotate'],
 		}))
 		.pipe(gulp.dest('./dist'))
 		.pipe(uglify())
-		.pipe(rename('ngPolyglot.min.js'))
+		.pipe(rename('polyglot.min.js'))
 		.pipe(gulp.dest('./dist'))
 });
+
+gulp.task('js:demo', ()=>
+	Promise.resolve()
+		.then(()=> rollup.rollup({
+			input: './demo/app.js',
+			output: {
+				format: 'umd',
+			},
+			plugins: [
+				require('rollup-plugin-alias')({
+					vue$: 'vue/dist/vue.common.js',
+				}),
+				// require('rollup-plugin-vue').default(),
+				require('rollup-plugin-node-resolve')(), // Allow Node style module resolution
+				require('rollup-plugin-node-globals')({ // Inject global Node module shivs
+					baseDir: false,
+					buffer: false,
+					dirname: false,
+					filename: false,
+					global: false,
+					process: true,
+				}),
+				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files
+					include: 'node_modules/**/*',
+				}),
+			],
+		}))
+		.then(bundle => bundle.write({
+			file: './dist/demoApp.js',
+			format: 'umd',
+			name: 'demoApp',
+			sourcemap: true,
+		}))
+);
 
 gulp.task('serve', ['build'], function() {
 	var monitor = nodemon({
@@ -52,7 +83,7 @@ gulp.task('serve', ['build'], function() {
 
 	watch(['./index.js', 'demo/**/*.js', 'src/**/*.js'], function() {
 		console.log('Rebuild client-side JS files...');
-		gulp.start('js');
+		gulp.start('js:demo');
 	});
 });
 

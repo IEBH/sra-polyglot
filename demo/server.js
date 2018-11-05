@@ -22,8 +22,8 @@ app.use('/node_modules', express.static(`${root}/node_modules`));
 app.use('/syntax', express.static(`${root}/syntax`));
 
 app.get('/', (req, res) => res.sendFile('index.html', {root: __dirname}));
-app.get('/app.js', (req, res) => res.sendFile('app.js', {root: root + '/demo'}));
-app.get('/app.css', (req, res) => res.sendFile('app.css', {root: root + '/demo'}));
+app.get('/dist/demoApp.js', (req, res) => res.sendFile('demoApp.js', {root: root + '/dist'}));
+app.get('/dist/demoApp.css', (req, res) => res.sendFile('demoApp.css', {root: root + '/dist'}));
 
 app.get('/dist/ngPolyglot.js', (req, res) => res.sendFile('ngPolyglot.js', {root: root + '/dist'}));
 
