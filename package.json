@@ -65,7 +65,8 @@
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-vue": "^4.3.2",
     "vue": "^2.5.17",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.5.17",
+    "vue2-ace-editor": "0.0.11"
   },
   "dependencies": {
     "lodash": "^4.17.11"

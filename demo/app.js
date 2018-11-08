@@ -1,12 +1,19 @@
-// var Vue = require('vue');
+import braceFix from 'braceFix';
+
 import _ from 'lodash';
+import ace from 'vue2-ace-editor';
 import Vue from 'vue/dist/vue.esm.js';
 import polyglot from 'polyglot';
+
 
 $(()=> window.app = new Vue({
 	el: '#app',
 	data: {
 		query: '',
+		editorOptions: {
+			showPrintMargin: false,
+			wrap: true,
+		},
 		engines: polyglot.engines,
 		enginesExpanded: {},
 		enginesQuery: {},
@@ -19,6 +26,9 @@ $(()=> window.app = new Vue({
 			transposeLines: true,
 		},
 		exampleLast: '',
+	},
+	components: {
+		editor: ace,
 	},
 	methods: {
 		clear() {
@@ -34,6 +44,10 @@ $(()=> window.app = new Vue({
 		},
 		toggleExpandEngine(engine) {
 			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
+		},
+		editorInit() { // Ace editor settings
+			require('brace/mode/json');
+			require('brace/theme/chrome');
 		},
 	},
 	watch: {

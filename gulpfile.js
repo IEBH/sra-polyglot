@@ -38,18 +38,21 @@ gulp.task('js:demo', ['js:lib'], ()=>
 	Promise.resolve()
 		.then(()=> rollup.rollup({
 			input: './demo/app.js',
-			output: {
-				format: 'umd',
-			},
 			plugins: [
 				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
-					include: ['node_modules/**/*', 'dist/**/*'],
+					include: ['node_modules/**/*', 'demo/**/*', 'dist/**/*'],
+					namedExports: {
+						'dist/polyglot.js': ['polyglot'],
+					},
 				}),
 				require('rollup-plugin-vue').default(),
 				require('rollup-plugin-includepaths')({
-					paths: ['dist'],
+					paths: ['dist', 'demo'],
 				}),
-				require('rollup-plugin-node-resolve')({jsnext: true}), // Allow Node style module resolution
+				require('rollup-plugin-node-resolve')({ // Allow Node style module resolution
+					jsnext: true,
+					browser: true, // Use the `browser` path in package.json when possible
+				}),
 				require('rollup-plugin-node-globals')({ // Inject global Node module shivs
 					baseDir: false,
 					buffer: false,
@@ -62,6 +65,7 @@ gulp.task('js:demo', ['js:lib'], ()=>
 					include: '**/*.js',
 					exclude: 'node_modules/**',
 					jQuery: 'jquery',
+					$: 'jquery',
 				}),
 				require('rollup-plugin-babel')({
 					presets: ['@babel/env'],
@@ -70,8 +74,8 @@ gulp.task('js:demo', ['js:lib'], ()=>
 			],
 		}))
 		.then(bundle => bundle.write({
+			format: 'cjs',
 			file: './dist/demoApp.js',
-			format: 'umd',
 			name: 'demoApp',
 			sourcemap: true,
 		}))
@@ -87,7 +91,7 @@ gulp.task('serve', ['build'], function() {
 	var monitor = nodemon({
 		script: './demo/server.js',
 		ext: 'js css',
-		ignore: ['**/*.js', '**/.css'], // Ignore everything else as its watched seperately
+		ignore: ['**/.css', '**/*.js', '**/*.vue'],
 	})
 		.on('start', function() {
 			console.log('Server started');
@@ -96,7 +100,7 @@ gulp.task('serve', ['build'], function() {
 			console.log('Server restarted');
 		});
 
-	watch(['./index.js', 'demo/**/*.js', 'src/**/*.js'], function() {
+	watch(['./index.js', 'demo/**/*.js', 'demo/**/*.vue', 'src/**/*.js', 'src/**/*.vue'], function() {
 		console.log('Rebuild client-side JS files...');
 		gulp.start('js:demo');
 	});

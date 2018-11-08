@@ -53,11 +53,15 @@
 							</div>
 						</div>
 						<div class="card-body p-0">
-							<!--
-							FIXME: EDITOR WOULD GO HERE
-							<pre>{{query}}</pre>
-							-->
-							<textarea v-model="query" rows="10" class="form-control" placeholder="Add your query here..."></textarea>
+							<editor
+								v-model="query"
+								v-on:init="editorInit"
+								lang="json"
+								theme="chrome"
+								width="100%"
+								height="380"
+								v-bind:options="editorOptions"
+							></editor>
 						</div>
 					</div>
 				</div>
