@@ -12,6 +12,8 @@ var rollup = require('rollup');
 var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
+var production = process.env.NODE_ENV == 'production';
+
 gulp.task('default', ['serve']);
 gulp.task('build', ['css:demo', 'js:demo', 'js:lib']);
 
@@ -71,6 +73,7 @@ gulp.task('js:demo', ['js:lib'], ()=>
 					presets: ['@babel/env'],
 					exclude: 'node_modules/**',
 				}),
+				production && require('rollup-plugin-uglify').uglify(),
 			],
 		}))
 		.then(bundle => bundle.write({
