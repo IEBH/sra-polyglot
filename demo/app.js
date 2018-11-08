@@ -46,8 +46,9 @@ $(()=> window.app = new Vue({
 			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
 		},
 		editorInit() { // Ace editor settings
-			require('brace/mode/json');
 			require('brace/theme/chrome');
+
+			window.ace.config.set('modePath', 'syntax/ace');
 		},
 	},
 	watch: {
