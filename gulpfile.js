@@ -41,6 +41,12 @@ gulp.task('js:demo', ['js:lib'], ()=>
 		.then(()=> rollup.rollup({
 			input: './demo/app.js',
 			plugins: [
+				require('rollup-plugin-replace')({
+					'process.env.NODE_ENV': production ? '"production"' : '"dev"',
+				}),
+				require('rollup-plugin-alias')({
+					vue: 'node_modules/vue/dist/vue.esm.js',
+				}),
 				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
 					include: ['node_modules/**/*', 'demo/**/*', 'dist/**/*'],
 					namedExports: {
