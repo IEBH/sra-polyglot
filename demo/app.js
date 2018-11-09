@@ -1,4 +1,3 @@
-import braceFix from 'braceFix';
 
 import _ from 'lodash';
 import ace from 'vue2-ace-editor';

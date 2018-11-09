@@ -43,6 +43,7 @@ gulp.task('js:demo', ['js:lib'], ()=>
 			plugins: [
 				require('rollup-plugin-replace')({
 					'process.env.NODE_ENV': production ? '"production"' : '"dev"',
+					'window.ace.acequire': 'window.ace.require', // Monkey patch to replace Ace's weird package loader with the standard one
 				}),
 				require('rollup-plugin-alias')({
 					vue: 'node_modules/vue/dist/vue.esm.js',
