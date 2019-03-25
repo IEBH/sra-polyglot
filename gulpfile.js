@@ -37,59 +37,64 @@ gulp.task('js:lib', function() {
 });
 
 gulp.task('js:demo', ['js:lib'], ()=>
-	Promise.resolve()
-		.then(()=> rollup.rollup({
-			input: './demo/app.js',
-			plugins: [
-				require('rollup-plugin-replace')({
-					'process.env.NODE_ENV': production ? '"production"' : '"dev"',
-					// Monkey patch to replace Ace's weird package loader with the standard one
-					'var brace = window.ace.acequire("ace/ace")': 'var brace\n;$(()=> brace = window.ace.require("ace/ace"));',
-				}),
-				require('rollup-plugin-alias')({
-					vue: 'node_modules/vue/dist/vue.esm.js',
-				}),
-				require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
-					include: ['node_modules/**/*', 'demo/**/*', 'dist/**/*'],
-					namedExports: {
-						'dist/polyglot.js': ['polyglot'],
-					},
-				}),
-				require('rollup-plugin-vue').default(),
-				require('rollup-plugin-includepaths')({
-					paths: ['dist', 'demo'],
-				}),
-				require('rollup-plugin-node-resolve')({ // Allow Node style module resolution
-					jsnext: true,
-					browser: true, // Use the `browser` path in package.json when possible
-				}),
-				require('rollup-plugin-node-globals')({ // Inject global Node module shivs
-					baseDir: false,
-					buffer: false,
-					dirname: false,
-					filename: false,
-					global: false,
-					process: true,
-				}),
-				require('rollup-plugin-inject')({
-					include: '**/*.js',
-					exclude: 'node_modules/**',
-					jQuery: 'jquery',
-					$: 'jquery',
-				}),
-				require('rollup-plugin-babel')({
-					presets: ['@babel/env'],
-					exclude: 'node_modules/**',
-				}),
-				production && require('rollup-plugin-uglify').uglify(),
-			],
-		}))
-		.then(bundle => bundle.write({
-			format: 'cjs',
-			file: './dist/demoApp.js',
-			name: 'demoApp',
-			sourcemap: true,
-		}))
+	rollup.rollup({
+		input: './demo/app.js',
+		experimentalCodeSplitting: false,
+		plugins: [
+			require('rollup-plugin-replace')({
+				'process.env.NODE_ENV': production ? '"production"' : '"dev"',
+				// Monkey patch to replace Ace's weird package loader with the standard one
+				'var brace = window.ace.acequire("ace/ace")': 'var brace\n;$(()=> brace = window.ace.require("ace/ace"));',
+			}),
+			require('rollup-plugin-alias')({
+				vue: 'node_modules/vue/dist/vue.esm.js',
+			}),
+			require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
+				include: ['node_modules/**/*', 'demo/**/*', 'dist/**/*'],
+				namedExports: {
+					'dist/polyglot.js': ['polyglot'],
+				},
+			}),
+			require('rollup-plugin-vue')(),
+			require('rollup-plugin-includepaths')({
+				paths: ['dist', 'demo'],
+			}),
+			require('rollup-plugin-node-resolve')({ // Allow Node style module resolution
+				jsnext: true,
+				browser: true, // Use the `browser` path in package.json when possible
+			}),
+			require('rollup-plugin-node-globals')({ // Inject global Node module shivs
+				baseDir: false,
+				buffer: false,
+				dirname: false,
+				filename: false,
+				global: false,
+				process: true,
+			}),
+			require('rollup-plugin-inject')({
+				include: '**/*.js',
+				exclude: 'node_modules/**',
+				jQuery: 'jquery',
+				$: 'jquery',
+			}),
+			require('rollup-plugin-babel')({
+				presets: ['@babel/env'],
+				plugins: ['@babel/plugin-syntax-dynamic-import'],
+				exclude: 'node_modules/**',
+			}),
+			production && require('rollup-plugin-uglify').uglify(),
+			require('rollup-plugin-sizes')(),
+			require('/home/mc/Papers/Projects/Node/rollup-plugin-fdnotify')({
+				baseDir: __dirname,
+			}),
+		],
+	})
+	.then(bundle => bundle.write({
+		format: 'cjs',
+		file: './dist/demoApp.js',
+		name: 'demoApp',
+		sourcemap: true,
+	}))
 );
 
 gulp.task('css:demo', ()=>
