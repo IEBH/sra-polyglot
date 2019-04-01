@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60635,6 +60639,12 @@ exports.setCore = function(e) {
                 (function() {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
+
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
 
 var vue2AceEditor = {
     render: function (h) {
