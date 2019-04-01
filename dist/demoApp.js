@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60640,12 +60636,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -60834,6 +60824,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
       if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
       var tree = polyglot.parse(query, options);
       tree = polyglot.preProcess(tree, options); // Removed postProcess
+      // return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
 
       return polyglot.engines[engine].compile(tree, options);
     },
@@ -60850,6 +60841,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var output = {};
       var tree = polyglot.parse(query, options);
       tree = polyglot.preProcess(tree, options); // Removed postprocess
+      // _.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
 
       lodash.forEach(polyglot.engines, function (engine, id) {
         return output[id] = engine.compile(tree, options);
@@ -61397,7 +61389,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
