@@ -579,8 +579,7 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') ||
-									(branchIndex > 0 && tree[branchIndex-1] && tree[branchIndex-1].type && tree[branchIndex-1].type == 'raw') // or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')// or the next item is a raw node
 									? '' : ' '
 								);
 						})
