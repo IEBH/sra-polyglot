@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import ace from 'vue2-ace-editor';
 import polyglot from 'polyglot';
+import JsonTree from 'vue-json-tree'
 
 export default {
 	data: ()=> ({
@@ -30,6 +31,7 @@ export default {
 	}),
 	components: {
 		editor: ace,
+		jsontree: JsonTree,
 	},
 	methods: {
 		clear() {
@@ -106,8 +108,9 @@ export default {
 					</a>
 				</div>
 				<div class="card-body collapse p-0" :class="enginesExpanded[engine.id] && 'show'">
+
 					<editor
-						v-if="enginesQuery[engine.id]"
+						v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"
 						v-model="enginesQuery[engine.id]"
 						v-on:init="editorInit"
 						lang="polyglot"
@@ -116,6 +119,10 @@ export default {
 						height="380"
 						v-bind:options="previewOptions"
 					></editor>
+					<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
+      				<hr>
+					<!-- MongoDB not included at this stage -->
+
 				</div>
 			</div>
 		</div>

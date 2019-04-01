@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60640,12 +60636,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61506,7 +61496,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -61623,7 +61613,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -61762,7 +61752,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -61864,7 +61854,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -62007,7 +61997,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -62110,7 +62100,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -62216,7 +62206,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
               branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' || branchIndex > 0 && tree[branchIndex - 1] && tree[branchIndex - 1].type && tree[branchIndex - 1].type == 'raw' // or the next item is a raw node
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
               ? '' : ' ');
             }).join('');
           };
@@ -62656,67 +62646,122 @@ var polyglot_9 = polyglot_1.parse;
 var polyglot_10 = polyglot_1.engines;
 var polyglot_11 = polyglot_1.tools;
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+function parse$1 (data, depth = 0, last = true, key = undefined) {
+  let kv = { depth, last, primitive: true, key: JSON.stringify(key) };
+  if (typeof data !== 'object') {
+    return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })
+  } else if (data === null) {
+    return Object.assign(kv, { type: 'null', value: 'null' })
+  } else if (Array.isArray(data)) {
+    let value = data.map((item, index) => {
+      return parse$1(item, depth + 1, index === data.length - 1)
+    });
+    return Object.assign(kv, { primitive: false, type: 'array', value })
+  } else {
+    let keys = Object.keys(data);
+    let value = keys.map((key, index) => {
+      return parse$1(data[key], depth + 1, index === keys.length - 1, key)
+    });
+    return Object.assign(kv, { primitive: false, type: 'object', value })
+  }
+}
+
 var script = {
-  data: function data() {
+  name: 'json-tree',
+
+  props: {
+    level: {
+      type: Number,
+      default: Infinity
+    },
+    kv: {
+      type: Object
+    },
+    raw: {
+      type: String
+    },
+    data: {}
+  },
+
+  data () {
     return {
-      query: '',
-      editorOptions: {
-        showPrintMargin: false,
-        wrap: true
-      },
-      previewOptions: {
-        showPrintMargin: false,
-        wrap: true,
-        readOnly: true
-      },
-      engines: polyglot_1.engines,
-      enginesExpanded: {},
-      enginesQuery: {},
-      polyglotOptions: {
-        groupLines: false,
-        groupLinesAlways: true,
-        removeNumbering: true,
-        preserveNewLines: true,
-        replaceWildcards: true,
-        transposeLines: true
-      },
-      exampleLast: ''
-    };
+      expanded: true,
+      hovered: false
+    }
   },
-  components: {
-    editor: vue2AceEditor
+
+  computed: {
+    parsed () {
+      if (this.kv) {
+        return this.kv
+      }
+      let result;
+      try {
+        if (this.raw) {
+          result = JSON.parse(this.raw);
+        } else if (typeof this.data !== 'undefined') {
+          result = this.data;
+        } else {
+          result = '[Vue JSON Tree] No data passed.';
+          console.warn(result);
+        }
+      } catch (e) {
+        result = '[Vue JSON Tree] Invalid raw JSON.';
+        console.warn(result);
+      } finally {
+        return parse$1(result)
+      }
+    }
   },
+
   methods: {
-    clear: function clear() {
-      this.query = '';
-    },
-    showExample: function showExample() {
-      var chosenExample;
-
-      do {
-        chosenExample = lodash.sample(polyglot_1.examples);
-      } while (this.exampleLast == chosenExample.title);
-
-      this.exampleLast = chosenExample;
-      this.query = chosenExample.query;
-    },
-    toggleExpandEngine: function toggleExpandEngine(engine) {
-      this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
-    },
-    editorInit: function editorInit() {
-      // Ace editor settings
-      Promise.resolve().then(function () { return chrome; });
-      window.ace.config.set('modePath', 'syntax/ace');
+    format (n) {
+      if (n > 1) return `${n} items`
+      return n ? '1 item' : 'no items'
     }
   },
-  watch: {
-    query: function query() {
-      var _this = this;
 
-      lodash(polyglot_1.translateAll(this.query, this.polyglotOptions)).forEach(function (query, key) {
-        return _this.$set(_this.enginesQuery, key, query);
-      });
-    }
+  created () {
+    this.expanded = this.parsed.depth < this.level;
   }
 };
 
@@ -62805,11 +62850,394 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
 
 var normalizeComponent_1 = normalizeComponent;
 
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
+function createInjector(context) {
+  return function (id, style) {
+    return addStyle(id, style);
+  };
+}
+var HEAD = document.head || document.getElementsByTagName('head')[0];
+var styles = {};
+
+function addStyle(id, css) {
+  var group = isOldIE ? css.media || 'default' : id;
+  var style = styles[group] || (styles[group] = {
+    ids: new Set(),
+    styles: []
+  });
+
+  if (!style.ids.has(id)) {
+    style.ids.add(id);
+    var code = css.source;
+
+    if (css.map) {
+      // https://developer.chrome.com/devtools/docs/javascript-debugging
+      // this makes source maps inside style tags work properly in Chrome
+      code += '\n/*# sourceURL=' + css.map.sources[0] + ' */'; // http://stackoverflow.com/a/26603875
+
+      code += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) + ' */';
+    }
+
+    if (!style.element) {
+      style.element = document.createElement('style');
+      style.element.type = 'text/css';
+      if (css.media) style.element.setAttribute('media', css.media);
+      HEAD.appendChild(style.element);
+    }
+
+    if ('styleSheet' in style.element) {
+      style.styles.push(code);
+      style.element.styleSheet.cssText = style.styles.filter(Boolean).join('\n');
+    } else {
+      var index = style.ids.size - 1;
+      var textNode = document.createTextNode(code);
+      var nodes = style.element.childNodes;
+      if (nodes[index]) style.element.removeChild(nodes[index]);
+      if (nodes.length) style.element.insertBefore(textNode, nodes[index]);else style.element.appendChild(textNode);
+    }
+  }
+}
+
+var browser = createInjector;
+
 /* script */
 const __vue_script__ = script;
 
 /* template */
 var __vue_render__ = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "span",
+    {
+      staticClass: "json-tree",
+      class: { "json-tree-root": _vm.parsed.depth === 0 }
+    },
+    [
+      _vm.parsed.primitive
+        ? _c(
+            "span",
+            { staticClass: "json-tree-row" },
+            [
+              _vm._l(_vm.parsed.depth * 2 + 3, function(n) {
+                return _c("span", { key: n, staticClass: "json-tree-indent" }, [
+                  _vm._v(" ")
+                ])
+              }),
+              _vm._v(" "),
+              _vm.parsed.key
+                ? _c("span", { staticClass: "json-tree-key" }, [
+                    _vm._v(_vm._s(_vm.parsed.key))
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.parsed.key
+                ? _c("span", { staticClass: "json-tree-colon" }, [_vm._v(": ")])
+                : _vm._e(),
+              _vm._v(" "),
+              _c(
+                "span",
+                {
+                  staticClass: "json-tree-value",
+                  class: "json-tree-value-" + _vm.parsed.type,
+                  attrs: { title: "" + _vm.parsed.value }
+                },
+                [_vm._v(_vm._s("" + _vm.parsed.value))]
+              ),
+              _vm._v(" "),
+              !_vm.parsed.last
+                ? _c("span", { staticClass: "json-tree-comma" }, [_vm._v(",")])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("span", { staticClass: "json-tree-indent" }, [_vm._v(" ")])
+            ],
+            2
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.parsed.primitive
+        ? _c("span", { staticClass: "json-tree-deep" }, [
+            _c(
+              "span",
+              {
+                staticClass: "json-tree-row json-tree-expando",
+                on: {
+                  click: function($event) {
+                    _vm.expanded = !_vm.expanded;
+                  },
+                  mouseover: function($event) {
+                    _vm.hovered = true;
+                  },
+                  mouseout: function($event) {
+                    _vm.hovered = false;
+                  }
+                }
+              },
+              [
+                _c("span", { staticClass: "json-tree-indent" }, [_vm._v(" ")]),
+                _vm._v(" "),
+                _c("span", { staticClass: "json-tree-sign" }, [
+                  _vm._v(_vm._s(_vm.expanded ? "-" : "+"))
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.parsed.depth * 2 + 1, function(n) {
+                  return _c(
+                    "span",
+                    { key: n, staticClass: "json-tree-indent" },
+                    [_vm._v(" ")]
+                  )
+                }),
+                _vm._v(" "),
+                _vm.parsed.key
+                  ? _c("span", { staticClass: "json-tree-key" }, [
+                      _vm._v(_vm._s(_vm.parsed.key))
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.parsed.key
+                  ? _c("span", { staticClass: "json-tree-colon" }, [
+                      _vm._v(": ")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("span", { staticClass: "json-tree-open" }, [
+                  _vm._v(_vm._s(_vm.parsed.type === "array" ? "[" : "{"))
+                ]),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.expanded,
+                        expression: "!expanded"
+                      }
+                    ],
+                    staticClass: "json-tree-collapsed"
+                  },
+                  [
+                    _vm._v(
+                      " /* " +
+                        _vm._s(_vm.format(_vm.parsed.value.length)) +
+                        " */ "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.expanded,
+                        expression: "!expanded"
+                      }
+                    ],
+                    staticClass: "json-tree-close"
+                  },
+                  [_vm._v(_vm._s(_vm.parsed.type === "array" ? "]" : "}"))]
+                ),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.expanded && !_vm.parsed.last,
+                        expression: "!expanded && !parsed.last"
+                      }
+                    ],
+                    staticClass: "json-tree-comma"
+                  },
+                  [_vm._v(",")]
+                ),
+                _vm._v(" "),
+                _c("span", { staticClass: "json-tree-indent" }, [_vm._v(" ")])
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c(
+              "span",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.expanded,
+                    expression: "expanded"
+                  }
+                ],
+                staticClass: "json-tree-deeper"
+              },
+              _vm._l(_vm.parsed.value, function(item, index) {
+                return _c("json-tree", {
+                  key: index,
+                  attrs: { kv: item, level: _vm.level }
+                })
+              }),
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "span",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.expanded,
+                    expression: "expanded"
+                  }
+                ],
+                staticClass: "json-tree-row"
+              },
+              [
+                _c(
+                  "span",
+                  {
+                    staticClass: "json-tree-ending",
+                    class: { "json-tree-paired": _vm.hovered }
+                  },
+                  [
+                    _vm._l(_vm.parsed.depth * 2 + 3, function(n) {
+                      return _c(
+                        "span",
+                        { key: n, staticClass: "json-tree-indent" },
+                        [_vm._v(" ")]
+                      )
+                    }),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "json-tree-close" }, [
+                      _vm._v(_vm._s(_vm.parsed.type === "array" ? "]" : "}"))
+                    ]),
+                    _vm._v(" "),
+                    !_vm.parsed.last
+                      ? _c("span", { staticClass: "json-tree-comma" }, [
+                          _vm._v(",")
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "json-tree-indent" }, [
+                      _vm._v(" ")
+                    ])
+                  ],
+                  2
+                )
+              ]
+            )
+          ])
+        : _vm._e()
+    ]
+  )
+};
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__ = function (inject) {
+    if (!inject) return
+    inject("data-v-3dacf241_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
+
+  };
+  /* scoped */
+  const __vue_scope_id__ = undefined;
+  /* module identifier */
+  const __vue_module_identifier__ = undefined;
+  /* functional template */
+  const __vue_is_functional_template__ = false;
+  /* style inject SSR */
+  
+
+  
+  var JsonTree = normalizeComponent_1(
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    __vue_inject_styles__,
+    __vue_script__,
+    __vue_scope_id__,
+    __vue_is_functional_template__,
+    __vue_module_identifier__,
+    browser,
+    undefined
+  );
+
+var script$1 = {
+  data: function data() {
+    return {
+      query: '',
+      editorOptions: {
+        showPrintMargin: false,
+        wrap: true
+      },
+      previewOptions: {
+        showPrintMargin: false,
+        wrap: true,
+        readOnly: true
+      },
+      engines: polyglot_1.engines,
+      enginesExpanded: {},
+      enginesQuery: {},
+      polyglotOptions: {
+        groupLines: false,
+        groupLinesAlways: true,
+        removeNumbering: true,
+        preserveNewLines: true,
+        replaceWildcards: true,
+        transposeLines: true
+      },
+      exampleLast: ''
+    };
+  },
+  components: {
+    editor: vue2AceEditor,
+    jsontree: JsonTree
+  },
+  methods: {
+    clear: function clear() {
+      this.query = '';
+    },
+    showExample: function showExample() {
+      var chosenExample;
+
+      do {
+        chosenExample = lodash.sample(polyglot_1.examples);
+      } while (this.exampleLast == chosenExample.title);
+
+      this.exampleLast = chosenExample;
+      this.query = chosenExample.query;
+    },
+    toggleExpandEngine: function toggleExpandEngine(engine) {
+      this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
+    },
+    editorInit: function editorInit() {
+      // Ace editor settings
+      Promise.resolve().then(function () { return chrome; });
+      window.ace.config.set('modePath', 'syntax/ace');
+    }
+  },
+  watch: {
+    query: function query() {
+      var _this = this;
+
+      lodash(polyglot_1.translateAll(this.query, this.polyglotOptions)).forEach(function (query, key) {
+        return _this.$set(_this.enginesQuery, key, query);
+      });
+    }
+  }
+};
+
+/* script */
+const __vue_script__$1 = script$1;
+
+/* template */
+var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -62828,7 +63256,7 @@ var __vue_render__ = function() {
           [
             _vm._m(0),
             _vm._v(
-              "\n\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations.\n\t\t"
+              "\n\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations.\n\t\t\t"
             ),
             _c("div", { staticClass: "text-muted" }, [
               _vm._v("(or click here to see an example)")
@@ -62840,7 +63268,7 @@ var __vue_render__ = function() {
     _c("div", { staticClass: "row-fluid" }, [
       _c("div", { staticClass: "card" }, [
         _c("div", { staticClass: "card-header" }, [
-          _vm._v("\n\t\t\t\tYour query\n\t\t\t\t"),
+          _vm._v("\n\t\t\t\t\tYour query\n\t\t\t\t\t"),
           _c("div", { staticClass: "pull-right" }, [
             _c(
               "a",
@@ -62927,7 +63355,7 @@ var __vue_render__ = function() {
                     ? "fa-chevron-down"
                     : "fa-chevron-right"
                 }),
-                _vm._v("\n\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t")
+                _vm._v("\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t")
               ])
             ]
           ),
@@ -62939,7 +63367,9 @@ var __vue_render__ = function() {
               class: _vm.enginesExpanded[engine.id] && "show"
             },
             [
-              _vm.enginesQuery[engine.id]
+              _vm.enginesQuery[engine.id] &&
+              engine.id != "lexicalTreeJSON" &&
+              engine.id != "mongodb"
                 ? _c("editor", {
                     attrs: {
                       lang: "polyglot",
@@ -62957,7 +63387,15 @@ var __vue_render__ = function() {
                       expression: "enginesQuery[engine.id]"
                     }
                   })
-                : _vm._e()
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
+                ? _c("jsontree", {
+                    attrs: { data: _vm.enginesQuery[engine.id] }
+                  })
+                : _vm._e(),
+              _vm._v(" "),
+              _c("hr")
             ],
             1
           )
@@ -62967,7 +63405,7 @@ var __vue_render__ = function() {
     )
   ])
 };
-var __vue_staticRenderFns__ = [
+var __vue_staticRenderFns__$1 = [
   function() {
     var _vm = this;
     var _h = _vm.$createElement;
@@ -62977,16 +63415,16 @@ var __vue_staticRenderFns__ = [
     ])
   }
 ];
-__vue_render__._withStripped = true;
+__vue_render__$1._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__ = undefined;
+  const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__ = undefined;
+  const __vue_scope_id__$1 = undefined;
   /* module identifier */
-  const __vue_module_identifier__ = undefined;
+  const __vue_module_identifier__$1 = undefined;
   /* functional template */
-  const __vue_is_functional_template__ = false;
+  const __vue_is_functional_template__$1 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -62994,12 +63432,12 @@ __vue_render__._withStripped = true;
 
   
   var editor = normalizeComponent_1(
-    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
-    __vue_inject_styles__,
-    __vue_script__,
-    __vue_scope_id__,
-    __vue_is_functional_template__,
-    __vue_module_identifier__,
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    __vue_inject_styles__$1,
+    __vue_script__$1,
+    __vue_scope_id__$1,
+    __vue_is_functional_template__$1,
+    __vue_module_identifier__$1,
     undefined,
     undefined
   );

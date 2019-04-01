@@ -74,7 +74,8 @@
     "vue2-ace-editor": "0.0.13"
   },
   "dependencies": {
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "vue-json-tree": "^0.3.3"
   },
   "engines": {
     "node": "4.0.0"
