@@ -84,9 +84,9 @@ gulp.task('js:demo', ['js:lib'], ()=>
 			}),
 			production && require('rollup-plugin-uglify').uglify(),
 			require('rollup-plugin-sizes')(),
-			require('/home/mc/Papers/Projects/Node/rollup-plugin-fdnotify')({
+			/*require('/home/mc/Papers/Projects/Node/rollup-plugin-fdnotify')({
 				baseDir: __dirname,
-			}),
+			}),*/
 		],
 	})
 	.then(bundle => bundle.write({

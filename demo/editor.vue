@@ -10,6 +10,11 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
+		previewOptions: {
+			showPrintMargin: false,
+			wrap: true,
+			readOnly: true,
+		},
 		engines: polyglot.engines,
 		enginesExpanded: {},
 		enginesQuery: {},
@@ -43,7 +48,7 @@ export default {
 		},
 		editorInit() { // Ace editor settings
 			import('brace/theme/chrome');
-
+			
 			window.ace.config.set('modePath', 'syntax/ace');
 		},
 	},
@@ -86,6 +91,7 @@ export default {
 						v-bind:options="editorOptions"
 					></editor>
 				</div>
+				
 			</div>
 		</div>
 
@@ -99,10 +105,20 @@ export default {
 						{{engine.title}}
 					</a>
 				</div>
-				<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
-					<pre v-html="enginesQuery[engine.id]"></pre>
+				<div class="card-body collapse p-0" :class="enginesExpanded[engine.id] && 'show'">
+					<editor
+						v-if="enginesQuery[engine.id]"
+						v-model="enginesQuery[engine.id]"
+						v-on:init="editorInit"
+						lang="polyglot"
+						theme="chrome"
+						width="100%"
+						height="380"
+						v-bind:options="previewOptions"
+					></editor>
 				</div>
 			</div>
 		</div>
+		
 	</div>
 </template>

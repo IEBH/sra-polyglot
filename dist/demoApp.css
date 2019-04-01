@@ -1,0 +1,20 @@
+body {
+	padding-top: 40px;
+}
+
+a, [ng-click] {
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+.ace_editor {
+	font-size: 16px;
+}
+
+.tab {
+	display: inline-block;
+	width: 20px;
+}

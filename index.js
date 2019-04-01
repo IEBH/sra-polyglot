@@ -85,7 +85,9 @@ var polyglot = module.exports = {
 		if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
 		var tree = polyglot.parse(query, options);
 		tree = polyglot.preProcess(tree, options);
-		return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+		// Removed postProcess
+		// return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+		return polyglot.engines[engine].compile(tree, options);
 	},
 
 	/**
@@ -100,7 +102,9 @@ var polyglot = module.exports = {
 		var output = {};
 		var tree = polyglot.parse(query, options);
 		tree = polyglot.preProcess(tree, options);
-		_.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
+		// Removed postprocess
+		// _.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
+		_.forEach(polyglot.engines, (engine, id) => output[id] = (engine.compile(tree, options)));
 		return output;
 	},
 
@@ -135,7 +139,7 @@ var polyglot = module.exports = {
 	* @returns {string} The post processed text
 	* @see parse()
 	*/
-	postProcess: (text, options) => {
+	/*postProcess: (text, options) => {
 		var settings = _.defaults(options, {
 			forceString: true,
 			html: true,
@@ -162,7 +166,7 @@ var polyglot = module.exports = {
 		}
 
 		return text;
-	},
+	},*/
 
 
 	/**
