@@ -61333,13 +61333,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
               switch (branch.type) {
                 case 'group':
                   if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-                    branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
-                    );
-                  } else {
-                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                    // If the group has a filter decorate all its children with that field
+                    // This mutates the tree for the other engine compile functions
+                    branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], function (b) {
+                      return b.field = branch.field;
+                    });
                   }
 
+                  buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
                 case 'phrase':
@@ -61433,13 +61434,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
           }]);
 
           var compileWalker = function compileWalker(tree) {
+            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
             return tree.map(function (branch, branchIndex) {
               var buffer = '';
 
               switch (branch.type) {
                 case 'group':
                   if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
+                    buffer += '(' + compileWalker(branch.nodes, false) + ')' + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -61448,7 +61450,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'phrase':
-                  if (branch.field) {
+                  if (branch.field && expand) {
                     buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
@@ -61940,10 +61942,6 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               switch (branch.type) {
                 case 'group':
-                  if (branch.field) // If the group has a filter decorate all its children with that field
-                    branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], function (b) {
-                      return b.field = branch.field;
-                    });
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 

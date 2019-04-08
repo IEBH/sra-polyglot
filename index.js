@@ -513,21 +513,11 @@ var polyglot = module.exports = {
 							switch (branch.type) {
 								case 'group':
 									if (branch.field) {
-										buffer +=
-											'(' + compileWalker(branch.nodes) + ')' +
-											(
-												branch.field == 'title' ? '[ti]' :
-												branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-												branch.field == 'title+abstract' ? '[tiab]' :
-												branch.field == 'title+abstract+other' ? '[tw]' :
-												branch.field == 'floatingSubheading' ? '[sh]' :
-												branch.field == 'publicationType' ? '[pt]' :
-												branch.field == 'substance' ? '[nm]' :
-												'' // Unsupported field suffix for PubMed
-											);
-									} else {
-										buffer += '(' + compileWalker(branch.nodes) + ')';
-									}
+										// If the group has a filter decorate all its children with that field
+										// This mutates the tree for the other engine compile functions
+										branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+									} 
+									buffer += '(' + compileWalker(branch.nodes) + ')';					
 									break;
 								case 'phrase':
 									if (branch.field) {
@@ -619,7 +609,7 @@ var polyglot = module.exports = {
 					{subject: /\?/g, value: '?'},
 				]);
 
-				var compileWalker = tree =>
+				var compileWalker = (tree, expand = true) =>
 					tree
 						.map((branch, branchIndex) => {
 							var buffer = '';
@@ -627,7 +617,7 @@ var polyglot = module.exports = {
 								case 'group':
 									if (branch.field) {
 										buffer +=
-											'(' + compileWalker(branch.nodes) + ')' +
+											'(' + compileWalker(branch.nodes, false) + ')' +
 											(
 												branch.field == 'title' ? '.ti.' :
 												branch.field == 'abstract' ? '.ab.' :
@@ -643,7 +633,7 @@ var polyglot = module.exports = {
 									}
 									break;
 								case 'phrase':
-									if (branch.field) {
+									if (branch.field && expand) {
 										buffer +=
 											branch.content +
 											(
@@ -1120,9 +1110,6 @@ var polyglot = module.exports = {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									if (branch.field) // If the group has a filter decorate all its children with that field
-										branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
-
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
