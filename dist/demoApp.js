@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60640,12 +60636,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61342,9 +61332,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               switch (branch.type) {
                 case 'group':
-                  // if (branch.field) // If the group has a filter decorate all its children with that field
-                  // branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
+                  if (branch.field) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
+                    branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+                    );
+                  } else {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  }
+
                   break;
 
                 case 'phrase':

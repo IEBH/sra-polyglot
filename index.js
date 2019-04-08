@@ -512,7 +512,22 @@ var polyglot = module.exports = {
 							var buffer = '';
 							switch (branch.type) {
 								case 'group':
-									buffer += '(' + compileWalker(branch.nodes) + ')';
+									if (branch.field) {
+										buffer +=
+											'(' + compileWalker(branch.nodes) + ')' +
+											(
+												branch.field == 'title' ? '[ti]' :
+												branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
+												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'title+abstract+other' ? '[tw]' :
+												branch.field == 'floatingSubheading' ? '[sh]' :
+												branch.field == 'publicationType' ? '[pt]' :
+												branch.field == 'substance' ? '[nm]' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
 									break;
 								case 'phrase':
 									if (branch.field) {
