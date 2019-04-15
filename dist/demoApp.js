@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60636,6 +60640,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -60925,7 +60935,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
         groupLinesAlways: false,
         removeNumbering: true,
         preserveNewlines: true,
-        transposeLines: true
+        transposeLines: false
       });
 
       var q = query + ''; // Clone query
@@ -60975,7 +60985,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           					})
           					.join(' ' + cond + ' ')
           			)
-          			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p2, cond, p2) => {
+          			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p1, cond, p2) => {
           				if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
           				if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
           				return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
@@ -61138,8 +61148,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               case 'ab,ti':
               case 'ti,ab':
-              case 'tw':
                 useLeaf.field = 'title+abstract';
+                break;
+
+              case 'tw':
+                useLeaf.field = 'title+abstract+tw';
                 break;
 
               case 'mp':
@@ -61338,6 +61351,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], function (b) {
                       return b.field = branch.field;
                     });
+                    branch.nodes = polyglot.tools.visit(branch.nodes, ['group'], function (b) {
+                      return b.field = branch.field;
+                    });
                   }
 
                   buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -61346,7 +61362,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                 case 'phrase':
                   if (branch.field) {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-                    branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+                    branch.field == 'title+abstract' || 'title+abstract+tw' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
@@ -61441,8 +61457,12 @@ var polyglot_1 = createCommonjsModule(function (module) {
               switch (branch.type) {
                 case 'group':
                   if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes, false) + ')' + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
-                    );
+                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+                    if (expand) {
+                      buffer += branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
+                      ;
+                    }
                   } else {
                     buffer += '(' + compileWalker(branch.nodes) + ')';
                   }
@@ -61451,7 +61471,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && expand) {
-                    buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for PubMed
+                    buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
                     );
                   } else {
                     buffer += branch.content;
@@ -61548,6 +61568,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           }]);
 
           var compileWalker = function compileWalker(tree) {
+            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
             return tree.map(function (branch, branchIndex) {
               var buffer = '';
 
@@ -61556,8 +61577,12 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   if (branch.field && branch.field == 'floatingSubheading') {
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
                   } else if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
-                    );
+                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+                    if (expand) {
+                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                      ;
+                    }
                   } else {
                     buffer += '(' + compileWalker(branch.nodes) + ')';
                   }
@@ -61567,8 +61592,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
                 case 'phrase':
                   if (branch.field && branch.field == 'floatingSubheading') {
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-                  } else if (branch.field) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                  } else if (branch.field && expand) {
+                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
@@ -61691,14 +61716,19 @@ var polyglot_1 = createCommonjsModule(function (module) {
           }]);
 
           var compileWalker = function compileWalker(tree) {
+            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
             return tree.map(function (branch, branchIndex) {
               var buffer = '';
 
               switch (branch.type) {
                 case 'group':
                   if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes) + ')' + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
-                    );
+                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+                    if (expand) {
+                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                      ;
+                    }
                   } else {
                     buffer += '(' + compileWalker(branch.nodes) + ')';
                   }
@@ -61706,8 +61736,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'phrase':
-                  if (branch.field) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                  if (branch.field && expand) {
+                    buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'embase');
@@ -62052,7 +62082,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field) {
-                    buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
+                    buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.tw' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
                   } else {
                     buffer += branch.content;
                   }
@@ -62158,7 +62188,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field) {
-                    buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
+                    buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' || 'title+abstract+tw' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
                   } else {
                     buffer += '"' + branch.content + '"';
                   }
