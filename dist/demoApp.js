@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.3.1
@@ -60640,12 +60636,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -60875,6 +60865,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
     },
 
     /**
+    * FUNCTION CURRENTLY NOT USED (UNUSED)
     * Post process the data from an engine
     * This function applies the following behaviours:
     * - If HTML is true all `\n` characters are replaced with `<br/>`
@@ -60887,35 +60878,31 @@ var polyglot_1 = createCommonjsModule(function (module) {
     * @returns {string} The post processed text
     * @see parse()
     */
+    postProcess: function postProcess(text, options) {
+      var settings = lodash.defaults(options, {
+        forceString: true,
+        html: true,
+        trim: true,
+        transposeLines: true
+      });
 
-    /*postProcess: (text, options) => {
-    	var settings = _.defaults(options, {
-    		forceString: true,
-    		html: true,
-    		trim: true,
-    		transposeLines: true,
-    	});
-    
-    	if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
-    
-    	if (settings.html) {
-    		text = text
-    			.replace(/\n/g, '<br/>')
-    			.replace(/\t/g, '<span class="tab"></span>')
-    	} else if (_.isString(text)) { // Flatten HTML - Yes this is a horrible method, but its quick
-    		for (var i = 0; i < 10; i ++) {
-    			text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
-    		}
-    	}
-    
-    	if (settings.trim) {
-    		text = text
-    			.replace(/^\s+/gm, '')
-    			.replace(/\s+$/gm, '')
-    	}
-    
-    	return text;
-    },*/
+      if (settings.forceString && !lodash.isString(text)) text = JSON.stringify(text, null, '\t');
+
+      if (settings.html) {
+        text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
+      } else if (lodash.isString(text)) {
+        // Flatten HTML - Yes this is a horrible method, but its quick
+        for (var i = 0; i < 10; i++) {
+          text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
+        }
+      }
+
+      if (settings.trim) {
+        text = text.replace(/^\s+/gm, '').replace(/\s+$/gm, '');
+      }
+
+      return text;
+    },
 
     /**
     * Parse a given string into a lexical object tree
@@ -60933,9 +60920,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var settings = lodash.defaults(options, {
         groupLines: false,
         groupLinesAlways: false,
-        removeNumbering: true,
+        removeNumbering: false,
         preserveNewlines: true,
-        transposeLines: false
+        transposeLines: true
       });
 
       var q = query + ''; // Clone query
@@ -60953,46 +60940,44 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
 
       var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
-
-      var lineRefs = {}; // Object lookup for line references (usually something like `1. Foo`), only populated if `transposeLines` is true
       // Operate in line-by-line mode? {{{
 
       if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
         var lines = q.split('\n'); // Transpose lines {{{
 
-        if (settings.transposeLines) {
-          // Compute array of line references
-          lineRefs = lodash(lines).filter(function (line) {
-            return !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line);
-          }) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
-          .map(function (line) {
-            var bits = /^\s*(\d+)\.?\s(.*)$/.exec(line);
-            if (bits) return [bits[1], bits[2]];
-          }).filter().mapKeys(function (i) {
-            return i[0];
-          }).mapValues(function (i) {
-            return lodash.trim(i[1]);
-          }).value();
-          /*
-          lines = lines
-          	.map((line, lineOffset) => {
-          		line = line
-          			.replace(/([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i, (match, from, to, cond) =>
-          				_.range(Number(from), Number(to) + 1)
-          					.map(ref => {
-          						if (!lineRefs[ref]) throw new Error(`Reference "${ref}" not found (required on line ${lineOffset})`);
-          						return lineRefs[ref];
-          					})
-          					.join(' ' + cond + ' ')
-          			)
-          			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p1, cond, p2) => {
-          				if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
-          				if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
-          				return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
-          			})
-          	})
-          */
-        } // }}}
+        if (settings.transposeLines) ;
+        /* TODO: NEED TO FIND OUT WHAT THIS DOES
+        // Compute array of line references
+        lineRefs = _(lines)
+        	.filter(line => !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line)) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
+        	.map(line => {
+        		var bits = /^\s*(\d+)\.?\s(.*)$/.exec(line);
+        		if (bits) return [bits[1], bits[2]];
+        	})
+        	.filter()
+        	.mapKeys(i => i[0])
+        	.mapValues(i => _.trim(i[1]))
+        	.value();
+        		
+        lines = lines
+        	.map((line, lineOffset) => {
+        		line = line
+        			.replace(/([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i, (match, from, to, cond) =>
+        				_.range(Number(from), Number(to) + 1)
+        					.map(ref => {
+        						if (!lineRefs[ref]) throw new Error(`Reference "${ref}" not found (required on line ${lineOffset})`);
+        						return lineRefs[ref];
+        					})
+        					.join(' ' + cond + ' ')
+        			)
+        			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p1, cond, p2) => {
+        				if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
+        				if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
+        				return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
+        			})
+        	})
+        */
+        // }}}
         // Remove numbering {{{
 
 
@@ -61033,6 +61018,37 @@ var polyglot_1 = createCommonjsModule(function (module) {
           if (!leaf.content) branch.nodes.pop();
         }
       }
+      /**
+      * End the previous line branch and create a new one
+      * this function is run every time a new raw node is inserted
+      */
+
+      function newLine(currentNumber) {
+        lastGroup = branch;
+        branch = branchStack.pop();
+        leaf = branch.nodes;
+        var newGroup = {
+          type: 'line',
+          number: currentNumber,
+          nodes: []
+        };
+        branch.nodes.push(newGroup);
+        branchStack.push(branch);
+        branch = newGroup;
+        leaf = branch.nodes;
+      }
+      // Create a group for the first line
+
+      var newGroup = {
+        type: 'line',
+        number: 1,
+        nodes: []
+      };
+      branch.nodes.push(newGroup);
+      branchStack.push(branch);
+      branch = newGroup;
+      leaf = branch.nodes;
+      var lineNumber = 2;
 
       while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -61123,6 +61139,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
             leaf = undefined;
           }
 
+          newLine(lineNumber);
+          lineNumber++;
           q = q.substr(match[0].length);
           cropString = false;
           afterWhitespace = true;
@@ -61242,18 +61260,22 @@ var polyglot_1 = createCommonjsModule(function (module) {
           q = q.substr(match[0].length);
           cropString = false;
         } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
+          // 1-7/OR
           branch.nodes.push({
             type: 'ref',
-            ref: lodash.range(match[1], match[2] + 1),
+            ref: lodash.range(match[1], (match[2] + 1) / 10),
             cond: match[3]
           });
           q = q.substr(match[0].length);
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)\s+([0-9]+)/i.exec(q))) {
+          // 1 AND 2
+          // TODO: 1 AND 2 AND 3 etc.
           branch.nodes.push({
             type: 'ref',
-            ref: [match[1]]
+            ref: [match[1], match[3]],
+            cond: match[2]
           });
-          q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+          q = q.substr(match[0].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
         } else {
           var nextChar = q.substr(0, 1);
 
@@ -61289,7 +61311,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
       if (settings.transposeLines) {
         polyglot.tools.visit(tree.nodes, ['ref'], function (node, path) {
           // FIXME: Do a line transposition here
-          node.type = 'phrase';
+          node.type = 'phrase'; // TODO: Set the node content to be whatever is referenced on a certain line
+
           node.content = 'REF(' + node.ref.join(',') + ')';
         });
       }
@@ -61344,6 +61367,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   if (branch.field) {
                     // If the group has a filter decorate all its children with that field
@@ -61362,7 +61389,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                 case 'phrase':
                   if (branch.field) {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-                    branch.field == 'title+abstract' || 'title+abstract+tw' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+                    branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+tw' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
@@ -61455,6 +61482,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   if (branch.field) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
@@ -61573,6 +61604,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   if (branch.field && branch.field == 'floatingSubheading') {
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
@@ -61580,7 +61615,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                     if (expand) {
-                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
                       ;
                     }
                   } else {
@@ -61593,7 +61628,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   if (branch.field && branch.field == 'floatingSubheading') {
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
                   } else if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
@@ -61721,12 +61756,16 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   if (branch.field) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                     if (expand) {
-                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
                       ;
                     }
                   } else {
@@ -61737,7 +61776,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':tw' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                    buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'embase');
@@ -61839,6 +61878,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
@@ -61971,12 +62014,16 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
                 case 'phrase':
-                  if (branch.field && branch.field == 'title+abstract') {
+                  if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
                     buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
                   } else if (branch.field) {
                     buffer += lodash.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl'));
@@ -62076,13 +62123,17 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
                 case 'phrase':
                   if (branch.field) {
-                    buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.tw' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
+                    buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
                   } else {
                     buffer += branch.content;
                   }
@@ -62182,13 +62233,17 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = '';
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
                 case 'phrase':
                   if (branch.field) {
-                    buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' || 'title+abstract+tw' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
+                    buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
                   } else {
                     buffer += '"' + branch.content + '"';
                   }
@@ -62292,6 +62347,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = lodash.repeat('  ', level) + '- ';
 
               switch (branch.type) {
+                case 'line':
+                  // TODO: Add case for line
+                  break;
+
                 case 'group':
                   buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
                   buffer += compileWalker(branch.nodes, level + 1);
@@ -62390,6 +62449,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
               var buffer = {};
 
               switch (branch.type) {
+                case 'line':
+                  buffer += compileWalker(branch.nodes);
+                  break;
+
                 case 'group':
                   if (branch.field && branch.field == 'title+abstract') {
                     // FIXME: Not yet properly supported
@@ -62522,7 +62585,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             } // Walk down nodes if its a group
 
 
-            if (branch.type == 'group') treeWalker(branch.nodes, nodePath.concat(['nodes']));
+            if (branch.type == 'group' || branch.type == 'line') treeWalker(branch.nodes, nodePath.concat(['nodes']));
           });
         };
 
@@ -62670,9 +62733,10 @@ var polyglot_5 = polyglot_1.templates;
 var polyglot_6 = polyglot_1.translate;
 var polyglot_7 = polyglot_1.translateAll;
 var polyglot_8 = polyglot_1.preProcess;
-var polyglot_9 = polyglot_1.parse;
-var polyglot_10 = polyglot_1.engines;
-var polyglot_11 = polyglot_1.tools;
+var polyglot_9 = polyglot_1.postProcess;
+var polyglot_10 = polyglot_1.parse;
+var polyglot_11 = polyglot_1.engines;
+var polyglot_12 = polyglot_1.tools;
 
 //
 //
@@ -63215,7 +63279,7 @@ var script$1 = {
       polyglotOptions: {
         groupLines: false,
         groupLinesAlways: true,
-        removeNumbering: true,
+        removeNumbering: false,
         preserveNewLines: true,
         replaceWildcards: true,
         transposeLines: true

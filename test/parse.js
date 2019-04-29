@@ -167,7 +167,7 @@ describe('Parse', ()=> {
 		expect(polyglot.parse('foo.tw. and bar baz.pt. and quz.ab. and (thud and waldo).fs.')).to.deep.equal([
 			{
 				type: 'phrase',
-				field: 'title+abstract',
+				field: 'title+abstract+tw',
 				content: 'foo',
 			},
 			{type: 'joinAnd'},

@@ -115,15 +115,15 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', ()
 		expect(polyglot.translate('term.tw.', 'pubmed')).to.equal('term[tiab]');
 	});
 
-	it('translate `term.tw.` -> OV `term:ti,ab`', ()=> {
-		expect(polyglot.translate('term.tw.', 'ovid')).to.equal('term.ti,ab.');
+	it('translate `term.tw.` -> OV `term.tw.`', ()=> {
+		expect(polyglot.translate('term.tw.', 'ovid')).to.equal('term.tw.');
 	});
 
-	it('translate `term.tw.` -> CO `term.tw.`', ()=> {
+	it('translate `term.tw.` -> CO `term:ti,ab`', ()=> {
 		expect(polyglot.translate('term.tw.', 'cochrane')).to.equal('term:ti,ab');
 	});
 
-	it('translate `term.tw.` -> EM `term.tw.`', ()=> {
+	it('translate `term.tw.` -> EM `term:ti,ab`', ()=> {
 		expect(polyglot.translate('term.tw.', 'embase')).to.equal('term:ti,ab');
 	});
 

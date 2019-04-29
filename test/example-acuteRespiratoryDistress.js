@@ -57,7 +57,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'group',
@@ -101,7 +101,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -117,7 +117,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -133,7 +133,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -152,7 +152,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -168,7 +168,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -184,7 +184,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'group',
@@ -233,19 +233,19 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						content: 'hyaline membrane diseas*',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						content: 'bronchopulmonary dysplasia',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -276,7 +276,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -295,7 +295,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -365,7 +365,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -406,7 +406,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -422,7 +422,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -443,7 +443,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'group',
@@ -472,7 +472,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -522,18 +522,18 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{
 						type: 'phrase',
 						content: 'lateral',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						content: 'upright',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -569,7 +569,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'group',
@@ -623,7 +623,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',
@@ -642,7 +642,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'title+abstract+tw',
 						nodes: [
 							{
 								type: 'phrase',

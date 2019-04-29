@@ -127,6 +127,7 @@ var polyglot = module.exports = {
 
 
 	/**
+	* FUNCTION CURRENTLY NOT USED (UNUSED)
 	* Post process the data from an engine
 	* This function applies the following behaviours:
 	* - If HTML is true all `\n` characters are replaced with `<br/>`
@@ -139,7 +140,7 @@ var polyglot = module.exports = {
 	* @returns {string} The post processed text
 	* @see parse()
 	*/
-	/*postProcess: (text, options) => {
+	postProcess: (text, options) => {
 		var settings = _.defaults(options, {
 			forceString: true,
 			html: true,
@@ -166,7 +167,7 @@ var polyglot = module.exports = {
 		}
 
 		return text;
-	},*/
+	},
 
 
 	/**
@@ -185,7 +186,7 @@ var polyglot = module.exports = {
 		var settings = _.defaults(options, {
 			groupLines: false,
 			groupLinesAlways: false,
-			removeNumbering: true,
+			removeNumbering: false,
 			preserveNewlines: true,
 			transposeLines: true,
 		});
@@ -205,6 +206,7 @@ var polyglot = module.exports = {
 
 			// Transpose lines {{{
 			if (settings.transposeLines) {
+				/* TODO: NEED TO FIND OUT WHAT THIS DOES
 				// Compute array of line references
 				lineRefs = _(lines)
 					.filter(line => !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line)) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
@@ -217,7 +219,7 @@ var polyglot = module.exports = {
 					.mapValues(i => _.trim(i[1]))
 					.value();
 
-				/*
+				
 				lines = lines
 					.map((line, lineOffset) => {
 						line = line
@@ -274,7 +276,29 @@ var polyglot = module.exports = {
 				if (!leaf.content) branch.nodes.pop();
 			}
 		};
+		/**
+		* End the previous line branch and create a new one
+		* this function is run every time a new raw node is inserted
+		*/
+		function newLine(currentNumber) {
+			lastGroup = branch;
+			branch = branchStack.pop();
+			leaf = branch.nodes;
+			var newGroup = {type: 'line', number: currentNumber, nodes: []};
+			branch.nodes.push(newGroup);
+			branchStack.push(branch);
+			branch = newGroup;
+			leaf = branch.nodes;
+		};
 		// }}}
+
+		// Create a group for the first line
+		var newGroup = {type: 'line', number: 1, nodes: []};
+		branch.nodes.push(newGroup);
+		branchStack.push(branch);
+		branch = newGroup;
+		leaf = branch.nodes;
+		var lineNumber = 2;
 
 		while (q.length) {
 			var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -337,6 +361,8 @@ var polyglot = module.exports = {
 					branch.nodes.push({type: 'raw', content: match[0]});
 					leaf = undefined;
 				}
+				newLine(lineNumber);
+				lineNumber++;
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
@@ -432,12 +458,21 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
-				branch.nodes.push({type: 'ref', ref: _.range(match[1], match[2]+1), cond: match[3]});
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) { // 1-7/OR
+				branch.nodes.push({
+					type: 'ref', 
+					ref: _.range(match[1], (match[2]+1)/10), 
+					cond: match[3]
+				});
 				q = q.substr(match[0].length);
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
-				branch.nodes.push({type: 'ref', ref: [match[1]]});
-				q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)\s+([0-9]+)/i.exec(q))) { // 1 AND 2
+				// TODO: 1 AND 2 AND 3 etc.
+				branch.nodes.push({
+					type: 'ref', 
+					ref: [match[1], match[3]],
+					cond: match[2]
+				});
+				q = q.substr(match[0].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 			} else {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
@@ -464,6 +499,7 @@ var polyglot = module.exports = {
 			polyglot.tools.visit(tree.nodes, ['ref'], (node, path) => {
 				// FIXME: Do a line transposition here
 				node.type = 'phrase';
+				// TODO: Set the node content to be whatever is referenced on a certain line
 				node.content = 'REF(' + node.ref.join(',') + ')';
 			});
 		}
@@ -513,6 +549,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									if (branch.field) {
 										// If the group has a filter decorate all its children with that field
@@ -529,7 +568,8 @@ var polyglot = module.exports = {
 											(
 												(branch.field == 'title') ? '[ti]' :
 												branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-												branch.field == 'title+abstract' || 'title+abstract+tw' ? '[tiab]' :
+												branch.field == 'title+abstract' ? '[tiab]' :
+												branch.field == 'title+abstract+tw' ? '[tiab]' :
 												branch.field == 'title+abstract+other' ? '[tw]' :
 												branch.field == 'floatingSubheading' ? '[sh]' :
 												branch.field == 'publicationType' ? '[pt]' :
@@ -572,7 +612,7 @@ var polyglot = module.exports = {
 								+ (
 									branch.type == 'raw' || // Its not a raw node
 									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')// or the next item is a raw node
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
 									? '' : ' '
 								);
 						})
@@ -611,12 +651,15 @@ var polyglot = module.exports = {
 				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
 					{subject: /\?/g, value: '?'},
 				]);
-
+				
 				var compileWalker = (tree, expand = true) =>
 					tree
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									if (branch.field) {
 										buffer += '(' + compileWalker(branch.nodes, false) + ')' 
@@ -737,6 +780,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									if (branch.field && branch.field == 'floatingSubheading') {
 										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
@@ -748,7 +794,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
-												branch.field == 'title+abstract+tw' ? ':tw' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
@@ -770,7 +816,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
-												branch.field == 'title+abstract+tw' ? ':tw' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
 												branch.field == 'floatingSubheading' ? ':fs' :
 												branch.field == 'publicationType' ? ':pt' :
@@ -887,6 +933,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									if (branch.field) {
 										buffer += '(' + compileWalker(branch.nodes, false) + ')' 
@@ -896,7 +945,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
-												branch.field == 'title+abstract+tw' ? ':tw' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
 												branch.field == 'publicationType' ? ':it' :
@@ -916,7 +965,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? ':ti' :
 												branch.field == 'abstract' ? ':ab' :
 												branch.field == 'title+abstract' ? ':ti,ab' :
-												branch.field == 'title+abstract+tw' ? ':tw' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
 												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
 												branch.field == 'floatingSubheading' ? ':lnk' :
 												branch.field == 'publicationType' ? ':it' :
@@ -1008,6 +1057,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
@@ -1125,11 +1177,14 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
 								case 'phrase':
-									if (branch.field && branch.field == 'title+abstract') {
+									if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
 										buffer +=
 											'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') +
 											' OR ' +
@@ -1230,6 +1285,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
@@ -1241,7 +1299,7 @@ var polyglot = module.exports = {
 												branch.field == 'title' ? '.ti' :
 												branch.field == 'abstract' ? '.ab' :
 												branch.field == 'title+abstract' ? '.ti,ab' :
-												branch.field == 'title+abstract+tw' ? '.tw' :
+												branch.field == 'title+abstract+tw' ? '.ti,ab' :
 												branch.field == 'title+abstract+other' ? '.mp.' :
 												branch.field == 'floatingSubheading' ? '.hw' :
 												branch.field == 'publicationType' ? '.pt' :
@@ -1332,6 +1390,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = '';
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
@@ -1341,7 +1402,8 @@ var polyglot = module.exports = {
 											branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
 											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
 											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
-											branch.field == 'title+abstract+other' || 'title+abstract+tw' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
+											branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
 											branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
 											branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
 											branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
@@ -1436,6 +1498,9 @@ var polyglot = module.exports = {
 						.map(branch => {
 							var buffer = _.repeat('  ', level) + '- ';
 							switch (branch.type) {
+								case 'line':
+									// TODO: Add case for line
+									break;
 								case 'group':
 									buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
 									buffer += compileWalker(branch.nodes, level +1);
@@ -1509,6 +1574,9 @@ var polyglot = module.exports = {
 						.map((branch, branchIndex) => {
 							var buffer = {};
 							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
 								case 'group':
 									if (branch.field && branch.field == 'title+abstract') {
 										// FIXME: Not yet properly supported
@@ -1625,7 +1693,7 @@ var polyglot = module.exports = {
 					}
 
 					// Walk down nodes if its a group
-					if (branch.type == 'group') treeWalker(branch.nodes, nodePath.concat(['nodes']));
+					if (branch.type == 'group' || branch.type == 'line') treeWalker(branch.nodes, nodePath.concat(['nodes']));
 				});
 			};
 

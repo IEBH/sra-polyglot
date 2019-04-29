@@ -3,7 +3,7 @@ var polyglot = require('..');
 
 describe('Translate field groups (Ovid -> CINAHL)', ()=> {
 
-	it('translate `(term1).tw.` -> CI `(TI term1 OR AB term1)`', ()=> {
+	it.only('translate `(term1).tw.` -> CI `(TI term1 OR AB term1)`', ()=> {
 		expect(polyglot.translate('(term1).tw.', 'cinahl')).to.equal('(TI term1 OR AB term1)');
 	});
 

@@ -23,11 +23,11 @@ describe('Translate floating subheading searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[sh]', 'cinahl')).to.equal('MW term');
 	});
 
-	it('translate `term[ab]` -> PY `term.hw`', ()=> {
+	it('translate `term[sh]` -> PY `term.hw`', ()=> {
 		expect(polyglot.translate('term[sh]', 'psycinfo')).to.equal('term.hw');
 	});
 
-	it('translate `term[ab]` -> SC `INDEXTERMS("term")`', ()=> {
+	it('translate `term[sh]` -> SC `INDEXTERMS("term")`', ()=> {
 		expect(polyglot.translate('term[sh]', 'scopus')).to.equal('INDEXTERMS("term")');
 	});
 

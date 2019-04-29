@@ -31,7 +31,7 @@ gulp.task('js:lib', function() {
 			presets: ['@babel/env'],
 		}))
 		.pipe(gulp.dest('./dist'))
-		.pipe(uglify())
+		// .pipe(uglify())
 		.pipe(rename('polyglot.min.js'))
 		.pipe(gulp.dest('./dist'))
 });

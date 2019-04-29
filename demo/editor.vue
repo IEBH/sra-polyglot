@@ -22,7 +22,7 @@ export default {
 		polyglotOptions: {
 			groupLines: false,
 			groupLinesAlways: true,
-			removeNumbering: true,
+			removeNumbering: false,
 			preserveNewLines: true,
 			replaceWildcards: true,
 			transposeLines: true,

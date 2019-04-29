@@ -23,11 +23,11 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[pt]', 'cinahl')).to.equal('PT term');
 	});
 
-	it('translate `term[ab]` -> PY `term.hw`', ()=> {
+	it('translate `term[pt]` -> PY `term.pt`', ()=> {
 		expect(polyglot.translate('term[pt]', 'psycinfo')).to.equal('term.pt');
 	});
 
-	it('translate `term[ab]` -> SC `DOCTYPE("term")`', ()=> {
+	it('translate `term[pt]` -> SC `DOCTYPE("term")`', ()=> {
 		expect(polyglot.translate('term[pt]', 'scopus')).to.equal('DOCTYPE("term")');
 	});
 
