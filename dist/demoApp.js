@@ -60732,6 +60732,28 @@ var vue2AceEditor = {
 
 var polyglot_1 = createCommonjsModule(function (module) {
 
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    }
+  }
+
   var polyglot = module.exports = {
     /**
     * List of example search queries
@@ -61068,6 +61090,41 @@ var polyglot_1 = createCommonjsModule(function (module) {
           lastGroup = branch;
           branch = branchStack.pop();
           leaf = branch.nodes;
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
+          // 1-7/OR
+          branch.nodes.push({
+            type: 'ref',
+            ref: lodash.range(match[1], (match[2] + 1) / 10),
+            cond: match[3],
+            nodes: []
+          });
+          q = q.substr(match[0].length);
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
+          // 1 AND ...
+          branch.nodes.push({
+            type: 'ref',
+            ref: [match[1]],
+            cond: '',
+            nodes: []
+          });
+          q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+        } else if (settings.transposeLines && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) {
+          // 1 AND ...
+          trimLastLeaf();
+          match[1].toLowerCase() == "and" ? branch.nodes.push({
+            type: 'joinAnd'
+          }) : branch.nodes.push({
+            type: 'joinOr'
+          });
+          leaf = undefined;
+          cropString = false;
+          branch.nodes.push({
+            type: 'ref',
+            ref: [match[2]],
+            cond: '',
+            nodes: []
+          });
+          q = q.substr(match[0].length);
         } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
           trimLastLeaf();
           branch.nodes.push({
@@ -61259,23 +61316,6 @@ var polyglot_1 = createCommonjsModule(function (module) {
           leaf = undefined;
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
-          // 1-7/OR
-          branch.nodes.push({
-            type: 'ref',
-            ref: lodash.range(match[1], (match[2] + 1) / 10),
-            cond: match[3]
-          });
-          q = q.substr(match[0].length);
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)\s+([0-9]+)/i.exec(q))) {
-          // 1 AND 2
-          // TODO: 1 AND 2 AND 3 etc.
-          branch.nodes.push({
-            type: 'ref',
-            ref: [match[1], match[3]],
-            cond: match[2]
-          });
-          q = q.substr(match[0].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
         } else {
           var nextChar = q.substr(0, 1);
 
@@ -61310,10 +61350,25 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
       if (settings.transposeLines) {
         polyglot.tools.visit(tree.nodes, ['ref'], function (node, path) {
-          // FIXME: Do a line transposition here
-          node.type = 'phrase'; // TODO: Set the node content to be whatever is referenced on a certain line
+          var reference;
+          var line; // Find the matching line
 
-          node.content = 'REF(' + node.ref.join(',') + ')';
+          for (reference in node.ref) {
+            for (line in tree.nodes) {
+              if (tree.nodes[line].number == node.ref[reference]) {
+                // Copy the nodes from that line into the reference nodes
+                // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+                node.nodes = _toConsumableArray(tree.nodes[line].nodes); // Pop the raw node
+
+                node.nodes.pop();
+              }
+            }
+          }
+          /*// FIXME: Do a line transposition here
+          node.type = 'phrase';
+          // TODO: Set the node content to be whatever is referenced on a certain line
+          node.content = 'REF(' + node.ref.join(' ' + node.cond + ' ') + ')';*/
+
         });
       }
 
@@ -61386,6 +61441,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
                 case 'phrase':
                   if (branch.field) {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
@@ -61432,9 +61494,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -61500,6 +61562,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
+                  break;
+
                 case 'phrase':
                   if (branch.field && expand) {
                     buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
@@ -61548,9 +61619,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -61624,6 +61695,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
                 case 'phrase':
                   if (branch.field && branch.field == 'floatingSubheading') {
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
@@ -61674,9 +61752,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -61774,6 +61852,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
                 case 'phrase':
                   if (branch.field && expand) {
                     buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
@@ -61822,9 +61907,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -61886,6 +61971,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
                 case 'phrase':
                   buffer += polyglot.tools.quotePhrase(branch, 'wos');
                   break;
@@ -61928,9 +62020,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -62022,6 +62114,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
                 case 'phrase':
                   if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
                     buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
@@ -62071,9 +62170,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -62131,6 +62230,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
+                  break;
+
                 case 'phrase':
                   if (branch.field) {
                     buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
@@ -62178,9 +62286,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -62241,6 +62349,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += '(' + compileWalker(branch.nodes) + ')';
                   break;
 
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
+
+                  break;
+
                 case 'phrase':
                   if (branch.field) {
                     buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
@@ -62288,9 +62405,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
               return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
               + (branch.type == 'raw' || // Its not a raw node
-              branchIndex == tree.length - 1 || // or the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' // or the next item is a raw node
-              ? '' : ' ');
+              branch.type == 'line' || // Its not a line node
+              branchIndex == tree.length - 1 || // Its not the last item in the sequence
+              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
             }).join('');
           };
 
@@ -62355,6 +62472,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
                   buffer += compileWalker(branch.nodes, level + 1);
                   break;
+
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
 
                 case 'phrase':
                   buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
@@ -62464,6 +62588,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   }
 
                   break;
+
+                case 'ref':
+                  if (branch.nodes) {
+                    buffer += '(' + compileWalker(branch.nodes) + ')';
+                  } else {
+                    buffer += branch.ref;
+                  }
 
                 case 'phrase':
                   if (branch.field && branch.field == 'title+abstract') {

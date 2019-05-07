@@ -314,7 +314,38 @@ var polyglot = module.exports = {
 				lastGroup = branch;
 				branch = branchStack.pop();
 				leaf = branch.nodes;
-			} else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
+			} 
+			else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) { // 1-7/OR
+				branch.nodes.push({
+					type: 'ref', 
+					ref: _.range(match[1], (match[2]+1)/10), 
+					cond: match[3],
+					nodes: []
+				});
+				q = q.substr(match[0].length);
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) { // 1 AND ...
+				branch.nodes.push({
+					type: 'ref', 
+					ref: [match[1]],
+					cond: '',
+					nodes: []
+				}); 
+				q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+			} else if ((settings.transposeLines) && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) { // 1 AND ...
+				trimLastLeaf();
+				(match[1].toLowerCase() == "and") ? branch.nodes.push({type: 'joinAnd'}) : branch.nodes.push({type: 'joinOr'});
+				leaf = undefined;
+				cropString = false;
+
+				branch.nodes.push({
+					type: 'ref', 
+					ref: [match[2]],
+					cond: '',
+					nodes: []
+				}); 
+				q = q.substr(match[0].length); 
+			}
+			else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinAnd'});
 				leaf = undefined;
@@ -458,22 +489,8 @@ var polyglot = module.exports = {
 				leaf = undefined;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) { // 1-7/OR
-				branch.nodes.push({
-					type: 'ref', 
-					ref: _.range(match[1], (match[2]+1)/10), 
-					cond: match[3]
-				});
-				q = q.substr(match[0].length);
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)\s+([0-9]+)/i.exec(q))) { // 1 AND 2
-				// TODO: 1 AND 2 AND 3 etc.
-				branch.nodes.push({
-					type: 'ref', 
-					ref: [match[1], match[3]],
-					cond: match[2]
-				});
-				q = q.substr(match[0].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
-			} else {
+			} 
+			else {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
 					if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
@@ -497,10 +514,24 @@ var polyglot = module.exports = {
 
 		if (settings.transposeLines) {
 			polyglot.tools.visit(tree.nodes, ['ref'], (node, path) => {
-				// FIXME: Do a line transposition here
+				var reference;
+				var line;
+				// Find the matching line
+				for (reference in node.ref) {
+					for (line in tree.nodes) {
+						if (tree.nodes[line].number == node.ref[reference]) {
+							// Copy the nodes from that line into the reference nodes
+							// TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+							node.nodes = [...tree.nodes[line].nodes];
+							// Pop the raw node
+							node.nodes.pop();
+						}
+					}
+				}
+				/*// FIXME: Do a line transposition here
 				node.type = 'phrase';
 				// TODO: Set the node content to be whatever is referenced on a certain line
-				node.content = 'REF(' + node.ref.join(',') + ')';
+				node.content = 'REF(' + node.ref.join(' ' + node.cond + ' ') + ')';*/
 			});
 		}
 
@@ -561,6 +592,12 @@ var polyglot = module.exports = {
 									} 
 									buffer += '(' + compileWalker(branch.nodes) + ')';					
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									if (branch.field) {
 										buffer +=
@@ -611,8 +648,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -681,6 +719,13 @@ var polyglot = module.exports = {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
+									break;
 								case 'phrase':
 									if (branch.field && expand) {
 										buffer +=
@@ -732,8 +777,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -806,6 +852,12 @@ var polyglot = module.exports = {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									if (branch.field && branch.field == 'floatingSubheading') {
 										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
@@ -859,8 +911,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -957,6 +1010,12 @@ var polyglot = module.exports = {
 										buffer += '(' + compileWalker(branch.nodes) + ')';
 									}
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									if (branch.field && expand) {
 										buffer +=
@@ -1008,8 +1067,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -1063,6 +1123,12 @@ var polyglot = module.exports = {
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									buffer += polyglot.tools.quotePhrase(branch, 'wos');
 									break;
@@ -1098,8 +1164,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -1183,6 +1250,12 @@ var polyglot = module.exports = {
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
 										buffer +=
@@ -1238,8 +1311,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -1290,6 +1364,13 @@ var polyglot = module.exports = {
 									break;
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 									break;
 								case 'phrase':
 									if (branch.field) {
@@ -1342,8 +1423,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -1396,6 +1478,13 @@ var polyglot = module.exports = {
 								case 'group':
 									buffer += '(' + compileWalker(branch.nodes) + ')';
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
+									break;
 								case 'phrase':
 									if (branch.field) {
 										buffer += (
@@ -1445,8 +1534,9 @@ var polyglot = module.exports = {
 								// Add spacing provided... its not a raw buffer or the last entity within the structure
 								+ (
 									branch.type == 'raw' || // Its not a raw node
-									branchIndex == tree.length-1 || // or the last item in the sequence
-									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw') // or the next item is a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
 									? '' : ' '
 								);
 						})
@@ -1505,6 +1595,12 @@ var polyglot = module.exports = {
 									buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
 									buffer += compileWalker(branch.nodes, level +1);
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
 									break;
@@ -1587,6 +1683,12 @@ var polyglot = module.exports = {
 										buffer = settings.translatePhraseField(compileWalker(branch.nodes));
 									}
 									break;
+								case 'ref':
+									if (branch.nodes) {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									} else {
+										buffer += branch.ref;
+									}
 								case 'phrase':
 									if (branch.field && branch.field == 'title+abstract') {
 										buffer = settings.translateTitleAbstract(branch.content);
