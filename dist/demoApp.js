@@ -61070,7 +61070,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
       branchStack.push(branch);
       branch = newGroup;
       leaf = branch.nodes;
-      var lineNumber = 2;
+      var lineNumber = 1;
 
       while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -61125,6 +61125,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
             nodes: []
           });
           q = q.substr(match[0].length);
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s+/i.exec(q))) {
+          // 1 (Line number)
+          lineNumber = parseInt(match[1], 10);
+          branch.number = lineNumber;
+          q = q.substr(match[0].length - 1);
         } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
           trimLastLeaf();
           branch.nodes.push({
@@ -61196,8 +61201,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
             leaf = undefined;
           }
 
+          lineNumber += match[0].length;
           newLine(lineNumber);
-          lineNumber++;
           q = q.substr(match[0].length);
           cropString = false;
           afterWhitespace = true;
