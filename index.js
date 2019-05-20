@@ -345,11 +345,11 @@ var polyglot = module.exports = {
 					nodes: []
 				}); 
 				q = q.substr(match[0].length); 
-			} /* else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
 				lineNumber = parseInt(match[1], 10)
 				branch.number = lineNumber
 				q = q.substr(match[0].length-1);
-			} */
+			} 
 			else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinAnd'});
@@ -503,10 +503,10 @@ var polyglot = module.exports = {
 						branch.nodes.push(leaf);
 						q = q.substr(match[0].length);
 						cropString = false;
-					} else if (match = /^([^\s\)\.\[]]+)/.exec(q)) { // Slurp the phrase until the space or close brackets
-						leaf = {type: 'phrase', content: match[1]};
+					} else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
+						leaf = {type: 'phrase', content: match[0]};
 						branch.nodes.push(leaf);
-						q = q.substr(match[1].length);
+						q = q.substr(match[0].length);
 						cropString = false;
 					} else { // All other first chars - just dump into a buffer and let it fill slowly
 						leaf = {type: 'phrase', content: nextChar};

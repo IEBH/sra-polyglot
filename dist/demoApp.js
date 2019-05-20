@@ -61128,154 +61128,94 @@ var polyglot_1 = createCommonjsModule(function (module) {
             nodes: []
           });
           q = q.substr(match[0].length);
-        }
-        /* else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
-        lineNumber = parseInt(match[1], 10)
-        branch.number = lineNumber
-        q = q.substr(match[0].length-1);
-        } */
-        else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
-            trimLastLeaf();
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s+/i.exec(q))) {
+          // 1 (Line number)
+          lineNumber = parseInt(match[1], 10);
+          branch.number = lineNumber;
+          q = q.substr(match[0].length - 1);
+        } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
+          trimLastLeaf();
+          branch.nodes.push({
+            type: 'joinAnd'
+          });
+          leaf = undefined;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
+          trimLastLeaf();
+          branch.nodes.push({
+            type: 'joinOr'
+          });
+          leaf = undefined;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
+          trimLastLeaf();
+          branch.nodes.push({
+            type: 'joinNot'
+          });
+          leaf = undefined;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
+          trimLastLeaf();
+          branch.nodes.push({
+            type: 'joinNear',
+            proximity: lodash.toNumber(match[2])
+          });
+          leaf = undefined;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
+          // Mesh term - PubMed syntax
+          leaf.type = 'mesh';
+          leaf.recurse = !match[2];
+          if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) {
+          // Mesh term - Ovid syntax (exploded)
+          branch.nodes.push({
+            type: 'mesh',
+            recurse: true,
+            content: match[1]
+          });
+          q = q.substr(match[0].length);
+          cropString = false;
+          afterWhitespace = true;
+        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) {
+          // Mesh term - Ovid syntax (non-exploded)
+          leaf.type = 'mesh';
+          leaf.recurse = false;
+        } else if (match = /^<(.*?)>/.exec(q)) {
+          branch.nodes.push({
+            type: 'template',
+            content: match[1].toLowerCase()
+          });
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (match = /^(\n+)/.exec(q)) {
+          if (settings.preserveNewlines) {
             branch.nodes.push({
-              type: 'joinAnd'
+              type: 'raw',
+              content: match[0]
             });
             leaf = undefined;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
-            trimLastLeaf();
-            branch.nodes.push({
-              type: 'joinOr'
-            });
-            leaf = undefined;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
-            trimLastLeaf();
-            branch.nodes.push({
-              type: 'joinNot'
-            });
-            leaf = undefined;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
-            trimLastLeaf();
-            branch.nodes.push({
-              type: 'joinNear',
-              proximity: lodash.toNumber(match[2])
-            });
-            leaf = undefined;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
-            // Mesh term - PubMed syntax
-            leaf.type = 'mesh';
-            leaf.recurse = !match[2];
-            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+          }
 
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) {
-            // Mesh term - Ovid syntax (exploded)
-            branch.nodes.push({
-              type: 'mesh',
-              recurse: true,
-              content: match[1]
-            });
-            q = q.substr(match[0].length);
-            cropString = false;
-            afterWhitespace = true;
-          } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) {
-            // Mesh term - Ovid syntax (non-exploded)
-            leaf.type = 'mesh';
-            leaf.recurse = false;
-          } else if (match = /^<(.*?)>/.exec(q)) {
-            branch.nodes.push({
-              type: 'template',
-              content: match[1].toLowerCase()
-            });
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (match = /^(\n+)/.exec(q)) {
-            if (settings.preserveNewlines) {
-              branch.nodes.push({
-                type: 'raw',
-                content: match[0]
-              });
-              leaf = undefined;
-            }
-
-            lineNumber += match[0].length;
-            newLine(lineNumber);
-            q = q.substr(match[0].length);
-            cropString = false;
-            afterWhitespace = true;
-          } else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
-          match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-          || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
-          ) {
-              // Field specifier - Ovid syntax
-              // Figure out the leaf to use (usually the last one) or the previously used group {{{
-              var useLeaf = {};
-
-              if (lodash.isObject(leaf) && leaf.type == 'phrase') {
-                useLeaf = leaf;
-              } else if (lodash.isArray(leaf) && lastGroup) {
-                useLeaf = lastGroup;
-              } // }}}
-
-
-              switch (match[1].toLowerCase()) {
-                case 'ti':
-                  useLeaf.field = 'title';
-                  break;
-
-                case 'ab,ti':
-                case 'ti,ab':
-                  useLeaf.field = 'title+abstract';
-                  break;
-
-                case 'tw':
-                  useLeaf.field = 'title+abstract+tw';
-                  break;
-
-                case 'mp':
-                  useLeaf.field = 'title+abstract+other';
-                  break;
-
-                case 'ab':
-                  useLeaf.field = 'abstract';
-                  break;
-
-                case 'fs':
-                case 'sh':
-                  useLeaf.field = 'floatingSubheading';
-                  break;
-
-                case 'nm':
-                  useLeaf.field = 'substance';
-                  break;
-
-                case 'pt':
-                  useLeaf.field = 'publicationType';
-                  break;
-
-                case 'kf':
-                  useLeaf.field = 'author';
-                  break;
-
-                case 'xm':
-                  useLeaf.type = 'mesh';
-                  useLeaf.recurse = true;
-                  break;
-              }
-
-              q = q.substr(match[0].length);
-              cropString = false;
-            } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
-            // Field specifier - PubMed syntax
+          lineNumber += match[0].length;
+          newLine(lineNumber);
+          q = q.substr(match[0].length);
+          cropString = false;
+          afterWhitespace = true;
+        } else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
+        match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+        || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+        ) {
+            // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
-            var useLeaf;
+            var useLeaf = {};
 
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
               useLeaf = leaf;
@@ -61285,83 +61225,142 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
 
             switch (match[1].toLowerCase()) {
-              case 'tiab':
+              case 'ti':
+                useLeaf.field = 'title';
+                break;
+
+              case 'ab,ti':
+              case 'ti,ab':
                 useLeaf.field = 'title+abstract';
                 break;
 
               case 'tw':
-                useLeaf.field = 'title+abstract+other';
+                useLeaf.field = 'title+abstract+tw';
                 break;
 
-              case 'ti':
-                useLeaf.field = 'title';
+              case 'mp':
+                useLeaf.field = 'title+abstract+other';
                 break;
 
               case 'ab':
                 useLeaf.field = 'abstract';
                 break;
 
-              case 'nm':
-                useLeaf.field = 'substance';
-                break;
-
+              case 'fs':
               case 'sh':
                 useLeaf.field = 'floatingSubheading';
+                break;
+
+              case 'nm':
+                useLeaf.field = 'substance';
                 break;
 
               case 'pt':
                 useLeaf.field = 'publicationType';
                 break;
+
+              case 'kf':
+                useLeaf.field = 'author';
+                break;
+
+              case 'xm':
+                useLeaf.type = 'mesh';
+                useLeaf.recurse = true;
+                break;
             }
 
             q = q.substr(match[0].length);
             cropString = false;
-          } else if (match = /^#([^\)\n]+)/.exec(q)) {
-            trimLastLeaf();
-            branch.nodes.push({
-              type: 'comment',
-              content: match[1]
-            });
-            leaf = undefined;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else {
-            var nextChar = q.substr(0, 1);
+          } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
+          // Field specifier - PubMed syntax
+          // Figure out the leaf to use (usually the last one) or the previously used group {{{
+          var useLeaf;
 
-            if ((lodash.isUndefined(leaf) || lodash.isArray(leaf)) && nextChar != ' ') {
-              // Leaf pointing to array entity - probably not created fallback leaf to append to
-              if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
-                // First character is a speachmark - slurp until we see the next one
-                leaf = {
-                  type: 'phrase',
-                  content: match[1]
-                };
-                branch.nodes.push(leaf);
-                q = q.substr(match[0].length);
-                cropString = false;
-              } else if (match = /^([^\s\)\.\[]]+)/.exec(q)) {
-                // Slurp the phrase until the space or close brackets
-                leaf = {
-                  type: 'phrase',
-                  content: match[1]
-                };
-                branch.nodes.push(leaf);
-                q = q.substr(match[1].length);
-                cropString = false;
-              } else {
-                // All other first chars - just dump into a buffer and let it fill slowly
-                leaf = {
-                  type: 'phrase',
-                  content: nextChar
-                };
-                branch.nodes.push(leaf);
-              }
-            } else if (lodash.isObject(leaf) && leaf.type == 'phrase') {
-              leaf.content += nextChar;
-            }
+          if (lodash.isObject(leaf) && leaf.type == 'phrase') {
+            useLeaf = leaf;
+          } else if (lodash.isArray(leaf) && lastGroup) {
+            useLeaf = lastGroup;
+          } // }}}
 
-            afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
+
+          switch (match[1].toLowerCase()) {
+            case 'tiab':
+              useLeaf.field = 'title+abstract';
+              break;
+
+            case 'tw':
+              useLeaf.field = 'title+abstract+other';
+              break;
+
+            case 'ti':
+              useLeaf.field = 'title';
+              break;
+
+            case 'ab':
+              useLeaf.field = 'abstract';
+              break;
+
+            case 'nm':
+              useLeaf.field = 'substance';
+              break;
+
+            case 'sh':
+              useLeaf.field = 'floatingSubheading';
+              break;
+
+            case 'pt':
+              useLeaf.field = 'publicationType';
+              break;
           }
+
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (match = /^#([^\)\n]+)/.exec(q)) {
+          trimLastLeaf();
+          branch.nodes.push({
+            type: 'comment',
+            content: match[1]
+          });
+          leaf = undefined;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else {
+          var nextChar = q.substr(0, 1);
+
+          if ((lodash.isUndefined(leaf) || lodash.isArray(leaf)) && nextChar != ' ') {
+            // Leaf pointing to array entity - probably not created fallback leaf to append to
+            if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
+              // First character is a speachmark - slurp until we see the next one
+              leaf = {
+                type: 'phrase',
+                content: match[1]
+              };
+              branch.nodes.push(leaf);
+              q = q.substr(match[0].length);
+              cropString = false;
+            } else if (match = /^[^\s\W]+/.exec(q)) {
+              // Slurp the phrase until the space or close brackets
+              leaf = {
+                type: 'phrase',
+                content: match[0]
+              };
+              branch.nodes.push(leaf);
+              q = q.substr(match[0].length);
+              cropString = false;
+            } else {
+              // All other first chars - just dump into a buffer and let it fill slowly
+              leaf = {
+                type: 'phrase',
+                content: nextChar
+              };
+              branch.nodes.push(leaf);
+            }
+          } else if (lodash.isObject(leaf) && leaf.type == 'phrase') {
+            leaf.content += nextChar;
+          }
+
+          afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
+        }
 
         if (cropString) q = q.substr(1); // Crop 1 character
       }
