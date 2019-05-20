@@ -61099,6 +61099,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             nodes: []
           });
           q = q.substr(match[0].length);
+          cropString = false;
         } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
           // 1 AND ...
           branch.nodes.push({
@@ -61108,6 +61109,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
             nodes: []
           });
           q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+
+          cropString = false;
         } else if (settings.transposeLines && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) {
           // 1 AND ...
           trimLastLeaf();
@@ -61313,11 +61316,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
             q = q.substr(match[0].length);
             cropString = false;
-          } else if (match = /^#(.*?)[)\n]/.exec(q)) {
+          } else if (match = /^#([^\)\n]+)/.exec(q)) {
             trimLastLeaf();
             branch.nodes.push({
               type: 'comment',
-              content: lodash.trim(match[1])
+              content: match[1]
             });
             leaf = undefined;
             q = q.substr(match[0].length);
@@ -61335,6 +61338,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                 };
                 branch.nodes.push(leaf);
                 q = q.substr(match[0].length);
+                cropString = false;
+              } else if (match = /^([^\s\)\.\[]]+)/.exec(q)) {
+                // Slurp the phrase until the space or close brackets
+                leaf = {
+                  type: 'phrase',
+                  content: match[1]
+                };
+                branch.nodes.push(leaf);
+                q = q.substr(match[1].length);
                 cropString = false;
               } else {
                 // All other first chars - just dump into a buffer and let it fill slowly

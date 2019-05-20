@@ -3,7 +3,7 @@ var polyglot = require('..');
 
 describe('Check that comments are ignored', ()=> {
 
-	it.only('should parse comments as a logical node', ()=> {
+	it('should parse comments as a logical node', ()=> {
 		expect(polyglot.parse('term1 OR term2\n#Comment1\n\n#Comment2\n\nAND\n\nterm3 or term4 #Comment3', {groupLines: false})).to.deep.equal([
 			{
 				type: 'line',
@@ -34,13 +34,13 @@ describe('Check that comments are ignored', ()=> {
 					},
 					{
 						type: 'raw',
-						content: '\n',
+						content: '\n\n',
 					},
 				]
 			},
 			{
 				type: 'line',
-				number: 3,
+				number: 4,
 				nodes: [
 					{
 						type: 'comment',
@@ -48,13 +48,13 @@ describe('Check that comments are ignored', ()=> {
 					},
 					{
 						type: 'raw',
-						content: '\n',
+						content: '\n\n',
 					},
 				]
 			},
 			{
 				type: 'line',
-				number: 4,
+				number: 6,
 				nodes: [
 					{type: 'joinAnd'},
 					{
@@ -65,7 +65,7 @@ describe('Check that comments are ignored', ()=> {
 			},
 			{
 				type: 'line',
-				number: 6,
+				number: 8,
 				nodes: [
 					{
 						type: 'phrase',

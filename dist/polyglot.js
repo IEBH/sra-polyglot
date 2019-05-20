@@ -578,11 +578,11 @@ var polyglot = module.exports = {
 
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (match = /^#(.*?)[)\n]/.exec(q)) {
+        } else if (match = /^#([^\)\n]+)/.exec(q)) {
           trimLastLeaf();
           branch.nodes.push({
             type: 'comment',
-            content: _.trim(match[1])
+            content: match[1]
           });
           leaf = undefined;
           q = q.substr(match[0].length);
@@ -600,6 +600,15 @@ var polyglot = module.exports = {
               };
               branch.nodes.push(leaf);
               q = q.substr(match[0].length);
+              cropString = false;
+            } else if (match = /^([^\s\)\.\[]]+)/.exec(q)) {
+              // Slurp the phrase until the space or close brackets
+              leaf = {
+                type: 'phrase',
+                content: match[1]
+              };
+              branch.nodes.push(leaf);
+              q = q.substr(match[1].length);
               cropString = false;
             } else {
               // All other first chars - just dump into a buffer and let it fill slowly
