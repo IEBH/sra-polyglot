@@ -361,6 +361,7 @@ var polyglot = module.exports = {
           nodes: []
         });
         q = q.substr(match[0].length);
+        cropString = false;
       } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
         // 1 AND ...
         branch.nodes.push({
@@ -370,6 +371,8 @@ var polyglot = module.exports = {
           nodes: []
         });
         q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+
+        cropString = false;
       } else if (settings.transposeLines && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) {
         // 1 AND ...
         trimLastLeaf();
