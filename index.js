@@ -343,11 +343,11 @@ var polyglot = module.exports = {
 					nodes: []
 				}); 
 				q = q.substr(match[0].length); 
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
+			} /* else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
 				lineNumber = parseInt(match[1], 10)
 				branch.number = lineNumber
 				q = q.substr(match[0].length-1);
-			} 
+			} */
 			else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinAnd'});
