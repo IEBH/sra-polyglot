@@ -61100,7 +61100,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           });
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR)/i.exec(q))) {
           // 1 AND ...
           branch.nodes.push({
             type: 'ref',
@@ -61111,7 +61111,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 
           cropString = false;
-        } else if (settings.transposeLines && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^(AND|OR) +([0-9]+)/i.exec(q))) {
           // 1 AND ...
           trimLastLeaf();
           match[1].toLowerCase() == "and" ? branch.nodes.push({
@@ -61128,7 +61128,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             nodes: []
           });
           q = q.substr(match[0].length);
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s+/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+\.?)\s+/i.exec(q))) {
           // 1 (Line number)
           lineNumber = parseInt(match[1], 10);
           branch.number = lineNumber;

@@ -323,7 +323,7 @@ var polyglot = module.exports = {
 				});
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+(AND|OR)/i.exec(q))) { // 1 AND ...
+			} else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR)/i.exec(q))) { // 1 AND ...
 				branch.nodes.push({
 					type: 'ref', 
 					ref: [match[1]],
@@ -332,7 +332,7 @@ var polyglot = module.exports = {
 				}); 
 				q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 				cropString = false;
-			} else if ((settings.transposeLines) && (match = /^(AND|OR)\s+([0-9]+)/i.exec(q))) { // 1 AND ...
+			} else if ((settings.transposeLines) && (match = /^(AND|OR) +([0-9]+)/i.exec(q))) { // 1 AND ...
 				trimLastLeaf();
 				(match[1].toLowerCase() == "and") ? branch.nodes.push({type: 'joinAnd'}) : branch.nodes.push({type: 'joinOr'});
 				leaf = undefined;
@@ -345,7 +345,7 @@ var polyglot = module.exports = {
 					nodes: []
 				}); 
 				q = q.substr(match[0].length); 
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s+/i.exec(q))) { // 1 (Line number)
+			} else if ((settings.transposeLines) && (match = /^([0-9]+\.?)\s+/i.exec(q))) { // 1 (Line number)
 				lineNumber = parseInt(match[1], 10)
 				branch.number = lineNumber
 				q = q.substr(match[0].length-1);
