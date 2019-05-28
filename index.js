@@ -628,6 +628,7 @@ var polyglot = module.exports = {
 											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
 										}	
 									}
+									break;
 								case 'phrase':
 									if (branch.field) {
 										buffer +=
@@ -697,1068 +698,1101 @@ var polyglot = module.exports = {
 			openTerms: 'any search box',
 		},
 		// }}}
-		// // Ovid Medline {{{
-		// ovid: {
-		// 	id: 'ovid',
-		// 	title: 'Ovid Medline / Ovid Embase',
-		// 	aliases: ['ovid', 'o', 'ov'],
+		// Ovid Medline {{{
+		ovid: {
+			id: 'ovid',
+			title: 'Ovid Medline / Ovid Embase',
+			aliases: ['ovid', 'o', 'ov'],
 
-		// 	/**
-		// 	* Compile a tree structure to Ovid MEDLINE output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to Ovid MEDLINE output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '?'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '?'},
+				]);
 				
-		// 		var compileWalker = (tree, expand = true) =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							if (branch.field) {
-		// 								buffer += '(' + compileWalker(branch.nodes, false) + ')' 
-		// 								if (expand) {
-		// 									buffer +=
-		// 									(
-		// 										branch.field == 'title' ? '.ti.' :
-		// 										branch.field == 'abstract' ? '.ab.' :
-		// 										branch.field == 'title+abstract' ? '.ti,ab.' :
-		// 										branch.field == 'title+abstract+tw' ? '.tw.' :
-		// 										branch.field == 'title+abstract+other' ? '.mp.' :
-		// 										branch.field == 'floatingSubheading' ? '.fs.' :
-		// 										branch.field == 'publicationType' ? '.pt.' :
-		// 										branch.field == 'substance' ? '.nm.' :
-		// 										'' // Unsupported field suffix for Ovid
-		// 									);
-		// 								}
-		// 							} else {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							}
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 							break;
-		// 						case 'phrase':
-		// 							if (branch.field && expand) {
-		// 								buffer +=
-		// 									branch.content +
-		// 									(
-		// 										branch.field == 'title' ? '.ti.' :
-		// 										branch.field == 'abstract' ? '.ab.' :
-		// 										branch.field == 'title+abstract' ? '.ti,ab.' :
-		// 										branch.field == 'title+abstract+tw' ? '.tw.' :
-		// 										branch.field == 'title+abstract+other' ? '.mp.' :
-		// 										branch.field == 'floatingSubheading' ? '.fs.' :
-		// 										branch.field == 'publicationType' ? '.pt.' :
-		// 										branch.field == 'substance' ? '.nm.' :
-		// 										'' // Unsupported field suffix for Ovid
-		// 									)
-		// 							} else {
-		// 								buffer += branch.content;
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'ADJ' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'ovid');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = (tree, expand = true) =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									if (branch.field) {
+										buffer += '(' + compileWalker(branch.nodes, false) + ')' 
+										if (expand) {
+											buffer +=
+											(
+												branch.field == 'title' ? '.ti.' :
+												branch.field == 'abstract' ? '.ab.' :
+												branch.field == 'title+abstract' ? '.ti,ab.' :
+												branch.field == 'title+abstract+tw' ? '.tw.' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
+												branch.field == 'floatingSubheading' ? '.fs.' :
+												branch.field == 'publicationType' ? '.pt.' :
+												branch.field == 'substance' ? '.nm.' :
+												'' // Unsupported field suffix for Ovid
+											);
+										}
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field && expand) {
+										buffer +=
+											branch.content +
+											(
+												branch.field == 'title' ? '.ti.' :
+												branch.field == 'abstract' ? '.ab.' :
+												branch.field == 'title+abstract' ? '.ti,ab.' :
+												branch.field == 'title+abstract+tw' ? '.tw.' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
+												branch.field == 'floatingSubheading' ? '.fs.' :
+												branch.field == 'publicationType' ? '.pt.' :
+												branch.field == 'substance' ? '.nm.' :
+												'' // Unsupported field suffix for Ovid
+											)
+									} else {
+										buffer += branch.content;
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'ADJ' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'ovid');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-		// 		fields: {
-		// 			textBox: query,
-		// 		},
-		// 	}),
-		// 	openTerms: 'any search box',
-		// },
-		// // }}}
-		// // Cochrane Library {{{
-		// cochrane: {
-		// 	id: 'cochrane',
-		// 	title: 'Cochrane Library',
-		// 	aliases: ['cochrane', 'c', 'cl'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
+			openTerms: 'any search box',
+		},
+		// }}}
+		// Cochrane Library {{{
+		cochrane: {
+			id: 'cochrane',
+			title: 'Cochrane Library',
+			aliases: ['cochrane', 'c', 'cl'],
 
-		// 	/**
-		// 	* Compile a tree structure to Cochrane Library output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to Cochrane Library output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-		// 			{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-		// 			{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
+					{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
+					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+				]);
 
-		// 		var compileWalker = (tree, expand = true) =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							if (branch.field && branch.field == 'floatingSubheading') {
-		// 								buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-		// 							} else if (branch.field) {
-		// 								buffer += '(' + compileWalker(branch.nodes, false) + ')' 
-		// 								if (expand) {
-		// 									buffer +=
-		// 									(
-		// 										branch.field == 'title' ? ':ti' :
-		// 										branch.field == 'abstract' ? ':ab' :
-		// 										branch.field == 'title+abstract' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+tw' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
-		// 										branch.field == 'floatingSubheading' ? ':fs' :
-		// 										branch.field == 'publicationType' ? ':pt' :
-		// 										branch.field == 'substance' ? ':kw' :
-		// 										'' // Unsupported field suffix for PubMed
-		// 									);
-		// 								}
-		// 							} else {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							}
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							if (branch.field && branch.field == 'floatingSubheading') {
-		// 								buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-		// 							} else if (branch.field && expand) {
-		// 								buffer +=
-		// 									polyglot.tools.quotePhrase(branch, 'cochrane') +
-		// 									(
-		// 										branch.field == 'title' ? ':ti' :
-		// 										branch.field == 'abstract' ? ':ab' :
-		// 										branch.field == 'title+abstract' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+tw' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
-		// 										branch.field == 'floatingSubheading' ? ':fs' :
-		// 										branch.field == 'publicationType' ? ':pt' :
-		// 										branch.field == 'substance' ? ':kw' :
-		// 										'' // Unsupported field suffix for PubMed
-		// 									);
-		// 							} else {
-		// 								buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'NEAR/' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'cochrane');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = (tree, expand = true) =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field) {
+										buffer += '(' + compileWalker(branch.nodes, false) + ')' 
+										if (expand) {
+											buffer +=
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
+												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
+												branch.field == 'substance' ? ':kw' :
+												'' // Unsupported field suffix for PubMed
+											);
+										}
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field && branch.field == 'floatingSubheading') {
+										buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									} else if (branch.field && expand) {
+										buffer +=
+											polyglot.tools.quotePhrase(branch, 'cochrane') +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,kw' :
+												branch.field == 'floatingSubheading' ? ':fs' :
+												branch.field == 'publicationType' ? ':pt' :
+												branch.field == 'substance' ? ':kw' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'cochrane');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
-		// 		fields: {
-		// 			'submitSearch': 'Go',
-		// 			'searchRows[0].searchCriterias[0].fieldRestriction': null,
-		// 			'searchRows[0].searchCriterias[0].term': query,
-		// 			'searchRows[0].searchOptions.searchProducts': null,
-		// 			'searchRows[0].searchOptions.searchStatuses': null,
-		// 			'searchRows[0].searchOptions.searchType': 'All',
-		// 			'searchRows[0].searchOptions.publicationStartYear': null,
-		// 			'searchRows[0].searchOptions.publicationEndYear': null,
-		// 			'searchRows[0].searchOptions.disableAutoStemming': null,
-		// 			'searchRows[0].searchOptions.reviewGroupIds': null,
-		// 			'searchRows[0].searchOptions.onlinePublicationStartYear': null,
-		// 			'searchRows[0].searchOptions.onlinePublicationEndYear': null,
-		// 			'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
-		// 			'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
-		// 			'searchRows[0].searchOptions.dateType:pubAllYears': null,
-		// 			'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
-		// 			'searchRow.ordinal': 0,
-		// 			'hiddenFields.currentPage': 1,
-		// 			'hiddenFields.strategySortBy': 'last-modified-date;desc',
-		// 			'hiddenFields.showStrategies': 'false',
-		// 			'hiddenFields.containerId': null,
-		// 			'hiddenFields.etag': null,
-		// 			'hiddenFields.originalContainerId': null,
-		// 			'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
-		// 			'hiddenFields.searchFilters.filterByIssue': 'all',
-		// 			'hiddenFields.searchFilters.filterByType': 'All',
-		// 			'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true',
-		// 		}
-		// 	}),
-		// 	openTerms: 'use search manager box',
-		// },
-		// // }}}
-		// // Embase {{{
-		// embase: {
-		// 	id: 'embase',
-		// 	title: 'Embase',
-		// 	aliases: ['embase', 'e', 'eb'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
+				fields: {
+					'submitSearch': 'Go',
+					'searchRows[0].searchCriterias[0].fieldRestriction': null,
+					'searchRows[0].searchCriterias[0].term': query,
+					'searchRows[0].searchOptions.searchProducts': null,
+					'searchRows[0].searchOptions.searchStatuses': null,
+					'searchRows[0].searchOptions.searchType': 'All',
+					'searchRows[0].searchOptions.publicationStartYear': null,
+					'searchRows[0].searchOptions.publicationEndYear': null,
+					'searchRows[0].searchOptions.disableAutoStemming': null,
+					'searchRows[0].searchOptions.reviewGroupIds': null,
+					'searchRows[0].searchOptions.onlinePublicationStartYear': null,
+					'searchRows[0].searchOptions.onlinePublicationEndYear': null,
+					'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
+					'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
+					'searchRows[0].searchOptions.dateType:pubAllYears': null,
+					'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
+					'searchRow.ordinal': 0,
+					'hiddenFields.currentPage': 1,
+					'hiddenFields.strategySortBy': 'last-modified-date;desc',
+					'hiddenFields.showStrategies': 'false',
+					'hiddenFields.containerId': null,
+					'hiddenFields.etag': null,
+					'hiddenFields.originalContainerId': null,
+					'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
+					'hiddenFields.searchFilters.filterByIssue': 'all',
+					'hiddenFields.searchFilters.filterByType': 'All',
+					'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true',
+				}
+			}),
+			openTerms: 'use search manager box',
+		},
+		// }}}
+		// Embase {{{
+		embase: {
+			id: 'embase',
+			title: 'Embase',
+			aliases: ['embase', 'e', 'eb'],
 
-		// 	/**
-		// 	* Compile a tree structure to Embase output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to Embase output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-		// 			{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-		// 			{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
+					{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
+					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+				]);
 
-		// 		var compileWalker = (tree, expand = true) =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							if (branch.field) {
-		// 								buffer += '(' + compileWalker(branch.nodes, false) + ')' 
-		// 								if (expand) {
-		// 									buffer +=
-		// 									(
-		// 										branch.field == 'title' ? ':ti' :
-		// 										branch.field == 'abstract' ? ':ab' :
-		// 										branch.field == 'title+abstract' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+tw' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
-		// 										branch.field == 'floatingSubheading' ? ':lnk' :
-		// 										branch.field == 'publicationType' ? ':it' :
-		// 										branch.field == 'substance' ? ':tn' :
-		// 										'' // Unsupported field suffix for PubMed
-		// 									);
-		// 								}
-		// 							} else {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							}
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							if (branch.field && expand) {
-		// 								buffer +=
-		// 									polyglot.tools.quotePhrase(branch, 'embase') +
-		// 									(
-		// 										branch.field == 'title' ? ':ti' :
-		// 										branch.field == 'abstract' ? ':ab' :
-		// 										branch.field == 'title+abstract' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+tw' ? ':ti,ab' :
-		// 										branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
-		// 										branch.field == 'floatingSubheading' ? ':lnk' :
-		// 										branch.field == 'publicationType' ? ':it' :
-		// 										branch.field == 'substance' ? ':tn' :
-		// 										'' // Unsupported field suffix for PubMed
-		// 									);
-		// 							} else {
-		// 								buffer += polyglot.tools.quotePhrase(branch, 'embase');
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'NEAR/' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'embase');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = (tree, expand = true) =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									if (branch.field) {
+										buffer += '(' + compileWalker(branch.nodes, false) + ')' 
+										if (expand) {
+											buffer +=
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
+												branch.field == 'floatingSubheading' ? ':lnk' :
+												branch.field == 'publicationType' ? ':it' :
+												branch.field == 'substance' ? ':tn' :
+												'' // Unsupported field suffix for PubMed
+											);
+										}
+									} else {
+										buffer += '(' + compileWalker(branch.nodes) + ')';
+									}
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field && expand) {
+										buffer +=
+											polyglot.tools.quotePhrase(branch, 'embase') +
+											(
+												branch.field == 'title' ? ':ti' :
+												branch.field == 'abstract' ? ':ab' :
+												branch.field == 'title+abstract' ? ':ti,ab' :
+												branch.field == 'title+abstract+tw' ? ':ti,ab' :
+												branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' :
+												branch.field == 'floatingSubheading' ? ':lnk' :
+												branch.field == 'publicationType' ? ':it' :
+												branch.field == 'substance' ? ':tn' :
+												'' // Unsupported field suffix for PubMed
+											);
+									} else {
+										buffer += polyglot.tools.quotePhrase(branch, 'embase');
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'embase');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'GET',
-		// 		action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
-		// 		fields: {
-		// 			sb: 'y',
-		// 			search_query: query.replace(/\n+/g, ' '),
-		// 		},
-		// 	}),
-		// 	openTerms: 'any search box',
-		// },
-		// // }}}
-		// // Web of Science {{{
-		// wos: {
-		// 	id: 'wos',
-		// 	title: 'Web of Science',
-		// 	aliases: ['webofscience', 'w', 'wos', 'websci'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'GET',
+				action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
+				fields: {
+					sb: 'y',
+					search_query: query.replace(/\n+/g, ' '),
+				},
+			}),
+			openTerms: 'any search box',
+		},
+		// }}}
+		// Web of Science {{{
+		wos: {
+			id: 'wos',
+			title: 'Web of Science',
+			aliases: ['webofscience', 'w', 'wos', 'websci'],
 
-		// 	/**
-		// 	* Compile a tree structure to Web of Science output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to Web of Science output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '$'},
-		// 			{subject: /\$/g, value: '*'},
-		// 			{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '$'},
+					{subject: /\$/g, value: '*'},
+					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+				]);
 
-		// 		var compileWalker = tree =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							buffer += polyglot.tools.quotePhrase(branch, 'wos');
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'NEAR/' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += polyglot.tools.quotePhrase(branch, 'wos');
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'wos');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'NEAR/' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += polyglot.tools.quotePhrase(branch, 'wos');
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'wos');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
-		// 		fields: {
-		// 			fieldCount: '1',
-		// 			action: 'search',
-		// 			product: 'UA',
-		// 			search_mode: 'GeneralSearch',
-		// 			SID: 'W15WDD6M2xkKPbfGfGY',
-		// 			max_field_count: '25',
-		// 			max_field_notice: 'Notice: You cannot add another field.',
-		// 			input_invalid_notice: 'Search Error: Please enter a search term.',
-		// 			exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
-		// 			input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
-		// 			sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
-		// 			formUpdated: 'true',
-		// 			'value(input1)': query,
-		// 			'value(select1)': 'TS',
-		// 			x: '798',
-		// 			y: '311',
-		// 			'value(hidInput1)': null,
-		// 			limitStatus: 'collapsed',
-		// 			ss_lemmatization: 'On',
-		// 			ss_spellchecking: 'Suggest',
-		// 			SinceLastVisit_UTC: null,
-		// 			SinceLastVisit_DATE: null,
-		// 			period: 'Range Selection',
-		// 			range: 'ALL',
-		// 			startYear: '1900',
-		// 			endYear: (new Date()).getYear(),
-		// 			update_back2search_link_param: 'yes',
-		// 			ssStatus: 'display:none',
-		// 			ss_showsuggestions: 'ON',
-		// 			ss_query_language: 'auto',
-		// 			ss_numDefaultGeneralSearchFields: '1',
-		// 			rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A',
-		// 		},
-		// 	}),
-		// 	openTerms: 'any search box',
-		// },
-		// // }}}
-		// // CINAHL {{{
-		// cinahl: {
-		// 	id: 'cinahl',
-		// 	title: 'CINAHL',
-		// 	aliases: ['cinahl', 'ci', 'cnal'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
+				fields: {
+					fieldCount: '1',
+					action: 'search',
+					product: 'UA',
+					search_mode: 'GeneralSearch',
+					SID: 'W15WDD6M2xkKPbfGfGY',
+					max_field_count: '25',
+					max_field_notice: 'Notice: You cannot add another field.',
+					input_invalid_notice: 'Search Error: Please enter a search term.',
+					exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
+					input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
+					sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
+					formUpdated: 'true',
+					'value(input1)': query,
+					'value(select1)': 'TS',
+					x: '798',
+					y: '311',
+					'value(hidInput1)': null,
+					limitStatus: 'collapsed',
+					ss_lemmatization: 'On',
+					ss_spellchecking: 'Suggest',
+					SinceLastVisit_UTC: null,
+					SinceLastVisit_DATE: null,
+					period: 'Range Selection',
+					range: 'ALL',
+					startYear: '1900',
+					endYear: (new Date()).getYear(),
+					update_back2search_link_param: 'yes',
+					ssStatus: 'display:none',
+					ss_showsuggestions: 'ON',
+					ss_query_language: 'auto',
+					ss_numDefaultGeneralSearchFields: '1',
+					rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A',
+				},
+			}),
+			openTerms: 'any search box',
+		},
+		// }}}
+		// CINAHL {{{
+		cinahl: {
+			id: 'cinahl',
+			title: 'CINAHL',
+			aliases: ['cinahl', 'ci', 'cnal'],
 
-		// 	/**
-		// 	* Compile a tree structure to CINAHL output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to CINAHL output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-		// 			{subject: /\?/g, value: '#'},
-		// 			{subject: /\$/g, value: '*'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+					{subject: /\?/g, value: '#'},
+					{subject: /\$/g, value: '*'},
+				]);
 
-		// 		var compileWalker = tree =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
-		// 								buffer +=
-		// 									'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') +
-		// 									' OR ' +
-		// 									'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
-		// 							} else if (branch.field) {
-		// 								buffer += _.trimStart(
-		// 									(
-		// 										branch.field == 'title' ? 'TI' :
-		// 										branch.field == 'abstract' ? 'AB' :
-		// 										branch.field == 'floatingSubheading' ? 'MW' :
-		// 										branch.field == 'publicationType' ? 'PT' :
-		// 										branch.field == 'substance' ? 'MW' :
-		// 										''
-		// 									)
-		// 									+ ' ' + polyglot.tools.quotePhrase(branch, 'cinahl')
-		// 								);
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
+										buffer +=
+											'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') +
+											' OR ' +
+											'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
+									} else if (branch.field) {
+										buffer += _.trimStart(
+											(
+												branch.field == 'title' ? 'TI' :
+												branch.field == 'abstract' ? 'AB' :
+												branch.field == 'floatingSubheading' ? 'MW' :
+												branch.field == 'publicationType' ? 'PT' :
+												branch.field == 'substance' ? 'MW' :
+												''
+											)
+											+ ' ' + polyglot.tools.quotePhrase(branch, 'cinahl')
+										);
 
-		// 							} else {
-		// 								buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'N' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'cinahl');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+									} else {
+										buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'N' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'cinahl');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
-		// 		fields: {
-		// 			bquery: query,
-		// 		},
-		// 	}),
-		// 	openTerms: 'any search box',
-		// },
-		// // }}}
-		// // PsycInfo {{{
-		// psycinfo: {
-		// 	id: 'psycinfo',
-		// 	title: 'PsycInfo',
-		// 	aliases: ['p', 'pi'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
+				fields: {
+					bquery: query,
+				},
+			}),
+			openTerms: 'any search box',
+		},
+		// }}}
+		// PsycInfo {{{
+		psycinfo: {
+			id: 'psycinfo',
+			title: 'PsycInfo',
+			aliases: ['p', 'pi'],
 
-		// 	/**
-		// 	* Compile a tree structure to PsycInfo output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to PsycInfo output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '?'},
-		// 			{subject: /\$/g, value: '*'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '?'},
+					{subject: /\$/g, value: '*'},
+				]);
 
-		// 		var compileWalker = tree =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 							break;
-		// 						case 'phrase':
-		// 							if (branch.field) {
-		// 								buffer +=
-		// 									branch.content +
-		// 									(
-		// 										branch.field == 'title' ? '.ti' :
-		// 										branch.field == 'abstract' ? '.ab' :
-		// 										branch.field == 'title+abstract' ? '.ti,ab' :
-		// 										branch.field == 'title+abstract+tw' ? '.ti,ab' :
-		// 										branch.field == 'title+abstract+other' ? '.mp.' :
-		// 										branch.field == 'floatingSubheading' ? '.hw' :
-		// 										branch.field == 'publicationType' ? '.pt' :
-		// 										branch.field == 'substance' ? '.hw' :
-		// 										''
-		// 									)
-		// 							} else {
-		// 								buffer += branch.content;
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'ADJ' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'psycinfo');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer +=
+											branch.content +
+											(
+												branch.field == 'title' ? '.ti' :
+												branch.field == 'abstract' ? '.ab' :
+												branch.field == 'title+abstract' ? '.ti,ab' :
+												branch.field == 'title+abstract+tw' ? '.ti,ab' :
+												branch.field == 'title+abstract+other' ? '.mp.' :
+												branch.field == 'floatingSubheading' ? '.hw' :
+												branch.field == 'publicationType' ? '.pt' :
+												branch.field == 'substance' ? '.hw' :
+												''
+											)
+									} else {
+										buffer += branch.content;
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'ADJ' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'psycinfo');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-		// 		fields: {
-		// 			textBox: query,
-		// 		},
-		// 	}),
-		// 	openTerms: 'any search box',
-		// },
-		// // }}}
-		// // Scopus {{{
-		// scopus: {
-		// 	id: 'scopus',
-		// 	title: 'Scopus',
-		// 	aliases: ['s', 'so'],
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
+			openTerms: 'any search box',
+		},
+		// }}}
+		// Scopus {{{
+		scopus: {
+			id: 'scopus',
+			title: 'Scopus',
+			aliases: ['s', 'so'],
 
-		// 	/**
-		// 	* Compile a tree structure to Scopus output
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 		});
+			/**
+			* Compile a tree structure to Scopus output
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-		// 			{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-		// 			{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
+					{subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
+					{subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>'},
+				]);
 
-		// 		var compileWalker = tree =>
-		// 			tree
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = '';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 							break;
-		// 						case 'phrase':
-		// 							if (branch.field) {
-		// 								buffer += (
-		// 									branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
-		// 									branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
-		// 									branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
-		// 									branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
-		// 									branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
-		// 									branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
-		// 									branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
-		// 									branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
-		// 									'"' + branch.content + '"'
-		// 								);
-		// 							} else {
-		// 								buffer += '"' + branch.content + '"';
-		// 							}
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT';
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'W/' + branch.proximity;
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += 'INDEXTERMS("' + branch.content + '")';
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += branch.content;
-		// 							break;
-		// 						case 'template':
-		// 							buffer += polyglot.tools.resolveTemplate(branch.content, 'scopus');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = tree =>
+					tree
+						.map((branch, branchIndex) => {
+							var buffer = '';
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									buffer += '(' + compileWalker(branch.nodes) + ')';
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field) {
+										buffer += (
+											branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
+											branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
+											branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
+											branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
+											branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
+											branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
+											'"' + branch.content + '"'
+										);
+									} else {
+										buffer += '"' + branch.content + '"';
+									}
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT';
+									break;
+								case 'joinNear':
+									buffer += 'W/' + branch.proximity;
+									break;
+								case 'mesh':
+									buffer += 'INDEXTERMS("' + branch.content + '")';
+									break;
+								case 'raw':
+									buffer += branch.content;
+									break;
+								case 'template':
+									buffer += polyglot.tools.resolveTemplate(branch.content, 'scopus');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer
-		// 						// Add spacing provided... its not a raw buffer or the last entity within the structure
-		// 						+ (
-		// 							branch.type == 'raw' || // Its not a raw node
-		// 							branch.type == 'line' || // Its not a line node
-		// 							branchIndex == tree.length-1 || // Its not the last item in the sequence
-		// 							(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-		// 							? '' : ' '
-		// 						);
-		// 				})
-		// 				.join('');
-		// 		return compileWalker(tree);
-		// 	},
-		// 	open: query => ({
-		// 		method: 'POST',
-		// 		action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-		// 		fields: {
-		// 			textBox: query,
-		// 		},
-		// 	}),
-		// 	openTerms: 'use advanced search box',
-		// },
-		// // }}} 
-		// // Lexical tree (Human Readable) {{{
-		// lexicalTreeHuman: {
-		// 	id: 'lexicalTreeHuman',
-		// 	title: 'Lexical Tree (Human Readable)',
-		// 	aliases: ['debug'],
-		// 	debugging: true, // Mark this module for debugging only
+							return buffer
+								// Add spacing provided... its not a raw buffer or the last entity within the structure
+								+ (
+									branch.type == 'raw' || // Its not a raw node
+									branch.type == 'line' || // Its not a line node
+									branchIndex == tree.length-1 || // Its not the last item in the sequence
+									(branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+									? '' : ' '
+								);
+						})
+						.join('');
+				return compileWalker(tree);
+			},
+			open: query => ({
+				method: 'POST',
+				action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+				fields: {
+					textBox: query,
+				},
+			}),
+			openTerms: 'use advanced search box',
+		},
+		// }}} 
+		// Lexical tree (Human Readable) {{{
+		lexicalTreeHuman: {
+			id: 'lexicalTreeHuman',
+			title: 'Lexical Tree (Human Readable)',
+			aliases: ['debug'],
+			debugging: true, // Mark this module for debugging only
 
-		// 	/**
-		// 	* Compile a tree structure to a passably human readable tree
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @return {string} The compiled output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var compileWalker = (tree, level) =>
-		// 			tree
-		// 				.map(branch => {
-		// 					var buffer = _.repeat('  ', level) + '- ';
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							// TODO: Add case for line
-		// 							break;
-		// 						case 'group':
-		// 							buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
-		// 							buffer += compileWalker(branch.nodes, level +1);
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
-		// 							break;
-		// 						case 'joinNear':
-		// 							buffer += 'NEAR' + branch.proximity;
-		// 							break;
-		// 						case 'joinAnd':
-		// 							buffer += 'AND';
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer += 'OR';
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer += 'NOT'
-		// 							break;
-		// 						case 'mesh':
-		// 							buffer += 'MESH("' + branch.content + '")';
-		// 							break;
-		// 						case 'raw':
-		// 							buffer += 'RAW(' + branch.content.length + ' bytes)';
-		// 							break;
-		// 						case 'template':
-		// 							buffer += 'TEMPLATE(' + branch.content + ')';
-		// 							break;
-		// 						case 'comment':
-		// 							buffer += 'COMMENT("' + branch.content + '")';
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+			/**
+			* Compile a tree structure to a passably human readable tree
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @return {string} The compiled output
+			*/
+			compile: (tree, options) => {
+				var compileWalker = (tree, level) =>
+					tree
+						.map(branch => {
+							var buffer = _.repeat('  ', level) + '- ';
+							switch (branch.type) {
+								case 'line':
+									// TODO: Add case for line
+									break;
+								case 'group':
+									buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
+									buffer += compileWalker(branch.nodes, level +1);
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
+									break;
+								case 'joinNear':
+									buffer += 'NEAR' + branch.proximity;
+									break;
+								case 'joinAnd':
+									buffer += 'AND';
+									break;
+								case 'joinOr':
+									buffer += 'OR';
+									break;
+								case 'joinNot':
+									buffer += 'NOT'
+									break;
+								case 'mesh':
+									buffer += 'MESH("' + branch.content + '")';
+									break;
+								case 'raw':
+									buffer += 'RAW(' + branch.content.length + ' bytes)';
+									break;
+								case 'template':
+									buffer += 'TEMPLATE(' + branch.content + ')';
+									break;
+								case 'comment':
+									buffer += 'COMMENT("' + branch.content + '")';
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer;
-		// 				})
-		// 				.join('\n');
-		// 		return compileWalker(tree, 0);
-		// 	},
-		// },
-		// // }}}
-		// // MongoDB {{{
-		// mongodb: {
-		// 	id: 'mongodb',
-		// 	title: 'MongoDB Query Format',
-		// 	aliases: ['mongo'],
-		// 	debugging: true, // Mark this module for debugging only
+							return buffer;
+						})
+						.join('\n');
+				return compileWalker(tree, 0);
+			},
+		},
+		// }}}
+		// MongoDB {{{
+		mongodb: {
+			id: 'mongodb',
+			title: 'MongoDB Query Format',
+			aliases: ['mongo'],
+			debugging: true, // Mark this module for debugging only
 
-		// 	/**
-		// 	* Compile a tree structure to a MongoDB query
-		// 	* @param {array} tree The parsed tree to process
-		// 	* @param {Object} [options] Optional options to use when compiling
-		// 	* @return {Object} The compiled MongoDB query output
-		// 	*/
-		// 	compile: (tree, options) => {
-		// 		var settings = _.defaults(options, {
-		// 			replaceWildcards: true,
-		// 			translatePhraseField: t => ({'title': t}),
-		// 			meshField: 'mesh',
-		// 			translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
-		// 		});
+			/**
+			* Compile a tree structure to a MongoDB query
+			* @param {array} tree The parsed tree to process
+			* @param {Object} [options] Optional options to use when compiling
+			* @return {Object} The compiled MongoDB query output
+			*/
+			compile: (tree, options) => {
+				var settings = _.defaults(options, {
+					replaceWildcards: true,
+					translatePhraseField: t => ({'title': t}),
+					meshField: 'mesh',
+					translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
+				});
 
-		// 		// Apply wildcard replacements
-		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-		// 			{subject: /[\?\$]/g, value: '*'},
-		// 		]);
+				// Apply wildcard replacements
+				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+					{subject: /[\?\$]/g, value: '*'},
+				]);
 
-		// 		var compileWalker = tree =>
-		// 			_(tree)
-		// 				.map((branch, branchIndex) => {
-		// 					var buffer = {};
-		// 					switch (branch.type) {
-		// 						case 'line':
-		// 							buffer += compileWalker(branch.nodes);
-		// 							break;
-		// 						case 'group':
-		// 							if (branch.field && branch.field == 'title+abstract') {
-		// 								// FIXME: Not yet properly supported
-		// 								buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
-		// 							} else if (branch.field) {
-		// 								buffer[branch.field] = compileWalker(branch.nodes);
-		// 							} else {
-		// 								buffer = settings.translatePhraseField(compileWalker(branch.nodes));
-		// 							}
-		// 							break;
-		// 						case 'ref':
-		// 							if (branch.nodes) {
-		// 								buffer += '(' + compileWalker(branch.nodes) + ')';
-		// 							} else {
-		// 								buffer += branch.ref;
-		// 							}
-		// 						case 'phrase':
-		// 							if (branch.field && branch.field == 'title+abstract') {
-		// 								buffer = settings.translateTitleAbstract(branch.content);
-		// 							} else if (branch.field) {
-		// 								buffer[branch.field] = branch.content;
-		// 							} else {
-		// 								buffer = settings.translatePhraseField(branch.content);
-		// 							}
-		// 							break;
-		// 						case 'joinNear':
-		// 						case 'joinAnd':
-		// 							buffer = {$and: []};
-		// 							break;
-		// 						case 'joinOr':
-		// 							buffer = {$or: []};
-		// 							break;
-		// 						case 'joinNot':
-		// 							buffer = {$not: {}};
-		// 							break;
-		// 						case 'mesh':
-		// 							// FIXME: No ability to recurse
-		// 							buffer[settings.meshField] = {$in: [branch.content]};
-		// 							break;
-		// 						case 'raw':
-		// 							// Do nothing
-		// 							break;
-		// 						case 'template':
-		// 							buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
-		// 							break;
-		// 						case 'comment':
-		// 							// Do nothing
-		// 							break;
-		// 						default:
-		// 							throw new Error('Unsupported object tree type: ' + branch.type);
-		// 					}
+				var compileWalker = tree =>
+					_(tree)
+						.map((branch, branchIndex) => {
+							var buffer = {};
+							switch (branch.type) {
+								case 'line':
+									buffer += compileWalker(branch.nodes);
+									break;
+								case 'group':
+									if (branch.field && branch.field == 'title+abstract') {
+										// FIXME: Not yet properly supported
+										buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+									} else if (branch.field) {
+										buffer[branch.field] = compileWalker(branch.nodes);
+									} else {
+										buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+									}
+									break;
+								case 'ref':
+									var node;
+									for (node in branch.nodes) {
+										if (node == 0) {
+											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+										} else {
+											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+										}	
+									}
+									break;
+								case 'phrase':
+									if (branch.field && branch.field == 'title+abstract') {
+										buffer = settings.translateTitleAbstract(branch.content);
+									} else if (branch.field) {
+										buffer[branch.field] = branch.content;
+									} else {
+										buffer = settings.translatePhraseField(branch.content);
+									}
+									break;
+								case 'joinNear':
+								case 'joinAnd':
+									buffer = {$and: []};
+									break;
+								case 'joinOr':
+									buffer = {$or: []};
+									break;
+								case 'joinNot':
+									buffer = {$not: {}};
+									break;
+								case 'mesh':
+									// FIXME: No ability to recurse
+									buffer[settings.meshField] = {$in: [branch.content]};
+									break;
+								case 'raw':
+									// Do nothing
+									break;
+								case 'template':
+									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
+									break;
+								case 'comment':
+									// Do nothing
+									break;
+								default:
+									throw new Error('Unsupported object tree type: ' + branch.type);
+							}
 
-		// 					return buffer;
-		// 				})
-		// 				// Renest + combine $or/$and conditions {{{
-		// 				/* NOTE: Highly experimental - causes bugs under some circumstances
-		// 				.thru(tree => polyglot.tools.renestConditions(tree))
-		// 				.thru(tree => polyglot.tools.combineConditions(tree))
-		// 				*/
-		// 				// }}}
-		// 				// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-		// 				.thru(tree => {
-		// 					if (_.isArray(tree) && tree.length == 1) tree = tree[0];
-		// 					return tree;
-		// 				})
-		// 				// }}}
-		// 				.value();
+							return buffer;
+						})
+						// Renest + combine $or/$and conditions {{{
+						/* NOTE: Highly experimental - causes bugs under some circumstances
+						.thru(tree => polyglot.tools.renestConditions(tree))
+						.thru(tree => polyglot.tools.combineConditions(tree))
+						*/
+						// }}}
+						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+						.thru(tree => {
+							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+							return tree;
+						})
+						// }}}
+						.value();
 
-		// 		return compileWalker(tree);
-		// 	},
-		// },
-		// // }}}
+				return compileWalker(tree);
+			},
+		},
+		// }}}
 	},
 
 
