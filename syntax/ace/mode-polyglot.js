@@ -26,6 +26,10 @@ ace.define("ace/mode/polyglot_highlight_rules", ["require", "exports", "module",
 					caseInsensitive: true,
 				},
 				{
+					token: 'variable',
+					regex: /\[[a-z]{2,4}\]/,
+				},
+				{
 					token: "paren.lparen",
 					regex : "[\\[({]",
 				},
@@ -43,7 +47,7 @@ ace.define("ace/mode/polyglot_highlight_rules", ["require", "exports", "module",
 				},
 				{
 					token: 'keyword.other',
-					regex: /\*/,
+					regex: /\*/,	
 				},
 				{
 					token: 'keyword',
@@ -55,7 +59,7 @@ ace.define("ace/mode/polyglot_highlight_rules", ["require", "exports", "module",
 				},
 				{
 					token: 'variable',
-					regex: /\.[a-z]{2}\./,
+					regex: /\.[a-z,]{2,5}\./,
 				},
 				{
 					token: keywordMapper,
