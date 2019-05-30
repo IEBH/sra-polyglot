@@ -21,11 +21,11 @@ describe('Allow reference numbering', ()=> {
 		expect(polyglot.translate(inputPrefix, 'pubmed', {html: false})).to.equal(inputPrefixResult);
 		// expect(polyglot.translate(inputPrefix + 'AND\n1', 'pubmed', {html: false})).to.equal(inputPrefixResult + '\nAND\nFoo');
 		// expect(polyglot.translate(inputPrefix + 'AND\n1 OR 2 OR 3', 'pubmed', {html: false})).to.equal(inputPrefixResult + '\nAND\nFoo OR Bar OR Baz');
-		expect(polyglot.translate(inputPrefix + 'AND\n1-3/OR', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\nFoo OR Bar OR Baz');
-		expect(polyglot.translate(inputPrefix + 'AND\n1 - 3/OR', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\nFoo OR Bar OR Baz');
-		expect(polyglot.translate(inputPrefix + 'AND\n1 - 3/AND', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\nFoo AND Bar AND Baz');
-		expect(polyglot.translate(inputPrefix + 'AND\n1 AND 3', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\nFoo AND Baz');
-		expect(polyglot.translate(inputPrefix + 'AND\n1 OR 3', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\nFoo OR Baz');
+		expect(polyglot.translate(inputPrefix + 'AND\n1-3/OR', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\n(Foo) OR (Bar) OR (Baz)');
+		expect(polyglot.translate(inputPrefix + 'AND\n1 - 3/OR', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\n(Foo) OR (Bar) OR (Baz)');
+		expect(polyglot.translate(inputPrefix + 'AND\n1 - 3/AND', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\n(Foo) AND (Bar) AND (Baz)');
+		expect(polyglot.translate(inputPrefix + 'AND\n1 AND 3', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\n(Foo) AND (Baz)');
+		expect(polyglot.translate(inputPrefix + 'AND\n1 OR 3', 'pubmed', {html: false})).to.equal(inputPrefixResult + 'AND\n(Foo) OR (Baz)');
 
 		expect(()=> polyglot.translate(inputPrefix + 'AND\n72-75/AND', 'pubmed', {html: false})).to.throw;
 		expect(()=> polyglot.translate(inputPrefix + 'AND\n86 - 93/AND', 'pubmed', {html: false})).to.throw;

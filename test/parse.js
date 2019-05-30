@@ -8,6 +8,7 @@ describe('Parse', ()=> {
 			{
 				type: "line",
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
@@ -23,6 +24,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'group',
@@ -53,6 +55,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'group',
@@ -98,6 +101,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -126,6 +130,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -160,6 +165,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
@@ -204,6 +210,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
@@ -248,6 +255,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
@@ -270,6 +278,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 3,
+				isNumbered: false,
 				nodes: [
 					{type: 'joinAnd'},
 					{
@@ -281,6 +290,7 @@ describe('Parse', ()=> {
 			{
 				type: 'line',
 				number: 5,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',

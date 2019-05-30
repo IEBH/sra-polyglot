@@ -61030,6 +61030,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
         var newGroup = {
           type: 'line',
           number: currentNumber,
+          isNumbered: false,
           nodes: []
         };
         branch.nodes.push(newGroup);
@@ -61042,13 +61043,16 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var newGroup = {
         type: 'line',
         number: 1,
+        isNumbered: false,
         nodes: []
       };
       branch.nodes.push(newGroup);
       branchStack.push(branch);
       branch = newGroup;
       leaf = branch.nodes;
-      var lineNumber = 1;
+      var lineNumber = 1; // Variable to store whether there is user entered line numbering
+
+      var userLineNumber = false;
 
       while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -61090,7 +61094,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
           cropString = false;
         } else if (settings.transposeLines && (match = /^(AND|OR) +([0-9]+)/i.exec(q))) {
-          // 1 AND ...
+          // AND 2...
           trimLastLeaf();
           match[1].toLowerCase() == "and" ? branch.nodes.push({
             type: 'joinAnd'
@@ -61107,9 +61111,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
           });
           q = q.substr(match[0].length);
         } else if (settings.transposeLines && (match = /^([0-9]+\.?)\s+/i.exec(q))) {
-          // 1 (Line number)
+          // 1 or 1. (Line number)
           lineNumber = parseInt(match[1], 10);
           branch.number = lineNumber;
+          branch.isNumbered = true;
+          userLineNumber = true;
           q = q.substr(match[0].length - 1);
         } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
           trimLastLeaf();
@@ -61350,21 +61356,28 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
           for (reference in node.ref) {
             for (line in tree.nodes) {
-              if (tree.nodes[line].number == node.ref[reference]) {
-                // Copy the nodes from that line into the reference nodes
-                // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
-                node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
+              // If custom numbering is used only use nodes that are numbered by the user
+              if (userLineNumber) {
+                if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
+                  // Copy the nodes from that line into the reference nodes
+                  // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+                  node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
 
-                node.nodes[reference].pop();
-                break;
+                  node.nodes[reference].pop();
+                  break;
+                }
+              } else {
+                if (tree.nodes[line].number == node.ref[reference]) {
+                  // Copy the nodes from that line into the reference nodes
+                  // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+                  node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
+
+                  node.nodes[reference].pop();
+                  break;
+                }
               }
             }
           }
-          /*// FIXME: Do a line transposition here
-          node.type = 'phrase';
-          // TODO: Set the node content to be whatever is referenced on a certain line
-          node.content = 'REF(' + node.ref.join(' ' + node.cond + ' ') + ')';*/
-
         });
       }
 
@@ -61383,25 +61396,6 @@ var polyglot_1 = createCommonjsModule(function (module) {
     * @var {array}
     */
     engines: {
-      // Lexical tree (JSON) {{{
-      lexicalTreeJSON: {
-        id: 'lexicalTreeJSON',
-        title: 'Lexical Tree (JSON)',
-        aliases: ['debug'],
-        debugging: true,
-        // Mark this module for debugging only
-
-        /**
-        * Compile a tree structure to JSON output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          return tree;
-        }
-      },
-      // }}}
       // PubMed {{{
       pubmed: {
         id: 'pubmed',
@@ -62482,6 +62476,25 @@ var polyglot_1 = createCommonjsModule(function (module) {
         openTerms: 'use advanced search box'
       },
       // }}} 
+      // Lexical tree (JSON) {{{
+      lexicalTreeJSON: {
+        id: 'lexicalTreeJSON',
+        title: 'Lexical Tree (JSON)',
+        aliases: ['debug'],
+        debugging: true,
+        // Mark this module for debugging only
+
+        /**
+        * Compile a tree structure to JSON output
+        * @param {array} tree The parsed tree to process
+        * @param {Object} [options] Optional options to use when compiling
+        * @return {string} The compiled output
+        */
+        compile: function compile(tree, options) {
+          return tree;
+        }
+      },
+      // }}}
       // Lexical tree (Human Readable) {{{
       lexicalTreeHuman: {
         id: 'lexicalTreeHuman',
