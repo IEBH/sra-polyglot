@@ -14,10 +14,7 @@ var watch = require('gulp-watch');
 
 var production = process.env.NODE_ENV == 'production';
 
-gulp.task('default', ['serve']);
-gulp.task('build', ['css:demo', 'js:demo', 'js:lib']);
-
-gulp.task('js:lib', function() {
+gulp.task('js:lib', function(done) {
 	gulp.src('./index.js')
 		.pipe(plumber({
 			errorHandler: function(err) {
@@ -34,9 +31,10 @@ gulp.task('js:lib', function() {
 		// .pipe(uglify())
 		.pipe(rename('polyglot.min.js'))
 		.pipe(gulp.dest('./dist'))
+		done();
 });
 
-gulp.task('js:demo', ['js:lib'], ()=>
+gulp.task('js:demo', gulp.series('js:lib', () =>
 	rollup.rollup({
 		input: './demo/app.js',
 		experimentalCodeSplitting: false,
@@ -95,7 +93,7 @@ gulp.task('js:demo', ['js:lib'], ()=>
 		name: 'demoApp',
 		sourcemap: true,
 	}))
-);
+));
 
 gulp.task('css:demo', ()=>
 	gulp.src('./demo/app.css')
@@ -103,7 +101,9 @@ gulp.task('css:demo', ()=>
 		.pipe(gulp.dest('./dist'))
 )
 
-gulp.task('serve', ['build'], function() {
+gulp.task('build', gulp.parallel('css:demo', 'js:demo'));
+
+gulp.task('serve', gulp.series('build', function(done) {
 	var monitor = nodemon({
 		script: './demo/server.js',
 		ext: 'js css',
@@ -120,9 +120,12 @@ gulp.task('serve', ['build'], function() {
 		console.log('Rebuild client-side JS files...');
 		gulp.start('js:demo');
 	});
-});
+	done()
+}));
 
-gulp.task('gh-pages', ['build'], function() {
+gulp.task('default', gulp.series('serve'));
+
+gulp.task('gh-pages', gulp.series('build', function(done) {
 	rimraf.sync('./gh-pages');
 
 	return gulp.src([
@@ -132,7 +135,7 @@ gulp.task('gh-pages', ['build'], function() {
 		'./demo/app.js',
 		'./demo/index.html',
 		'./dist/**/*',
-		'./node_modules/angular/angular.min.js',
+		'./node_modules/vue/dist/vue.min.js',
 		'./node_modules/bootstrap/dist/css/bootstrap.min.css',
 		'./node_modules/bootstrap/dist/js/bootstrap.min.js',
 		'./node_modules/lodash/lodash.min.js',
@@ -152,5 +155,6 @@ gulp.task('gh-pages', ['build'], function() {
 		.pipe(ghPages({
 			cacheDir: 'gh-pages',
 			push: true, // Change to false for dryrun (files dumped to cacheDir)
-		}))
-});
+		})),
+	done()
+}));
