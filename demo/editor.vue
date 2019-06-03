@@ -11,11 +11,6 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		previewOptions: {
-			showPrintMargin: false,
-			wrap: true,
-			readOnly: true,
-		},
 		engines: polyglot.engines,
 		enginesExpanded: {},
 		enginesQuery: {},
@@ -107,22 +102,11 @@ export default {
 						{{engine.title}}
 					</a>
 				</div>
-				<div class="card-body collapse p-0" :class="enginesExpanded[engine.id] && 'show'">
-
-					<editor
-						v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"
-						v-model="enginesQuery[engine.id]"
-						v-on:init="editorInit"
-						lang="polyglot"
-						theme="chrome"
-						width="100%"
-						height="380"
-						v-bind:options="previewOptions"
-					></editor>
+				<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
+					<pre v-html="enginesQuery[engine.id]" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"></pre>
 					<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
       				<hr>
 					<!-- MongoDB not included at this stage -->
-
 				</div>
 			</div>
 		</div>

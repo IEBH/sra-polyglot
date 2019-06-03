@@ -60823,10 +60823,13 @@ var polyglot_1 = createCommonjsModule(function (module) {
     translate: function translate(query, engine, options) {
       if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
       var tree = polyglot.parse(query, options);
-      tree = polyglot.preProcess(tree, options); // Removed postProcess
-      // return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+      tree = polyglot.preProcess(tree, options);
 
-      return polyglot.engines[engine].compile(tree, options);
+      if (engine.id == "lexicalTreeJSON") {
+        return polyglot.engines[engine].compile(tree, options);
+      } else {
+        return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+      }
     },
 
     /**
@@ -60840,11 +60843,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
     translateAll: function translateAll(query, options) {
       var output = {};
       var tree = polyglot.parse(query, options);
-      tree = polyglot.preProcess(tree, options); // Removed postprocess
-      // _.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
+      tree = polyglot.preProcess(tree, options);
 
       lodash.forEach(polyglot.engines, function (engine, id) {
-        return output[id] = engine.compile(tree, options);
+        if (id == "lexicalTreeJSON") {
+          output[id] = engine.compile(tree, options), options;
+        } else {
+          output[id] = polyglot.postProcess(engine.compile(tree, options), options);
+        }
       });
 
       return output;
@@ -60865,7 +60871,6 @@ var polyglot_1 = createCommonjsModule(function (module) {
     },
 
     /**
-    * FUNCTION CURRENTLY NOT USED (UNUSED)
     * Post process the data from an engine
     * This function applies the following behaviours:
     * - If HTML is true all `\n` characters are replaced with `<br/>`
@@ -63462,11 +63467,6 @@ var script$1 = {
         showPrintMargin: false,
         wrap: true
       },
-      previewOptions: {
-        showPrintMargin: false,
-        wrap: true,
-        readOnly: true
-      },
       engines: polyglot_1.engines,
       enginesExpanded: {},
       enginesQuery: {},
@@ -63649,29 +63649,15 @@ var __vue_render__$1 = function() {
           _c(
             "div",
             {
-              staticClass: "card-body collapse p-0",
+              staticClass: "card-body collapse",
               class: _vm.enginesExpanded[engine.id] && "show"
             },
             [
               _vm.enginesQuery[engine.id] &&
               engine.id != "lexicalTreeJSON" &&
               engine.id != "mongodb"
-                ? _c("editor", {
-                    attrs: {
-                      lang: "polyglot",
-                      theme: "chrome",
-                      width: "100%",
-                      height: "380",
-                      options: _vm.previewOptions
-                    },
-                    on: { init: _vm.editorInit },
-                    model: {
-                      value: _vm.enginesQuery[engine.id],
-                      callback: function($$v) {
-                        _vm.$set(_vm.enginesQuery, engine.id, $$v);
-                      },
-                      expression: "enginesQuery[engine.id]"
-                    }
+                ? _c("pre", {
+                    domProps: { innerHTML: _vm._s(_vm.enginesQuery[engine.id]) }
                   })
                 : _vm._e(),
               _vm._v(" "),

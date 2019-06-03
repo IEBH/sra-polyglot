@@ -125,7 +125,7 @@ gulp.task('serve', gulp.series('build', function(done) {
 
 gulp.task('default', gulp.series('serve'));
 
-gulp.task('gh-pages', gulp.series('build', function(done) {
+gulp.task('gh-pages', gulp.series('build', function() {
 	rimraf.sync('./gh-pages');
 
 	return gulp.src([
@@ -135,16 +135,14 @@ gulp.task('gh-pages', gulp.series('build', function(done) {
 		'./demo/app.js',
 		'./demo/index.html',
 		'./dist/**/*',
-		'./node_modules/vue/dist/vue.min.js',
-		'./node_modules/bootstrap/dist/css/bootstrap.min.css',
-		'./node_modules/bootstrap/dist/js/bootstrap.min.js',
-		'./node_modules/lodash/lodash.min.js',
-		'./node_modules/jquery/dist/jquery.min.js',
-		'./node_modules/font-awesome/css/font-awesome.min.css',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.ttf',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
-		'./node_modules/popper.js/dist/umd/popper.min.js',
+		'./syntax/ace/mode-polyglot.js',
+		'./node_modules/vue/dist/vue.js',
+		'./node_modules/bootstrap/dist/css/bootstrap.css',
+		'./node_modules/bootstrap/dist/js/bootstrap.js',
+		'./node_modules/lodash/lodash.js',
+		'./node_modules/jquery/dist/jquery.js',
+		'./node_modules/font-awesome/**/*',
+		'./node_modules/popper.js/dist/umd/popper.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
 			if (path.dirname == 'demo') { // Move all demo files into root
@@ -155,6 +153,5 @@ gulp.task('gh-pages', gulp.series('build', function(done) {
 		.pipe(ghPages({
 			cacheDir: 'gh-pages',
 			push: true, // Change to false for dryrun (files dumped to cacheDir)
-		})),
-	done()
+		}))
 }));

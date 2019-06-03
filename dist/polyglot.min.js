@@ -93,10 +93,13 @@ var polyglot = module.exports = {
   translate: function translate(query, engine, options) {
     if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
     var tree = polyglot.parse(query, options);
-    tree = polyglot.preProcess(tree, options); // Removed postProcess
-    // return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+    tree = polyglot.preProcess(tree, options);
 
-    return polyglot.engines[engine].compile(tree, options);
+    if (engine.id == "lexicalTreeJSON") {
+      return polyglot.engines[engine].compile(tree, options);
+    } else {
+      return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+    }
   },
 
   /**
@@ -110,11 +113,16 @@ var polyglot = module.exports = {
   translateAll: function translateAll(query, options) {
     var output = {};
     var tree = polyglot.parse(query, options);
-    tree = polyglot.preProcess(tree, options); // Removed postprocess
-    // _.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
+    tree = polyglot.preProcess(tree, options);
 
     _.forEach(polyglot.engines, function (engine, id) {
-      return output[id] = engine.compile(tree, options);
+      console.log(id);
+
+      if (id == "lexicalTreeJSON") {
+        output[id] = engine.compile(tree, options), options;
+      } else {
+        output[id] = polyglot.postProcess(engine.compile(tree, options), options);
+      }
     });
 
     return output;
@@ -135,7 +143,6 @@ var polyglot = module.exports = {
   },
 
   /**
-  * FUNCTION CURRENTLY NOT USED (UNUSED)
   * Post process the data from an engine
   * This function applies the following behaviours:
   * - If HTML is true all `\n` characters are replaced with `<br/>`
