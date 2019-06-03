@@ -116,8 +116,7 @@ var polyglot = module.exports = {
     tree = polyglot.preProcess(tree, options);
 
     _.forEach(polyglot.engines, function (engine, id) {
-      console.log(id);
-
+      // Dont run postprocess for lexicalTreeJSON
       if (id == "lexicalTreeJSON") {
         output[id] = engine.compile(tree, options), options;
       } else {
@@ -222,43 +221,7 @@ var polyglot = module.exports = {
     // Operate in line-by-line mode? {{{
 
     if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
-      var lines = q.split('\n'); // Transpose lines {{{
-
-      if (settings.transposeLines) {}
-      /* TODO: NEED TO FIND OUT WHAT THIS DOES
-      // Compute array of line references
-      lineRefs = _(lines)
-      	.filter(line => !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line)) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
-      	.map(line => {
-      		var bits = /^\s*(\d+)\.?\s(.*)$/.exec(line);
-      		if (bits) return [bits[1], bits[2]];
-      	})
-      	.filter()
-      	.mapKeys(i => i[0])
-      	.mapValues(i => _.trim(i[1]))
-      	.value();
-      		
-      lines = lines
-      	.map((line, lineOffset) => {
-      		line = line
-      			.replace(/([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i, (match, from, to, cond) =>
-      				_.range(Number(from), Number(to) + 1)
-      					.map(ref => {
-      						if (!lineRefs[ref]) throw new Error(`Reference "${ref}" not found (required on line ${lineOffset})`);
-      						return lineRefs[ref];
-      					})
-      					.join(' ' + cond + ' ')
-      			)
-      			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p1, cond, p2) => {
-      				if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
-      				if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
-      				return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
-      			})
-      	})
-      */
-      // }}}
-      // Remove numbering {{{
-
+      var lines = q.split('\n'); // Remove numbering {{{
 
       if (settings.removeNumbering) {
         var match;

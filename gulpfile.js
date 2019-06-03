@@ -34,7 +34,7 @@ gulp.task('js:lib', function(done) {
 		done();
 });
 
-gulp.task('js:demo', gulp.series('js:lib', () =>
+gulp.task('js:demo', gulp.series('js:lib', (done) =>
 	rollup.rollup({
 		input: './demo/app.js',
 		experimentalCodeSplitting: false,
@@ -92,7 +92,9 @@ gulp.task('js:demo', gulp.series('js:lib', () =>
 		file: './dist/demoApp.js',
 		name: 'demoApp',
 		sourcemap: true,
-	}))
+	}),
+	done()
+	)
 ));
 
 gulp.task('css:demo', ()=>
