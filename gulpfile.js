@@ -13,9 +13,14 @@ var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
 var production = process.env.NODE_ENV == 'production';
+const jsBuild = gulp.series(jsLib, jsDemo);
+const build = gulp.parallel(cssDemo, jsBuild)
 
-gulp.task('js:lib', function(done) {
-	gulp.src('./index.js')
+exports.default = gulp.series(build, serve)
+exports.gh_pages = gulp.series(build, ghPages)
+
+function jsLib() {
+	return gulp.src('./index.js')
 		.pipe(plumber({
 			errorHandler: function(err) {
 				gutil.log(gutil.colors.red('ERROR DURING JS BUILD'));
@@ -31,11 +36,10 @@ gulp.task('js:lib', function(done) {
 		// .pipe(uglify())
 		.pipe(rename('polyglot.min.js'))
 		.pipe(gulp.dest('./dist'))
-		done();
-});
+};
 
-gulp.task('js:demo', gulp.series('js:lib', (done) =>
-	rollup.rollup({
+async function jsDemo() {
+	const bundle = await rollup.rollup({
 		input: './demo/app.js',
 		experimentalCodeSplitting: false,
 		plugins: [
@@ -47,7 +51,7 @@ gulp.task('js:demo', gulp.series('js:lib', (done) =>
 			require('rollup-plugin-alias')({
 				vue: 'node_modules/vue/dist/vue.esm.js',
 			}),
-			require('rollup-plugin-commonjs')({ // Allow reading CommonJS formatted files (this has to exist high in the load order)
+			require('rollup-plugin-commonjs')({
 				include: ['node_modules/**/*', 'demo/**/*', 'dist/**/*'],
 				namedExports: {
 					'dist/polyglot.js': ['polyglot'],
@@ -57,11 +61,11 @@ gulp.task('js:demo', gulp.series('js:lib', (done) =>
 			require('rollup-plugin-includepaths')({
 				paths: ['dist', 'demo'],
 			}),
-			require('rollup-plugin-node-resolve')({ // Allow Node style module resolution
+			require('rollup-plugin-node-resolve')({
 				jsnext: true,
-				browser: true, // Use the `browser` path in package.json when possible
+				browser: true,
 			}),
-			require('rollup-plugin-node-globals')({ // Inject global Node module shivs
+			require('rollup-plugin-node-globals')({
 				baseDir: false,
 				buffer: false,
 				dirname: false,
@@ -82,30 +86,23 @@ gulp.task('js:demo', gulp.series('js:lib', (done) =>
 			}),
 			production && require('rollup-plugin-uglify').uglify(),
 			require('rollup-plugin-sizes')(),
-			/*require('/home/mc/Papers/Projects/Node/rollup-plugin-fdnotify')({
-				baseDir: __dirname,
-			}),*/
 		],
-	})
-	.then(bundle => bundle.write({
+	});
+	return await bundle.write({
 		format: 'cjs',
 		file: './dist/demoApp.js',
 		name: 'demoApp',
 		sourcemap: true,
-	}),
-	done()
-	)
-));
+	});
+};
 
-gulp.task('css:demo', ()=>
-	gulp.src('./demo/app.css')
+function cssDemo() {
+	return gulp.src('./demo/app.css')
 		.pipe(rename('demoApp.css'))
 		.pipe(gulp.dest('./dist'))
-)
+}
 
-gulp.task('build', gulp.parallel('css:demo', 'js:demo'));
-
-gulp.task('serve', gulp.series('build', function(done) {
+function serve() {
 	var monitor = nodemon({
 		script: './demo/server.js',
 		ext: 'js css',
@@ -118,16 +115,13 @@ gulp.task('serve', gulp.series('build', function(done) {
 			console.log('Server restarted');
 		});
 
-	watch(['./index.js', 'demo/**/*.js', 'demo/**/*.vue', 'src/**/*.js', 'src/**/*.vue'], function() {
+	return watch(['./index.js', 'demo/**/*.js', 'demo/**/*.vue', 'src/**/*.js', 'src/**/*.vue'], function() {
 		console.log('Rebuild client-side JS files...');
-		gulp.start('js:demo');
+		jsBuild();
 	});
-	done()
-}));
+}
 
-gulp.task('default', gulp.series('serve'));
-
-gulp.task('gh-pages', gulp.series('build', function() {
+function ghPages() {
 	rimraf.sync('./gh-pages');
 
 	return gulp.src([
@@ -156,4 +150,4 @@ gulp.task('gh-pages', gulp.series('build', function() {
 			cacheDir: 'gh-pages',
 			push: true, // Change to false for dryrun (files dumped to cacheDir)
 		}))
-}));
+};

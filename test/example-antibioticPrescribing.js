@@ -20,7 +20,9 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		// Tree structure {{{
 		var tree = [
 			{
-				type: 'group',
+				type: 'line',
+				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -47,19 +49,28 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						type: 'phrase',
 						content: 'General practice',
 					},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
 				],
 			},
 			{
-				type: 'raw',
-				content: '\n\n',
+				type: 'line',
+				number: 3,
+				isNumbered: false,
+				nodes: [
+					{type: 'joinAnd'},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
+				]
 			},
-			{type: 'joinAnd'},
 			{
-				type: 'raw',
-				content: '\n\n',
-			},
-			{
-				type: 'group',
+				type: 'line',
+				number: 5,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -76,19 +87,28 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						type: 'phrase',
 						content: 'Treatment failures',
 					},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
 				],
 			},
 			{
-				type: 'raw',
-				content: '\n\n',
+				type: 'line',
+				number: 7,
+				isNumbered: false,
+				nodes: [
+					{type: 'joinAnd'},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
+				]
 			},
-			{type: 'joinAnd'},
 			{
-				type: 'raw',
-				content: '\n\n',
-			},
-			{
-				type: 'group',
+				type: 'line',
+				number: 9,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -105,19 +125,28 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						type: 'phrase',
 						content: 'Bacterial',
 					},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
 				],
 			},
 			{
-				type: 'raw',
-				content: '\n\n',
+				type: 'line',
+				number: 11,
+				isNumbered: false,
+				nodes: [
+					{type: 'joinAnd'},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
+				]
 			},
-			{type: 'joinAnd'},
 			{
-				type: 'raw',
-				content: '\n\n',
-			},
-			{
-				type: 'group',
+				type: 'line',
+				number: 13,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -148,7 +177,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 			},
 		];
 		// }}}
-		expect(polyglot.parse(example.query, {groupLines: true})).to.deep.equal(tree);
+		expect(polyglot.parse(example.query, {groupLines: false})).to.deep.equal(tree);
 	});
 
 	it('should translate the example into PubMed format', ()=> {

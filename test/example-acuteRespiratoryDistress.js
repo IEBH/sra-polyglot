@@ -25,11 +25,24 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 		var tree = [
 			// Line 1 {{{
 			{
-				type: 'comment',
-				content: 'Lung diseases or other infections',
+				type: 'line',
+				number: 1,
+				isNumbered: false,
+				nodes: [
+					{
+						type: 'comment',
+						content: ' Lung diseases or other infections',
+					},
+					{
+						type: 'raw',
+						content: '\n',
+					},
+				]
 			},
 			{
-				type: 'group',
+				type: 'line',
+				number: 2,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -378,25 +391,45 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							},
 						],
 					},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
 				],
 			},
 			// }}}
 			{
-				type: 'raw',
-				content: '\n\n',
-			},
-			{type: 'joinAnd'},
-			{
-				type: 'raw',
-				content: '\n\n',
+				type: "line",
+				number: 4,
+				isNumbered: false,
+				nodes: [
+					{type: 'joinAnd'},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
+				]
 			},
 			// Line 2 {{{
 			{
-				type: 'comment',
-				content: 'Posture',
+				type: "line",
+				number: 6,
+				isNumbered: false,
+				nodes: [
+					{
+						type: 'comment',
+						content: ' Posture',
+					},
+					{
+						type: 'raw',
+						content: '\n',
+					},
+				]
 			},
 			{
-				type: 'group',
+				type: 'line',
+				number: 7,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'mesh',
@@ -658,25 +691,45 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							},
 						],
 					},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
 				],
 			},
 			// }}}
 			{
-				type: 'raw',
-				content: '\n\n',
-			},
-			{type: 'joinAnd'},
-			{
-				type: 'raw',
-				content: '\n\n',
+				type: "line",
+				number: 9,
+				isNumbered: false,
+				nodes: [
+					{type: 'joinAnd'},
+					{
+						type: 'raw',
+						content: '\n\n',
+					},
+				]
 			},
 			// Line 3 {{{
 			{
-				type: 'comment',
-				content: 'RCTs',
+				type: "line",
+				number: 11,
+				isNumbered: false,
+				nodes: [
+					{
+						type: 'comment',
+						content: ' RCTs',
+					},
+					{
+						type: 'raw',
+						content: '\n',
+					},
+				]
 			},
 			{
-				type: 'group',
+				type: 'line',
+				number: 12,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'template',
@@ -687,7 +740,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 			// }}}
 		];
 		// }}}
-		expect(polyglot.parse(example.query, {groupLines: true})).to.deep.equal(tree);
+		expect(polyglot.parse(example.query, {groupLines: false})).to.deep.equal(tree);
 	});
 
 });

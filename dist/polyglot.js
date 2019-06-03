@@ -158,7 +158,7 @@ var polyglot = module.exports = {
     var settings = _.defaults(options, {
       forceString: true,
       html: true,
-      trim: true,
+      trim: false,
       transposeLines: true
     });
 

@@ -8,6 +8,7 @@ describe('Check that comments are ignored', ()=> {
 			{
 				type: 'line',
 				number: 1,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
@@ -27,6 +28,7 @@ describe('Check that comments are ignored', ()=> {
 			{
 				type: 'line',
 				number: 2,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'comment',
@@ -41,6 +43,7 @@ describe('Check that comments are ignored', ()=> {
 			{
 				type: 'line',
 				number: 4,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'comment',
@@ -55,6 +58,7 @@ describe('Check that comments are ignored', ()=> {
 			{
 				type: 'line',
 				number: 6,
+				isNumbered: false,
 				nodes: [
 					{type: 'joinAnd'},
 					{
@@ -66,6 +70,7 @@ describe('Check that comments are ignored', ()=> {
 			{
 				type: 'line',
 				number: 8,
+				isNumbered: false,
 				nodes: [
 					{
 						type: 'phrase',
