@@ -21,6 +21,7 @@ export default {
 			preserveNewLines: true,
 			replaceWildcards: true,
 			transposeLines: true,
+			highlighting: true,
 		},
 		exampleLast: '',
 	}),

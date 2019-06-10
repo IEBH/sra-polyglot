@@ -60898,18 +60898,19 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var settings = lodash.defaults(options, {
         forceString: true,
         html: true,
+        highlighting: false,
         trim: false,
         transposeLines: true
       });
 
       if (settings.forceString && !lodash.isString(text)) text = JSON.stringify(text, null, '\t');
 
+      if (settings.highlighting) {
+        text = text.replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>').replace(/\bNOT\b/g, '<font color="purple">NOT</font>');
+      }
+
       if (settings.html) {
-        text = text // Phrases
-        .replace(/((["'])(?:(?=(\\?))\3.)*?\2)/g, '<font color="#00008B">$1</font>') // Spaces
-        .replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>') // Field specifiers
-        .replace(/(\[[a-z]{2,4}\])/g, '<font color="LightSeaGreen ">$1</font>').replace(/(\.[a-z,]{2,5}\.)/g, '<font color="LightSeaGreen ">$1</font>') // Mesh terms
-        .replace(/(\[Mesh\])/g, '<font color="blue">$1</font>').replace(/(exp .+?\/)/g, '<font color="blue">$1</font>').replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>');
+        text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
       } else if (lodash.isString(text)) {
         // Flatten HTML - Yes this is a horrible method, but its quick
         for (var i = 0; i < 10; i++) {
@@ -61449,11 +61450,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-                    branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+tw' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' : branch.field == 'abstract' ? settings.highlighting ? '<span class="myTooltip"><font color="LightSeaGreen">[tiab]</font><span class="myTooltiptext">PubMed cannot search abstract field term</span></span>' : '[tiab]' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
+                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
                   }
 
                   break;
@@ -61472,7 +61472,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'mesh':
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'raw':
@@ -61552,7 +61554,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                     if (expand) {
-                      buffer += branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
+                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
                       ;
                     }
                   } else {
@@ -61576,7 +61578,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && expand) {
-                    buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
+                    buffer += branch.content + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
                     );
                   } else {
                     buffer += branch.content;
@@ -61597,11 +61599,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'joinNear':
+                  if (settings.highlighting) buffer += '<font color="purple">';
                   buffer += 'ADJ' + branch.proximity;
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'mesh':
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'raw':
@@ -61684,12 +61690,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'group':
                   if (branch.field && branch.field == 'floatingSubheading') {
+                    if (settings.highlighting) buffer += '<font color="blue">';
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                    if (settings.highlighting) buffer += '</font>';
                   } else if (branch.field) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                     if (expand) {
-                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
                       ;
                     }
                   } else {
@@ -61713,12 +61721,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && branch.field == 'floatingSubheading') {
+                    if (settings.highlighting) buffer += '<font color="blue">';
                     buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                    if (settings.highlighting) buffer += '</font>';
                   } else if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
+                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
                   }
 
                   break;
@@ -61736,11 +61746,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'joinNear':
+                  if (settings.highlighting) buffer += '<font color="purple">';
                   buffer += 'NEAR/' + branch.proximity;
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'mesh':
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'raw':
@@ -61852,7 +61866,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                     if (expand) {
-                      buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
                       ;
                     }
                   } else {
@@ -61876,10 +61890,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                    buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase');
+                    buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
                   }
 
                   break;
@@ -61897,11 +61911,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'joinNear':
+                  if (settings.highlighting) buffer += '<font color="purple">';
                   buffer += 'NEAR/' + branch.proximity;
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'mesh':
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+                  if (settings.highlighting) buffer += '</font>';
                   break;
 
                 case 'raw':
@@ -62000,7 +62018,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'phrase':
-                  buffer += polyglot.tools.quotePhrase(branch, 'wos');
+                  buffer += polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting);
                   break;
 
                 case 'joinAnd':
@@ -62020,7 +62038,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'mesh':
-                  buffer += polyglot.tools.quotePhrase(branch, 'wos');
+                  buffer += polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting);
                   break;
 
                 case 'raw':
@@ -62150,11 +62168,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'phrase':
                   if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
-                    buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
+                    buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
                   } else if (branch.field) {
-                    buffer += lodash.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl'));
+                    buffer += lodash.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
+                    buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
                   }
 
                   break;
@@ -62296,7 +62314,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   break;
 
                 case 'mesh':
-                  buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
+                  buffer += polyglot.tools.quotePhrase(branch, 'psycinfo', settings.highlighting);
                   break;
 
                 case 'raw':
@@ -62706,12 +62724,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
       * Determine if a phrase needs to be enclosed within speachmarks and return the result
       * @param {Object} branch Phrase branch to examine
       * @param {string} engine Optional engine ID to examine for other enclose methods
+      * @param {boolean} highlighting Optional bool to determine if html color styling is added
       * @return {string} The phrase enclosed as needed
       */
       quotePhrase: function quotePhrase(branch, engine) {
+        var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
         var text = lodash.trimEnd(branch.content);
 
-        return /\s/.test(text) ? '"' + text + '"' : text;
+        return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
       },
 
       /**
@@ -63365,7 +63386,8 @@ var script$1 = {
         removeNumbering: false,
         preserveNewLines: true,
         replaceWildcards: true,
-        transposeLines: true
+        transposeLines: true,
+        highlighting: true
       },
       exampleLast: ''
     };
