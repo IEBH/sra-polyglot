@@ -18,3 +18,7 @@ a:hover {
 	display: inline-block;
 	width: 20px;
 }
+
+pre {
+	white-space: pre-wrap;
+}

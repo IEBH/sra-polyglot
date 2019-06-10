@@ -116,8 +116,8 @@ var polyglot = module.exports = {
     tree = polyglot.preProcess(tree, options);
 
     _.forEach(polyglot.engines, function (engine, id) {
-      // Dont run postprocess for lexicalTreeJSON
       if (id == "lexicalTreeJSON") {
+        // Dont run postprocess for lexicalTreeJSON
         output[id] = engine.compile(tree, options), options;
       } else {
         output[id] = polyglot.postProcess(engine.compile(tree, options), options);
@@ -165,7 +165,11 @@ var polyglot = module.exports = {
     if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
     if (settings.html) {
-      text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
+      text = text // Phrases
+      .replace(/((["'])(?:(?=(\\?))\3.)*?\2)/g, '<font color="#00008B">$1</font>') // Spaces
+      .replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>') // Field specifiers
+      .replace(/(\[[a-z]{2,4}\])/g, '<font color="LightSeaGreen ">$1</font>').replace(/(\.[a-z,]{2,5}\.)/g, '<font color="LightSeaGreen ">$1</font>') // Mesh terms
+      .replace(/(\[Mesh\])/g, '<font color="blue">$1</font>').replace(/(exp .+?\/)/g, '<font color="blue">$1</font>').replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>');
     } else if (_.isString(text)) {
       // Flatten HTML - Yes this is a horrible method, but its quick
       for (var i = 0; i < 10; i++) {
