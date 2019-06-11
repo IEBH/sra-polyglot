@@ -93,10 +93,13 @@ var polyglot = module.exports = {
   translate: function translate(query, engine, options) {
     if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
     var tree = polyglot.parse(query, options);
-    tree = polyglot.preProcess(tree, options); // Removed postProcess
-    // return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+    tree = polyglot.preProcess(tree, options);
 
-    return polyglot.engines[engine].compile(tree, options);
+    if (engine.id == "lexicalTreeJSON") {
+      return polyglot.engines[engine].compile(tree, options);
+    } else {
+      return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+    }
   },
 
   /**
@@ -110,11 +113,15 @@ var polyglot = module.exports = {
   translateAll: function translateAll(query, options) {
     var output = {};
     var tree = polyglot.parse(query, options);
-    tree = polyglot.preProcess(tree, options); // Removed postprocess
-    // _.forEach(polyglot.engines, (engine, id) => output[id] = polyglot.postProcess(engine.compile(tree, options), options));
+    tree = polyglot.preProcess(tree, options);
 
     _.forEach(polyglot.engines, function (engine, id) {
-      return output[id] = engine.compile(tree, options);
+      if (id == "lexicalTreeJSON") {
+        // Dont run postprocess for lexicalTreeJSON
+        output[id] = engine.compile(tree, options), options;
+      } else {
+        output[id] = polyglot.postProcess(engine.compile(tree, options), options);
+      }
     });
 
     return output;
@@ -135,7 +142,6 @@ var polyglot = module.exports = {
   },
 
   /**
-  * FUNCTION CURRENTLY NOT USED (UNUSED)
   * Post process the data from an engine
   * This function applies the following behaviours:
   * - If HTML is true all `\n` characters are replaced with `<br/>`
@@ -152,11 +158,16 @@ var polyglot = module.exports = {
     var settings = _.defaults(options, {
       forceString: true,
       html: true,
-      trim: true,
+      highlighting: false,
+      trim: false,
       transposeLines: true
     });
 
     if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
+
+    if (settings.highlighting) {
+      text = text.replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>').replace(/\bNOT\b/g, '<font color="purple">NOT</font>');
+    }
 
     if (settings.html) {
       text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
@@ -215,43 +226,7 @@ var polyglot = module.exports = {
     // Operate in line-by-line mode? {{{
 
     if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
-      var lines = q.split('\n'); // Transpose lines {{{
-
-      if (settings.transposeLines) {}
-      /* TODO: NEED TO FIND OUT WHAT THIS DOES
-      // Compute array of line references
-      lineRefs = _(lines)
-      	.filter(line => !/^\s*\d+(\s*\-|\s+AND|\s+OR)/i.test(line)) // Exclude lines that look like '1 - 3' '1 AND' or '1 OR'
-      	.map(line => {
-      		var bits = /^\s*(\d+)\.?\s(.*)$/.exec(line);
-      		if (bits) return [bits[1], bits[2]];
-      	})
-      	.filter()
-      	.mapKeys(i => i[0])
-      	.mapValues(i => _.trim(i[1]))
-      	.value();
-      		
-      lines = lines
-      	.map((line, lineOffset) => {
-      		line = line
-      			.replace(/([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i, (match, from, to, cond) =>
-      				_.range(Number(from), Number(to) + 1)
-      					.map(ref => {
-      						if (!lineRefs[ref]) throw new Error(`Reference "${ref}" not found (required on line ${lineOffset})`);
-      						return lineRefs[ref];
-      					})
-      					.join(' ' + cond + ' ')
-      			)
-      			.replace(/^\s*(\d) (AND|OR) (\d)/, (match, p1, cond, p2) => {
-      				if (!lineRefs[p1]) throw new Error(`Reference "${p1}" not found (required on line ${lineOffset})`);
-      				if (!lineRefs[p2]) throw new Error(`Reference "${p2}" not found (required on line ${lineOffset})`);
-      				return `${lineRefs[p1]} ${cond} ${lineRefs[p2]}`;
-      			})
-      	})
-      */
-      // }}}
-      // Remove numbering {{{
-
+      var lines = q.split('\n'); // Remove numbering {{{
 
       if (settings.removeNumbering) {
         var match;
@@ -741,11 +716,10 @@ var polyglot = module.exports = {
 
               case 'phrase':
                 if (branch.field) {
-                  buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + (branch.field == 'title' ? '[ti]' : branch.field == 'abstract' ? '[tiab]' : // PubMed has no way to search abstract by itself
-                  branch.field == 'title+abstract' ? '[tiab]' : branch.field == 'title+abstract+tw' ? '[tiab]' : branch.field == 'title+abstract+other' ? '[tw]' : branch.field == 'floatingSubheading' ? '[sh]' : branch.field == 'publicationType' ? '[pt]' : branch.field == 'substance' ? '[nm]' : '' // Unsupported field suffix for PubMed
+                  buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' : branch.field == 'abstract' ? settings.highlighting ? polyglot.tools.createTooltip('<font color="LightSeaGreen">[tiab]</font>', 'PubMed cannot search abstract field term independently') : '[tiab]' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' : '' // Unsupported field suffix for PubMed
                   );
                 } else {
-                  buffer += polyglot.tools.quotePhrase(branch, 'pubmed');
+                  buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
                 }
 
                 break;
@@ -764,7 +738,12 @@ var polyglot = module.exports = {
                 break;
 
               case 'mesh':
-                buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                } else {
+                  buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+                }
+
                 break;
 
               case 'raw':
@@ -844,7 +823,7 @@ var polyglot = module.exports = {
                   buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                   if (expand) {
-                    buffer += branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
+                    buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
                     ;
                   }
                 } else {
@@ -868,7 +847,7 @@ var polyglot = module.exports = {
 
               case 'phrase':
                 if (branch.field && expand) {
-                  buffer += branch.content + (branch.field == 'title' ? '.ti.' : branch.field == 'abstract' ? '.ab.' : branch.field == 'title+abstract' ? '.ti,ab.' : branch.field == 'title+abstract+tw' ? '.tw.' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.fs.' : branch.field == 'publicationType' ? '.pt.' : branch.field == 'substance' ? '.nm.' : '' // Unsupported field suffix for Ovid
+                  buffer += branch.content + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
                   );
                 } else {
                   buffer += branch.content;
@@ -889,11 +868,18 @@ var polyglot = module.exports = {
                 break;
 
               case 'joinNear':
+                if (settings.highlighting) buffer += '<font color="purple">';
                 buffer += 'ADJ' + branch.proximity;
+                if (settings.highlighting) buffer += '</font>';
                 break;
 
               case 'mesh':
-                buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+                } else {
+                  buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+                }
+
                 break;
 
               case 'raw':
@@ -976,12 +962,14 @@ var polyglot = module.exports = {
 
               case 'group':
                 if (branch.field && branch.field == 'floatingSubheading') {
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                  if (settings.highlighting) buffer += '</font>';
                 } else if (branch.field) {
                   buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                   if (expand) {
-                    buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                    buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
                     ;
                   }
                 } else {
@@ -1005,12 +993,14 @@ var polyglot = module.exports = {
 
               case 'phrase':
                 if (branch.field && branch.field == 'floatingSubheading') {
+                  if (settings.highlighting) buffer += '<font color="blue">';
                   buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                  if (settings.highlighting) buffer += '</font>';
                 } else if (branch.field && expand) {
-                  buffer += polyglot.tools.quotePhrase(branch, 'cochrane') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,kw' : branch.field == 'floatingSubheading' ? ':fs' : branch.field == 'publicationType' ? ':pt' : branch.field == 'substance' ? ':kw' : '' // Unsupported field suffix for PubMed
+                  buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
                   );
                 } else {
-                  buffer += polyglot.tools.quotePhrase(branch, 'cochrane');
+                  buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
                 }
 
                 break;
@@ -1028,11 +1018,18 @@ var polyglot = module.exports = {
                 break;
 
               case 'joinNear':
+                if (settings.highlighting) buffer += '<font color="purple">';
                 buffer += 'NEAR/' + branch.proximity;
+                if (settings.highlighting) buffer += '</font>';
                 break;
 
               case 'mesh':
-                buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                } else {
+                  buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+                }
+
                 break;
 
               case 'raw':
@@ -1144,7 +1141,7 @@ var polyglot = module.exports = {
                   buffer += '(' + compileWalker(branch.nodes, false) + ')';
 
                   if (expand) {
-                    buffer += branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                    buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
                     ;
                   }
                 } else {
@@ -1168,10 +1165,10 @@ var polyglot = module.exports = {
 
               case 'phrase':
                 if (branch.field && expand) {
-                  buffer += polyglot.tools.quotePhrase(branch, 'embase') + (branch.field == 'title' ? ':ti' : branch.field == 'abstract' ? ':ab' : branch.field == 'title+abstract' ? ':ti,ab' : branch.field == 'title+abstract+tw' ? ':ti,ab' : branch.field == 'title+abstract+other' ? ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? ':lnk' : branch.field == 'publicationType' ? ':it' : branch.field == 'substance' ? ':tn' : '' // Unsupported field suffix for PubMed
+                  buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
                   );
                 } else {
-                  buffer += polyglot.tools.quotePhrase(branch, 'embase');
+                  buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
                 }
 
                 break;
@@ -1189,11 +1186,18 @@ var polyglot = module.exports = {
                 break;
 
               case 'joinNear':
+                if (settings.highlighting) buffer += '<font color="purple">';
                 buffer += 'NEAR/' + branch.proximity;
+                if (settings.highlighting) buffer += '</font>';
                 break;
 
               case 'mesh':
-                buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+                } else {
+                  buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+                }
+
                 break;
 
               case 'raw':
@@ -1292,7 +1296,7 @@ var polyglot = module.exports = {
                 break;
 
               case 'phrase':
-                buffer += polyglot.tools.quotePhrase(branch, 'wos');
+                buffer += polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting);
                 break;
 
               case 'joinAnd':
@@ -1312,7 +1316,12 @@ var polyglot = module.exports = {
                 break;
 
               case 'mesh':
-                buffer += polyglot.tools.quotePhrase(branch, 'wos');
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting), "Web of Science does not support MeSH terms");
+                } else {
+                  buffer += polyglot.tools.quotePhrase(branch, 'wos');
+                }
+
                 break;
 
               case 'raw':
@@ -1442,11 +1451,11 @@ var polyglot = module.exports = {
 
               case 'phrase':
                 if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
-                  buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl') + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl');
+                  buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
                 } else if (branch.field) {
-                  buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl'));
+                  buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
                 } else {
-                  buffer += polyglot.tools.quotePhrase(branch, 'cinahl');
+                  buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
                 }
 
                 break;
@@ -1468,7 +1477,12 @@ var polyglot = module.exports = {
                 break;
 
               case 'mesh':
-                buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                } else {
+                  buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+                }
+
                 break;
 
               case 'raw':
@@ -1588,7 +1602,12 @@ var polyglot = module.exports = {
                 break;
 
               case 'mesh':
-                buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'psycinfo', settings.highlighting), "PsycInfo does not support MeSH terms");
+                } else {
+                  buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
+                }
+
                 break;
 
               case 'raw':
@@ -1689,7 +1708,7 @@ var polyglot = module.exports = {
                 if (branch.field) {
                   buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
                 } else {
-                  buffer += '"' + branch.content + '"';
+                  buffer += polyglot.tools.quotePhrase(branch, 'scopus', settings.highlighting);
                 }
 
                 break;
@@ -1711,7 +1730,12 @@ var polyglot = module.exports = {
                 break;
 
               case 'mesh':
-                buffer += 'INDEXTERMS("' + branch.content + '")';
+                if (settings.highlighting) {
+                  buffer += polyglot.tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                } else {
+                  buffer += 'INDEXTERMS("' + branch.content + '")';
+                }
+
                 break;
 
               case 'raw':
@@ -1768,96 +1792,6 @@ var polyglot = module.exports = {
       */
       compile: function compile(tree, options) {
         return tree;
-      }
-    },
-    // }}}
-    // Lexical tree (Human Readable) {{{
-    lexicalTreeHuman: {
-      id: 'lexicalTreeHuman',
-      title: 'Lexical Tree (Human Readable)',
-      aliases: ['debug'],
-      debugging: true,
-      // Mark this module for debugging only
-
-      /**
-      * Compile a tree structure to a passably human readable tree
-      * @param {array} tree The parsed tree to process
-      * @param {Object} [options] Optional options to use when compiling
-      * @return {string} The compiled output
-      */
-      compile: function compile(tree, options) {
-        var compileWalker = function compileWalker(tree, level) {
-          return tree.map(function (branch) {
-            var buffer = _.repeat('  ', level) + '- ';
-
-            switch (branch.type) {
-              case 'line':
-                // TODO: Add case for line
-                break;
-
-              case 'group':
-                buffer += 'GROUP' + (branch.field ? ' (field=' + branch.field + '):' : ':') + '\n';
-                buffer += compileWalker(branch.nodes, level + 1);
-                break;
-
-              case 'ref':
-                var node;
-
-                for (node in branch.nodes) {
-                  if (node == 0) {
-                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                  } else {
-                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                  }
-                }
-
-                break;
-
-              case 'phrase':
-                buffer += '"' + branch.content + '"' + (branch.field ? ' (field=' + branch.field + ')' : '');
-                break;
-
-              case 'joinNear':
-                buffer += 'NEAR' + branch.proximity;
-                break;
-
-              case 'joinAnd':
-                buffer += 'AND';
-                break;
-
-              case 'joinOr':
-                buffer += 'OR';
-                break;
-
-              case 'joinNot':
-                buffer += 'NOT';
-                break;
-
-              case 'mesh':
-                buffer += 'MESH("' + branch.content + '")';
-                break;
-
-              case 'raw':
-                buffer += 'RAW(' + branch.content.length + ' bytes)';
-                break;
-
-              case 'template':
-                buffer += 'TEMPLATE(' + branch.content + ')';
-                break;
-
-              case 'comment':
-                buffer += 'COMMENT("' + branch.content + '")';
-                break;
-
-              default:
-                throw new Error('Unsupported object tree type: ' + branch.type);
-            }
-
-            return buffer;
-          }).join('\n');
-        };
-
-        return compileWalker(tree, 0);
       }
     },
     // }}}
@@ -2088,12 +2022,15 @@ var polyglot = module.exports = {
     * Determine if a phrase needs to be enclosed within speachmarks and return the result
     * @param {Object} branch Phrase branch to examine
     * @param {string} engine Optional engine ID to examine for other enclose methods
+    * @param {boolean} highlighting Optional bool to determine if html color styling is added
     * @return {string} The phrase enclosed as needed
     */
     quotePhrase: function quotePhrase(branch, engine) {
+      var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
       var text = _.trimEnd(branch.content);
 
-      return /\s/.test(text) ? '"' + text + '"' : text;
+      return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
     },
 
     /**
@@ -2193,6 +2130,9 @@ var polyglot = module.exports = {
         _.set(tree, collapse.path.slice(0, -1), child);
       });
       return tree;
+    },
+    createTooltip: function createTooltip(content, message) {
+      return '<span class="myTooltip">' + content + '<span class="myTooltiptext">' + message + '</span></span>';
     }
   }
 };
