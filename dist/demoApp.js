@@ -62432,7 +62432,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   if (branch.field) {
                     buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'scopus', settings.highlighting);
+                    buffer += '"' + branch.content + '"';
                   }
 
                   break;
