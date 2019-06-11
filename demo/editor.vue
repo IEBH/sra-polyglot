@@ -96,10 +96,10 @@ export default {
 		<hr/>
 
 		<div class="accordion panel-group">
-			<div v-for="engine in engines" :key="engine.id" class="card">
+			<div v-for="engine in engines" :key="engine.id" class="card" id="customcard">
 				<div class="card-header" v-on:click="toggleExpandEngine(engine)" >
 					<a class="accordion-toggle collapsed">
-						<i class="fa fa-fw" :class="engine.expanded ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+						<i class="fa fa-fw" :class="enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
 						{{engine.title}}
 					</a>
 				</div>
@@ -111,6 +111,5 @@ export default {
 				</div>
 			</div>
 		</div>
-		
 	</div>
 </template>
