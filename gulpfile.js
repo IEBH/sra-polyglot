@@ -17,7 +17,7 @@ const jsBuild = gulp.series(jsLib, jsDemo);
 const build = gulp.parallel(cssDemo, jsBuild)
 
 exports.default = gulp.series(build, serve)
-exports.gh_pages = gulp.series(build, ghPages)
+exports.gh_pages = gulp.series(build, gh_page)
 
 function jsLib() {
 	return gulp.src('./index.js')
@@ -121,7 +121,7 @@ function serve() {
 	});
 }
 
-function ghPages() {
+function gh_page() {
 	rimraf.sync('./gh-pages');
 
 	return gulp.src([

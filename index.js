@@ -608,7 +608,7 @@ var polyglot = module.exports = {
 											polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting) +
 											(
 												(branch.field == 'title') ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' :
-												branch.field == 'abstract' ? settings.highlighting ? '<span class="myTooltip"><font color="LightSeaGreen">[tiab]</font><span class="myTooltiptext">PubMed cannot search abstract field term</span></span>' : '[tiab]' :
+												branch.field == 'abstract' ? settings.highlighting ? polyglot.tools.createTooltip('<font color="LightSeaGreen">[tiab]</font>', 'PubMed cannot search abstract field term independently') : '[tiab]' :
 												branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
 												branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
 												branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
@@ -632,9 +632,12 @@ var polyglot = module.exports = {
 									buffer += 'NOT';
 									break;
 								case 'mesh':
-									if (settings.highlighting) buffer += '<font color="blue">'
-									buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
-									if (settings.highlighting) buffer += '</font>'
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
+																				"Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+									} else {
+										buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -768,9 +771,12 @@ var polyglot = module.exports = {
 									if (settings.highlighting) buffer += '</font>';
 									break;
 								case 'mesh':
-									if (settings.highlighting) buffer += '<font color="blue">';
-									buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
-									if (settings.highlighting) buffer += '</font>';
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>',
+																				"Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
+									} else {
+										buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -914,9 +920,12 @@ var polyglot = module.exports = {
 									if (settings.highlighting) buffer += '</font>'
 									break;
 								case 'mesh':
-									if (settings.highlighting) buffer += '<font color="blue">'
-									buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-									if (settings.highlighting) buffer += '</font>'
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']</font>',
+																				"Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+									} else {
+										buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1078,9 +1087,12 @@ var polyglot = module.exports = {
 									if (settings.highlighting) buffer += '</font>';
 									break;
 								case 'mesh':
-									if (settings.highlighting) buffer += '<font color="blue">'
-									buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
-								if (settings.highlighting) buffer += '</font>';
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font',
+																				"Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
+									} else {
+										buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1181,7 +1193,12 @@ var polyglot = module.exports = {
 									buffer += 'NEAR/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting);
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting),
+																				"Web of Science does not support MeSH terms")
+									} else {
+										buffer += polyglot.tools.quotePhrase(branch, 'wos');
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1332,7 +1349,12 @@ var polyglot = module.exports = {
 									buffer += 'N' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
+																				"Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+									} else {
+										buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1447,7 +1469,12 @@ var polyglot = module.exports = {
 									buffer += 'ADJ' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += polyglot.tools.quotePhrase(branch, 'psycinfo', settings.highlighting);
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'psycinfo', settings.highlighting),
+																				"PsycInfo does not support MeSH terms")
+									} else {
+										buffer +=  polyglot.tools.quotePhrase(branch, 'psycinfo');
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1561,7 +1588,12 @@ var polyglot = module.exports = {
 									buffer += 'W/' + branch.proximity;
 									break;
 								case 'mesh':
-									buffer += 'INDEXTERMS("' + branch.content + '")';
+									if (settings.highlighting) {
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
+																				"Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+									} else {
+										buffer += 'INDEXTERMS("' + branch.content + '")';
+									}
 									break;
 								case 'raw':
 									buffer += branch.content;
@@ -1908,5 +1940,9 @@ var polyglot = module.exports = {
 
 			return tree;
 		},
+
+		createTooltip(content, message) {
+			return '<span class="myTooltip">' + content + '<span class="myTooltiptext">' + message + '</span></span>';
+		}
 	},
 };
