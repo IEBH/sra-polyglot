@@ -63558,56 +63558,64 @@ var __vue_render__$1 = function() {
       "div",
       { staticClass: "accordion panel-group" },
       _vm._l(_vm.engines, function(engine) {
-        return _c("div", { key: engine.id, staticClass: "card" }, [
-          _c(
-            "div",
-            {
-              staticClass: "card-header",
-              on: {
-                click: function($event) {
-                  return _vm.toggleExpandEngine(engine)
+        return _c(
+          "div",
+          { key: engine.id, staticClass: "card", attrs: { id: "customcard" } },
+          [
+            _c(
+              "div",
+              {
+                staticClass: "card-header",
+                on: {
+                  click: function($event) {
+                    return _vm.toggleExpandEngine(engine)
+                  }
                 }
-              }
-            },
-            [
-              _c("a", { staticClass: "accordion-toggle collapsed" }, [
-                _c("i", {
-                  staticClass: "fa fa-fw",
-                  class: engine.expanded
-                    ? "fa-chevron-down"
-                    : "fa-chevron-right"
-                }),
-                _vm._v("\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t")
-              ])
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "card-body collapse",
-              class: _vm.enginesExpanded[engine.id] && "show"
-            },
-            [
-              _vm.enginesQuery[engine.id] &&
-              engine.id != "lexicalTreeJSON" &&
-              engine.id != "mongodb"
-                ? _c("pre", {
-                    domProps: { innerHTML: _vm._s(_vm.enginesQuery[engine.id]) }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
-                ? _c("jsontree", {
-                    attrs: { data: _vm.enginesQuery[engine.id] }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              _c("hr")
-            ],
-            1
-          )
-        ])
+              },
+              [
+                _c("a", { staticClass: "accordion-toggle collapsed" }, [
+                  _c("i", {
+                    staticClass: "fa fa-fw",
+                    class: _vm.enginesExpanded[engine.id]
+                      ? "fa-chevron-down"
+                      : "fa-chevron-right"
+                  }),
+                  _vm._v(
+                    "\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t"
+                  )
+                ])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "card-body collapse",
+                class: _vm.enginesExpanded[engine.id] && "show"
+              },
+              [
+                _vm.enginesQuery[engine.id] &&
+                engine.id != "lexicalTreeJSON" &&
+                engine.id != "mongodb"
+                  ? _c("pre", {
+                      domProps: {
+                        innerHTML: _vm._s(_vm.enginesQuery[engine.id])
+                      }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
+                  ? _c("jsontree", {
+                      attrs: { data: _vm.enginesQuery[engine.id] }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("hr")
+              ],
+              1
+            )
+          ]
+        )
       }),
       0
     )
