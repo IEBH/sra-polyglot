@@ -61047,7 +61047,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           lastGroup = branch;
           branch = branchStack.pop();
           leaf = branch.nodes;
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR))?/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))?/i.exec(q))) {
           // 1-7/OR
           branch.nodes.push({
             type: 'ref',
@@ -61057,7 +61057,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           });
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR|NOT)/i.exec(q))) {
           // 1 AND ...
           branch.nodes.push({
             type: 'ref',
@@ -61068,14 +61068,30 @@ var polyglot_1 = createCommonjsModule(function (module) {
           q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 
           cropString = false;
-        } else if (settings.transposeLines && (match = /^(AND|OR) +([0-9]+)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) {
           // AND 2...
           trimLastLeaf();
-          match[1].toLowerCase() == "and" ? branch.nodes.push({
-            type: 'joinAnd'
-          }) : branch.nodes.push({
-            type: 'joinOr'
-          });
+
+          switch (match[1].toLowerCase()) {
+            case "and":
+              branch.nodes.push({
+                type: 'joinAnd'
+              });
+              break;
+
+            case "or":
+              branch.nodes.push({
+                type: 'joinOr'
+              });
+              break;
+
+            case "not":
+              branch.nodes.push({
+                type: 'joinNot'
+              });
+              break;
+          }
+
           leaf = undefined;
           cropString = false;
           branch.nodes.push({
@@ -63442,14 +63458,34 @@ var script$1 = {
       // Ace editor settings
       Promise.resolve().then(function () { return chrome; });
       window.ace.config.set('modePath', 'syntax/ace');
+    },
+    loadTextFromFile: function loadTextFromFile(ev) {
+      var myFile = ev.target.files[0];
+      var reader = new FileReader();
+
+      var _this = this; // reader.readAsText(myFile);
+
+      /* reader.onload = function() {
+      	console.log(reader.result);
+      	this.query = reader.result
+      } */
+
+
+      reader.onload = function (f) {
+        return function (e) {
+          _this.query = reader.result;
+        };
+      }(myFile);
+
+      reader.readAsText(myFile);
     }
   },
   watch: {
     query: function query() {
-      var _this = this;
+      var _this2 = this;
 
       lodash(polyglot_1.translateAll(this.query, this.polyglotOptions)).forEach(function (query, key) {
-        return _this.$set(_this.enginesQuery, key, query);
+        return _this2.$set(_this2.enginesQuery, key, query);
       });
     }
   }
@@ -63464,6 +63500,14 @@ var __vue_render__$1 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "container" }, [
+    _c("label", { staticClass: "text-reader" }, [
+      _vm._v("\n\t\t\tImport Search From .txt File\n\t\t\t"),
+      _c("input", {
+        attrs: { type: "file" },
+        on: { change: _vm.loadTextFromFile }
+      })
+    ]),
+    _vm._v(" "),
     !_vm.query
       ? _c(
           "div",
