@@ -49,6 +49,23 @@ export default {
 			
 			window.ace.config.set('modePath', 'syntax/ace');
 		},
+		loadTextFromFile(ev) {
+			var myFile = ev.target.files[0];
+			var reader = new FileReader();
+			var _this = this;
+			// reader.readAsText(myFile);
+			/* reader.onload = function() {
+				console.log(reader.result);
+				this.query = reader.result
+			} */
+			reader.onload = (function(f) {
+				return function(e) {
+					_this.query = reader.result
+				};
+			})(myFile);
+
+        	reader.readAsText(myFile);
+		}
 	},
 	watch: {
 		query() {
@@ -61,6 +78,10 @@ export default {
 
 <template>
 	<div class="container">
+		<label class="text-reader">
+			Import Search From .txt File
+			<input type="file" @change="loadTextFromFile">
+  		</label>
 		<div v-if="!query" v-on:click="showExample()" class="alert alert-info text-center">
 			<div class="pull-left font-xl h1">
 				<i class="fa fa-question-circle"></i>
