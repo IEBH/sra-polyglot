@@ -33,6 +33,22 @@ export default {
 		clear() {
 			this.query = '';
 		},
+		copyQuery() {
+			// Create new element
+			var el = document.createElement('textarea');
+			// Set value (string to be copied)
+			el.value = this.query;
+			// Set non-editable to avoid focus and move outside of view
+			el.setAttribute('readonly', '');
+			el.style = {position: 'absolute', left: '-9999px'};
+			document.body.appendChild(el);
+			// Select text inside element
+			el.select();
+			// Copy text to clipboard
+			document.execCommand('copy');
+			// Remove temporary element
+			document.body.removeChild(el);
+		},
 		showExample() {
 			var chosenExample;
 			do {
@@ -63,8 +79,7 @@ export default {
 					_this.query = reader.result
 				};
 			})(myFile);
-
-        	reader.readAsText(myFile);
+			reader.readAsText(myFile);
 		}
 	},
 	watch: {
@@ -78,15 +93,11 @@ export default {
 
 <template>
 	<div class="container">
-		<label class="text-reader">
-			Import Search From .txt File
-			<input type="file" @change="loadTextFromFile">
-  		</label>
 		<div v-if="!query" v-on:click="showExample()" class="alert alert-info text-center">
 			<div class="pull-left font-xl h1">
 				<i class="fa fa-question-circle"></i>
 			</div>
-			Type a PubMed or Ovid MEDLINE query in the box above to see its translations.
+			Type a PubMed or Ovid MEDLINE query in the box below to see its translations.
 			<div class="text-muted">(or click here to see an example)</div>
 		</div>
 
@@ -96,6 +107,7 @@ export default {
 					Your query
 					<div class="pull-right">
 						<a v-on:click="clear()" class="btn btn-sm btn-default"><i class="fa fa-eraser"></i></a>
+						<a v-on:click="copyQuery()" class="btn btn-sm btn-default"><i class="fa fa-clipboard"></i></a>
 						<a v-on:click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" tooltip="Show a random example"></i></a>
 					</div>
 				</div>
@@ -110,10 +122,14 @@ export default {
 						v-bind:options="editorOptions"
 					></editor>
 				</div>
-				
 			</div>
 		</div>
 
+		<label class="text-reader">
+			<span class="select-button">Import Search From .txt File</span>
+			<input type="file" @change="loadTextFromFile">
+  		</label>
+		
 		<hr/>
 
 		<div class="accordion panel-group">
@@ -134,3 +150,31 @@ export default {
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	.text-reader {
+		margin: 20px 0px 0px 0px;
+	}
+	.text-reader > .select-button {
+		padding: .5rem;
+
+		color: #426E7B;
+		background-color: #D3ECF1; 
+
+		border-radius: .3rem;
+
+		text-align: center;
+
+		-webkit-transition-duration: 0.4s; /* Safari */
+  		transition-duration: 0.4s;
+	}
+
+	.text-reader > .select-button:hover {
+		background-color: #426E7B;
+  		color: #D3ECF1;
+	}
+
+	.text-reader > input[type="file"] {
+		display: none;
+	}
+</style>
