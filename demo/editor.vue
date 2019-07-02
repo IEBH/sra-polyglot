@@ -3,10 +3,13 @@ import _ from 'lodash';
 import ace from 'vue2-ace-editor';
 import polyglot from 'polyglot';
 import JsonTree from 'vue-json-tree'
+import VRuntimeTemplate from "v-runtime-template";
 
 export default {
 	data: ()=> ({
 		query: '',
+		customField: '',
+		replaceAll: false,
 		editorOptions: {
 			showPrintMargin: false,
 			wrap: true,
@@ -28,6 +31,7 @@ export default {
 	components: {
 		editor: ace,
 		jsontree: JsonTree,
+		VRuntimeTemplate
 	},
 	methods: {
 		clear() {
@@ -38,6 +42,22 @@ export default {
 			var el = document.createElement('textarea');
 			// Set value (string to be copied)
 			el.value = this.query;
+			// Set non-editable to avoid focus and move outside of view
+			el.setAttribute('readonly', '');
+			el.style = {position: 'absolute', left: '-9999px'};
+			document.body.appendChild(el);
+			// Select text inside element
+			el.select();
+			// Copy text to clipboard
+			document.execCommand('copy');
+			// Remove temporary element
+			document.body.removeChild(el);
+		},
+		copyContent(id) {
+			// Create new element
+			var el = document.createElement('textarea');
+			// Set value (string to be copied)
+			el.value = polyglot.translate(this.query, id, {html: false});
 			// Set non-editable to avoid focus and move outside of view
 			el.setAttribute('readonly', '');
 			el.style = {position: 'absolute', left: '-9999px'};
@@ -69,18 +89,28 @@ export default {
 			var myFile = ev.target.files[0];
 			var reader = new FileReader();
 			var _this = this;
-			// reader.readAsText(myFile);
-			/* reader.onload = function() {
-				console.log(reader.result);
-				this.query = reader.result
-			} */
 			reader.onload = (function(f) {
 				return function(e) {
-					_this.query = reader.result
+					_this.query = reader.result.replace(/\r/g, '')
 				};
 			})(myFile);
 			reader.readAsText(myFile);
-		}
+		},
+		replaceFields(field, replace_all) {
+			if (replace_all) {
+				var itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items
+				for (var x in itemsToReplace) {
+					// If original query is quoted, 2 must be added to offset
+					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2
+					console.log(this.query[itemsToReplace[x]]);
+					if (/(\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === "undefined") {
+						this.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);
+					}
+				}
+			} else {
+				console.log('stub');
+			}
+		},
 	},
 	watch: {
 		query() {
@@ -106,9 +136,9 @@ export default {
 				<div class="card-header">
 					Your query
 					<div class="pull-right">
-						<a v-on:click="clear()" class="btn btn-sm btn-default"><i class="fa fa-eraser"></i></a>
-						<a v-on:click="copyQuery()" class="btn btn-sm btn-default"><i class="fa fa-clipboard"></i></a>
-						<a v-on:click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" tooltip="Show a random example"></i></a>
+						<a v-on:click="clear()" class="btn btn-sm btn-default"><i class="fa fa-eraser" title="Clear search"></i></a>
+						<a v-on:click="copyQuery()" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
+						<a v-on:click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" title="Show a random example"></i></a>
 					</div>
 				</div>
 				<div class="card-body p-0">
@@ -139,9 +169,13 @@ export default {
 						<i class="fa fa-fw" :class="enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
 						{{engine.title}}
 					</a>
+					<div class="pull-right">
+						<a v-if="engine.id != 'lexicalTreeJSON'" v-on:click.stop="copyContent(engine.id)" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
+					</div>
 				</div>
 				<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
-					<pre v-html="enginesQuery[engine.id]" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"></pre>
+					<v-runtime-template class="preview" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" :template="'<div>' + enginesQuery[engine.id] + '</div>'" ></v-runtime-template>
+					<!-- <pre class="preview" v-html="enginesQuery[engine.id]" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"></pre> -->
 					<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
       				<hr>
 					<!-- MongoDB not included at this stage -->

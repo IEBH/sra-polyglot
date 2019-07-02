@@ -53,8 +53,8 @@
     "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
     "gulp-watch": "^5.0.1",
-    "jquery": "^3.3.1",
-    "mocha": "^6.0.2",
+    "jquery": "^3.4.1",
+    "mocha": "^6.1.4",
     "popper.js": "^1.14.7",
     "rimraf": "^2.6.3",
     "rollup": "^0.68.2",
@@ -75,6 +75,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.11",
+    "v-runtime-template": "^1.10.0",
+    "v-tooltip": "^2.0.2",
     "vue-json-tree": "^0.3.3"
   },
   "engines": {

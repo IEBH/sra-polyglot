@@ -19,6 +19,10 @@ var polyglot = module.exports = {
 		'NO_OPTIONAL_WILDCARD': 'There is no optional single character wildcard equievelent, so an unlimited matching length wildcard has been used instead',
 	},
 
+	variables: {
+		no_field_tag: [] // Stores offsets for phrases with no field tags (for replacement)
+	},
+
 	/**
 	* List of templates
 	* Each key is the (case insensitive; specify in lowercase) keyword used in angular brackets
@@ -204,6 +208,8 @@ var polyglot = module.exports = {
 			transposeLines: true,
 		});
 
+		polyglot.no_field_tag = []; // Empty array of offsets each time the query is parsed
+
 		var q = query + ''; // Clone query
 		var tree = {nodes: []}; // Tree is the full parsed tree
 		var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
@@ -278,6 +284,8 @@ var polyglot = module.exports = {
 
 		// Variable to store whether there is user entered line numbering
 		var userLineNumber = false;
+		// Variable to store byte offset of string at current point
+		var offset = 0;
 
 		while (q.length) {
 			var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -293,22 +301,34 @@ var polyglot = module.exports = {
 				lastGroup = branch;
 				branch = branchStack.pop();
 				leaf = branch.nodes;
-			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))?/i.exec(q))) { // 1-7/OR
+			} else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
 				branch.nodes.push({
 					type: 'ref', 
 					ref: _.range(match[1], (match[2]+1)/10), 
 					cond: match[3].toUpperCase(),
 					nodes: []
 				});
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR|NOT)/i.exec(q))) { // 1 AND ...
+			} else if ((settings.transposeLines) && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) { // OR/1-7
+				branch.nodes.push({
+					type: 'ref', 
+					ref: _.range(match[2], (match[3]+1)/10), 
+					cond: match[1].toUpperCase(),
+					nodes: []
+				});
+				offset += match[0].length;
+				q = q.substr(match[0].length);
+				cropString = false;
+			} else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) { // 1 AND ...
 				branch.nodes.push({
 					type: 'ref', 
 					ref: [match[1]],
 					cond: '',
 					nodes: []
 				}); 
+				offset += match[1].length;
 				q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 				cropString = false;
 			} else if ((settings.transposeLines) && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) { // AND 2...
@@ -333,47 +353,55 @@ var polyglot = module.exports = {
 					cond: '',
 					nodes: []
 				}); 
+				offset += match[0].length; 
 				q = q.substr(match[0].length); 
 			} else if ((settings.transposeLines) && (match = /^([0-9]+\.?)\s+/i.exec(q))) { // 1 or 1. (Line number)
 				lineNumber = parseInt(match[1], 10)
 				branch.number = lineNumber
 				branch.isNumbered = true
 				userLineNumber = true
+				offset += match[0].length-1;
 				q = q.substr(match[0].length-1);
 			} 
 			else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinAnd'});
 				leaf = undefined;
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinOr'});
 				leaf = undefined;
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinNot'});
 				leaf = undefined;
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
 				leaf = undefined;
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
 				leaf.type = 'mesh';
 				leaf.recurse = ! match[2];
 				if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
-				branch.nodes.push({type: 'mesh', recurse: true, content: match[1]});
-				q = q.substr(match[0].length);
+			} else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
+				branch.nodes.push({type: 'mesh', recurse: true, content: match[2]});
+				offset += match[1].length;
+				q = q.substr(match[1].length);
 				cropString = false;
 				afterWhitespace = true;
 			} else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) { // Mesh term - Ovid syntax (non-exploded)
@@ -381,15 +409,18 @@ var polyglot = module.exports = {
 				leaf.recurse = false;
 			} else if (match = /^<(.*?)>/.exec(q)) {
 				branch.nodes.push({type: 'template', content: match[1].toLowerCase()});
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^(\n+)/.exec(q)) {
+			} else if (match = /^(\n|\r)+/.exec(q)) {
 				if (settings.preserveNewlines) {
-					branch.nodes.push({type: 'raw', content: match[0]});
+					var number_newline = match[0].length
+					branch.nodes.push({type: 'raw', content: '\n'.repeat(number_newline)});
 					leaf = undefined;
 				}
 				lineNumber += match[0].length;
 				newLine(lineNumber);
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 				afterWhitespace = true;
@@ -442,6 +473,7 @@ var polyglot = module.exports = {
 						useLeaf.recurse = true;
 						break;
 				}
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
@@ -477,12 +509,14 @@ var polyglot = module.exports = {
 						useLeaf.field = 'publicationType';
 						break;
 				}
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} else if (match = /^#([^\)\n]+)/.exec(q)) {
 				trimLastLeaf();
 				branch.nodes.push({type: 'comment', content: match[1]});
 				leaf = undefined;
+				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
 			} 
@@ -490,17 +524,19 @@ var polyglot = module.exports = {
 				var nextChar = q.substr(0, 1);
 				if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
 					if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
-						leaf = {type: 'phrase', content: match[1]};
+						leaf = {type: 'phrase', content: match[1], offset: offset};
 						branch.nodes.push(leaf);
+						offset += match[0].length;
 						q = q.substr(match[0].length);
 						cropString = false;
 					} else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
-						leaf = {type: 'phrase', content: match[0]};
+						leaf = {type: 'phrase', content: match[0], offset: offset};
 						branch.nodes.push(leaf);
+						offset += match[0].length;
 						q = q.substr(match[0].length);
 						cropString = false;
 					} else { // All other first chars - just dump into a buffer and let it fill slowly
-						leaf = {type: 'phrase', content: nextChar};
+						leaf = {type: 'phrase', content: nextChar, offset: offset};
 						branch.nodes.push(leaf);
 					}
 				} else if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -510,7 +546,10 @@ var polyglot = module.exports = {
 				afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
 			}
 
-			if (cropString) q = q.substr(1); // Crop 1 character
+			if (cropString) {
+				offset += 1; // Increment offset by 1
+				q = q.substr(1); // Crop 1 character
+			}
 		}
 
 		if (settings.transposeLines) {
@@ -628,7 +667,15 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
-										buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+										// If no field tag exists create popover with ability to replace field tag
+										if (polyglot.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {
+											polyglot.no_field_tag.push(branch.offset + branch.content.length);
+										}
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting));
+										} else {
+											buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+										}
 									}
 									break;
 								case 'joinNear':
@@ -1098,7 +1145,7 @@ var polyglot = module.exports = {
 									break;
 								case 'mesh':
 									if (settings.highlighting) {
-										buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font',
+										buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>',
 																				"Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
 									} else {
 										buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
@@ -1658,114 +1705,113 @@ var polyglot = module.exports = {
 		},
 		// }}}
 		// MongoDB {{{
-		mongodb: {
-			id: 'mongodb',
-			title: 'MongoDB Query Format',
-			aliases: ['mongo'],
-			debugging: true, // Mark this module for debugging only
+		// mongodb: {
+		// 	id: 'mongodb',
+		// 	title: 'MongoDB Query Format',
+		// 	aliases: ['mongo'],
+		// 	debugging: true, // Mark this module for debugging only
 
-			/**
-			* Compile a tree structure to a MongoDB query
-			* @param {array} tree The parsed tree to process
-			* @param {Object} [options] Optional options to use when compiling
-			* @return {Object} The compiled MongoDB query output
-			*/
-			compile: (tree, options) => {
-				var settings = _.defaults(options, {
-					replaceWildcards: true,
-					translatePhraseField: t => ({'title': t}),
-					meshField: 'mesh',
-					translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
-				});
+		// 	/**
+		// 	* Compile a tree structure to a MongoDB query
+		// 	* @param {array} tree The parsed tree to process
+		// 	* @param {Object} [options] Optional options to use when compiling
+		// 	* @return {Object} The compiled MongoDB query output
+		// 	*/
+		// 	compile: (tree, options) => {
+		// 		var settings = _.defaults(options, {
+		// 			replaceWildcards: true,
+		// 			translatePhraseField: t => ({'title': t}),
+		// 			meshField: 'mesh',
+		// 			translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
+		// 		});
 
-				// Apply wildcard replacements
-				if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-					{subject: /[\?\$]/g, value: '*'},
-				]);
+		// 		// Apply wildcard replacements
+		// 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+		// 			{subject: /[\?\$]/g, value: '*'},
+		// 		]);
 
-				var compileWalker = tree =>
-					_(tree)
-						.map((branch, branchIndex) => {
-							var buffer = {};
-							switch (branch.type) {
-								case 'line':
-									buffer += compileWalker(branch.nodes);
-									break;
-								case 'group':
-									if (branch.field && branch.field == 'title+abstract') {
-										// FIXME: Not yet properly supported
-										buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
-									} else if (branch.field) {
-										buffer[branch.field] = compileWalker(branch.nodes);
-									} else {
-										buffer = settings.translatePhraseField(compileWalker(branch.nodes));
-									}
-									break;
-								case 'ref':
-									var node;
-									for (node in branch.nodes) {
-										if (node == 0) {
-											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-										} else {
-											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-										}	
-									}
-									break;
-								case 'phrase':
-									if (branch.field && branch.field == 'title+abstract') {
-										buffer = settings.translateTitleAbstract(branch.content);
-									} else if (branch.field) {
-										buffer[branch.field] = branch.content;
-									} else {
-										buffer = settings.translatePhraseField(branch.content);
-									}
-									break;
-								case 'joinNear':
-								case 'joinAnd':
-									buffer = {$and: []};
-									break;
-								case 'joinOr':
-									buffer = {$or: []};
-									break;
-								case 'joinNot':
-									buffer = {$not: {}};
-									break;
-								case 'mesh':
-									// FIXME: No ability to recurse
-									buffer[settings.meshField] = {$in: [branch.content]};
-									break;
-								case 'raw':
-									// Do nothing
-									break;
-								case 'template':
-									buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
-									break;
-								case 'comment':
-									// Do nothing
-									break;
-								default:
-									throw new Error('Unsupported object tree type: ' + branch.type);
-							}
+		// 		var compileWalker = tree =>
+		// 			_(tree)
+		// 				.map((branch, branchIndex) => {
+		// 					var buffer = {};
+		// 					switch (branch.type) {
+		// 						case 'line':
+		// 							buffer += compileWalker(branch.nodes);
+		// 							break;
+		// 						case 'group':
+		// 							if (branch.field && branch.field == 'title+abstract') {
+		// 								// FIXME: Not yet properly supported
+		// 								buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+		// 							} else if (branch.field) {
+		// 								buffer[branch.field] = compileWalker(branch.nodes);
+		// 							} else {
+		// 								buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+		// 							}
+		// 							break;
+		// 						case 'ref':
+		// 							var node;
+		// 							for (node in branch.nodes) {
+		// 								if (node == 0) {
+		// 									buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+		// 								} else {
+		// 									buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+		// 								}	
+		// 							}
+		// 							break;
+		// 						case 'phrase':
+		// 							if (branch.field && branch.field == 'title+abstract') {
+		// 								buffer = settings.translateTitleAbstract(branch.content);
+		// 							} else if (branch.field) {
+		// 								buffer[branch.field] = branch.content;
+		// 							} else {
+		// 								buffer = settings.translatePhraseField(branch.content);
+		// 							}
+		// 							break;
+		// 						case 'joinNear':
+		// 						case 'joinAnd':
+		// 							buffer = {$and: []};
+		// 							break;
+		// 						case 'joinOr':
+		// 							buffer = {$or: []};
+		// 							break;
+		// 						case 'joinNot':
+		// 							buffer = {$not: {}};
+		// 							break;
+		// 						case 'mesh':
+		// 							// FIXME: No ability to recurse
+		// 							buffer[settings.meshField] = {$in: [branch.content]};
+		// 							break;
+		// 						case 'raw':
+		// 							// Do nothing
+		// 							break;
+		// 						case 'template':
+		// 							buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
+		// 							break;
+		// 						case 'comment':
+		// 							// Do nothing
+		// 							break;
+		// 						default:
+		// 							throw new Error('Unsupported object tree type: ' + branch.type);
+		// 					}
 
-							return buffer;
-						})
-						// Renest + combine $or/$and conditions {{{
-						/* NOTE: Highly experimental - causes bugs under some circumstances
-						.thru(tree => polyglot.tools.renestConditions(tree))
-						.thru(tree => polyglot.tools.combineConditions(tree))
-						*/
-						// }}}
-						// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-						.thru(tree => {
-							if (_.isArray(tree) && tree.length == 1) tree = tree[0];
-							return tree;
-						})
-						// }}}
-						.value();
+		// 					return buffer;
+		// 				})
+		// 				// Renest + combine $or/$and conditions {{{
+		// 				// NOTE: Highly experimental - causes bugs under some circumstances
+		// 				// .thru(tree => polyglot.tools.renestConditions(tree))
+		// 				// .thru(tree => polyglot.tools.combineConditions(tree))
+		// 				// }}}
+		// 				// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+		// 				.thru(tree => {
+		// 					if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+		// 					return tree;
+		// 				})
+		// 				// }}}
+		// 				.value();
 
-				return compileWalker(tree);
-			},
-		},
+		// 		return compileWalker(tree);
+		// 	},
+		// },
 		// }}}
 	},
 
@@ -1951,8 +1997,33 @@ var polyglot = module.exports = {
 			return tree;
 		},
 
+		/**
+		* Create a tooltip with a specified message
+		* @param {string} content Content to append tooltip to
+		* @param {string} message Message to contain inside tooltip
+		*/
 		createTooltip(content, message) {
-			return '<span class="myTooltip">' + content + '<span class="myTooltiptext">' + message + '</span></span>';
-		}
+			return `<span class="black-underline" v-tooltip="'` + message + `'">`
+					+ content 
+					+ '</span>'
+		},
+
+		/**
+		* Create a popover with options to replace empty field tags with specified field tag
+		* @param {string} content Content to append popover to
+		*/
+		createPopover(content) {
+			return '<v-popover offset="8" placement="right">'
+					+ '<span class="blue-underline">' + content + '</span>'
+					+ '<template slot="popover">'
+					+ '<h3 class="popover-header">Add Field Tag</h3>'
+					+ '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />'
+					+ '<input type="checkbox" id="checkbox" v-model="replaceAll">'
+					+ '<label for="checkbox">Replace All</label>'
+					+ '<button v-on:click="replaceFields(customField, replaceAll)" type="button" class="btn btn-primary">Replace</button>'
+					+ '<button v-close-popover type="button" class="btn btn-dark">Close</button>'
+					+ '</template>'
+					+ '</v-popover>';
+		},
 	},
 };

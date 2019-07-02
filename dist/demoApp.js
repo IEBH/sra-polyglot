@@ -12,7 +12,7 @@ function getCjsExportFromNamespace (n) {
 
 var jquery = createCommonjsModule(function (module) {
 /*!
- * jQuery JavaScript Library v3.3.1
+ * jQuery JavaScript Library v3.4.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -22,7 +22,7 @@ var jquery = createCommonjsModule(function (module) {
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2018-01-20T17:24Z
+ * Date: 2019-05-01T21:04Z
  */
 ( function( global, factory ) {
 
@@ -94,20 +94,33 @@ var isWindow = function isWindow( obj ) {
 	var preservedScriptAttributes = {
 		type: true,
 		src: true,
+		nonce: true,
 		noModule: true
 	};
 
-	function DOMEval( code, doc, node ) {
+	function DOMEval( code, node, doc ) {
 		doc = doc || document;
 
-		var i,
+		var i, val,
 			script = doc.createElement( "script" );
 
 		script.text = code;
 		if ( node ) {
 			for ( i in preservedScriptAttributes ) {
-				if ( node[ i ] ) {
-					script[ i ] = node[ i ];
+
+				// Support: Firefox 64+, Edge 18+
+				// Some browsers don't support the "nonce" property on scripts.
+				// On the other hand, just using `getAttribute` is not enough as
+				// the `nonce` attribute is reset to an empty string whenever it
+				// becomes browsing-context connected.
+				// See https://github.com/whatwg/html/issues/2369
+				// See https://html.spec.whatwg.org/#nonce-attributes
+				// The `node.getAttribute` check was added for the sake of
+				// `jQuery.globalEval` so that it can fake a nonce-containing node
+				// via an object.
+				val = node[ i ] || node.getAttribute && node.getAttribute( i );
+				if ( val ) {
+					script.setAttribute( i, val );
 				}
 			}
 		}
@@ -132,7 +145,7 @@ function toType( obj ) {
 
 
 var
-	version = "3.3.1",
+	version = "3.4.1",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -261,25 +274,28 @@ jQuery.extend = jQuery.fn.extend = function() {
 
 			// Extend the base object
 			for ( name in options ) {
-				src = target[ name ];
 				copy = options[ name ];
 
+				// Prevent Object.prototype pollution
 				// Prevent never-ending loop
-				if ( target === copy ) {
+				if ( name === "__proto__" || target === copy ) {
 					continue;
 				}
 
 				// Recurse if we're merging plain objects or arrays
 				if ( deep && copy && ( jQuery.isPlainObject( copy ) ||
 					( copyIsArray = Array.isArray( copy ) ) ) ) {
+					src = target[ name ];
 
-					if ( copyIsArray ) {
-						copyIsArray = false;
-						clone = src && Array.isArray( src ) ? src : [];
-
+					// Ensure proper type for the source value
+					if ( copyIsArray && !Array.isArray( src ) ) {
+						clone = [];
+					} else if ( !copyIsArray && !jQuery.isPlainObject( src ) ) {
+						clone = {};
 					} else {
-						clone = src && jQuery.isPlainObject( src ) ? src : {};
+						clone = src;
 					}
+					copyIsArray = false;
 
 					// Never move original objects, clone them
 					target[ name ] = jQuery.extend( deep, clone, copy );
@@ -332,9 +348,6 @@ jQuery.extend( {
 	},
 
 	isEmptyObject: function( obj ) {
-
-		/* eslint-disable no-unused-vars */
-		// See https://github.com/eslint/eslint/issues/6125
 		var name;
 
 		for ( name in obj ) {
@@ -344,8 +357,8 @@ jQuery.extend( {
 	},
 
 	// Evaluates a script in a global context
-	globalEval: function( code ) {
-		DOMEval( code );
+	globalEval: function( code, options ) {
+		DOMEval( code, { nonce: options && options.nonce } );
 	},
 
 	each: function( obj, callback ) {
@@ -501,14 +514,14 @@ function isArrayLike( obj ) {
 }
 var Sizzle =
 /*!
- * Sizzle CSS Selector Engine v2.3.3
+ * Sizzle CSS Selector Engine v2.3.4
  * https://sizzlejs.com/
  *
- * Copyright jQuery Foundation and other contributors
+ * Copyright JS Foundation and other contributors
  * Released under the MIT license
- * http://jquery.org/license
+ * https://js.foundation/
  *
- * Date: 2016-08-08
+ * Date: 2019-04-08
  */
 (function( window ) {
 
@@ -542,6 +555,7 @@ var i,
 	classCache = createCache(),
 	tokenCache = createCache(),
 	compilerCache = createCache(),
+	nonnativeSelectorCache = createCache(),
 	sortOrder = function( a, b ) {
 		if ( a === b ) {
 			hasDuplicate = true;
@@ -603,8 +617,7 @@ var i,
 
 	rcomma = new RegExp( "^" + whitespace + "*," + whitespace + "*" ),
 	rcombinators = new RegExp( "^" + whitespace + "*([>+~]|" + whitespace + ")" + whitespace + "*" ),
-
-	rattributeQuotes = new RegExp( "=" + whitespace + "*([^\\]'\"]*?)" + whitespace + "*\\]", "g" ),
+	rdescend = new RegExp( whitespace + "|>" ),
 
 	rpseudo = new RegExp( pseudos ),
 	ridentifier = new RegExp( "^" + identifier + "$" ),
@@ -625,6 +638,7 @@ var i,
 			whitespace + "*((?:-\\d)?\\d*)" + whitespace + "*\\)|)(?=[^-]|$)", "i" )
 	},
 
+	rhtml = /HTML$/i,
 	rinputs = /^(?:input|select|textarea|button)$/i,
 	rheader = /^h\d$/i,
 
@@ -679,9 +693,9 @@ var i,
 		setDocument();
 	},
 
-	disabledAncestor = addCombinator(
+	inDisabledFieldset = addCombinator(
 		function( elem ) {
-			return elem.disabled === true && ("form" in elem || "label" in elem);
+			return elem.disabled === true && elem.nodeName.toLowerCase() === "fieldset";
 		},
 		{ dir: "parentNode", next: "legend" }
 	);
@@ -794,18 +808,22 @@ function Sizzle( selector, context, results, seed ) {
 
 			// Take advantage of querySelectorAll
 			if ( support.qsa &&
-				!compilerCache[ selector + " " ] &&
-				(!rbuggyQSA || !rbuggyQSA.test( selector )) ) {
+				!nonnativeSelectorCache[ selector + " " ] &&
+				(!rbuggyQSA || !rbuggyQSA.test( selector )) &&
 
-				if ( nodeType !== 1 ) {
-					newContext = context;
-					newSelector = selector;
-
-				// qSA looks outside Element context, which is not what we want
-				// Thanks to Andrew Dupont for this workaround technique
-				// Support: IE <=8
+				// Support: IE 8 only
 				// Exclude object elements
-				} else if ( context.nodeName.toLowerCase() !== "object" ) {
+				(nodeType !== 1 || context.nodeName.toLowerCase() !== "object") ) {
+
+				newSelector = selector;
+				newContext = context;
+
+				// qSA considers elements outside a scoping root when evaluating child or
+				// descendant combinators, which is not what we want.
+				// In such cases, we work around the behavior by prefixing every selector in the
+				// list with an ID selector referencing the scope context.
+				// Thanks to Andrew Dupont for this technique.
+				if ( nodeType === 1 && rdescend.test( selector ) ) {
 
 					// Capture the context ID, setting it first if necessary
 					if ( (nid = context.getAttribute( "id" )) ) {
@@ -827,17 +845,16 @@ function Sizzle( selector, context, results, seed ) {
 						context;
 				}
 
-				if ( newSelector ) {
-					try {
-						push.apply( results,
-							newContext.querySelectorAll( newSelector )
-						);
-						return results;
-					} catch ( qsaError ) {
-					} finally {
-						if ( nid === expando ) {
-							context.removeAttribute( "id" );
-						}
+				try {
+					push.apply( results,
+						newContext.querySelectorAll( newSelector )
+					);
+					return results;
+				} catch ( qsaError ) {
+					nonnativeSelectorCache( selector, true );
+				} finally {
+					if ( nid === expando ) {
+						context.removeAttribute( "id" );
 					}
 				}
 			}
@@ -1001,7 +1018,7 @@ function createDisabledPseudo( disabled ) {
 					// Where there is no isDisabled, check manually
 					/* jshint -W018 */
 					elem.isDisabled !== !disabled &&
-						disabledAncestor( elem ) === disabled;
+						inDisabledFieldset( elem ) === disabled;
 			}
 
 			return elem.disabled === disabled;
@@ -1058,10 +1075,13 @@ support = Sizzle.support = {};
  * @returns {Boolean} True iff elem is a non-HTML XML node
  */
 isXML = Sizzle.isXML = function( elem ) {
-	// documentElement is verified for cases where it doesn't yet exist
-	// (such as loading iframes in IE - #4833)
-	var documentElement = elem && (elem.ownerDocument || elem).documentElement;
-	return documentElement ? documentElement.nodeName !== "HTML" : false;
+	var namespace = elem.namespaceURI,
+		docElem = (elem.ownerDocument || elem).documentElement;
+
+	// Support: IE <=8
+	// Assume HTML when documentElement doesn't yet exist, such as inside loading iframes
+	// https://bugs.jquery.com/ticket/4833
+	return !rhtml.test( namespace || docElem && docElem.nodeName || "HTML" );
 };
 
 /**
@@ -1483,11 +1503,8 @@ Sizzle.matchesSelector = function( elem, expr ) {
 		setDocument( elem );
 	}
 
-	// Make sure that attribute selectors are quoted
-	expr = expr.replace( rattributeQuotes, "='$1']" );
-
 	if ( support.matchesSelector && documentIsHTML &&
-		!compilerCache[ expr + " " ] &&
+		!nonnativeSelectorCache[ expr + " " ] &&
 		( !rbuggyMatches || !rbuggyMatches.test( expr ) ) &&
 		( !rbuggyQSA     || !rbuggyQSA.test( expr ) ) ) {
 
@@ -1501,7 +1518,9 @@ Sizzle.matchesSelector = function( elem, expr ) {
 					elem.document && elem.document.nodeType !== 11 ) {
 				return ret;
 			}
-		} catch (e) {}
+		} catch (e) {
+			nonnativeSelectorCache( expr, true );
+		}
 	}
 
 	return Sizzle( expr, document, null, [ elem ] ).length > 0;
@@ -1960,7 +1979,7 @@ Expr = Sizzle.selectors = {
 		"contains": markFunction(function( text ) {
 			text = text.replace( runescape, funescape );
 			return function( elem ) {
-				return ( elem.textContent || elem.innerText || getText( elem ) ).indexOf( text ) > -1;
+				return ( elem.textContent || getText( elem ) ).indexOf( text ) > -1;
 			};
 		}),
 
@@ -2099,7 +2118,11 @@ Expr = Sizzle.selectors = {
 		}),
 
 		"lt": createPositionalPseudo(function( matchIndexes, length, argument ) {
-			var i = argument < 0 ? argument + length : argument;
+			var i = argument < 0 ?
+				argument + length :
+				argument > length ?
+					length :
+					argument;
 			for ( ; --i >= 0; ) {
 				matchIndexes.push( i );
 			}
@@ -3148,18 +3171,18 @@ jQuery.each( {
 		return siblings( elem.firstChild );
 	},
 	contents: function( elem ) {
-        if ( nodeName( elem, "iframe" ) ) {
-            return elem.contentDocument;
-        }
+		if ( typeof elem.contentDocument !== "undefined" ) {
+			return elem.contentDocument;
+		}
 
-        // Support: IE 9 - 11 only, iOS 7 only, Android Browser <=4.3 only
-        // Treat the template element as a regular one in browsers that
-        // don't support it.
-        if ( nodeName( elem, "template" ) ) {
-            elem = elem.content || elem;
-        }
+		// Support: IE 9 - 11 only, iOS 7 only, Android Browser <=4.3 only
+		// Treat the template element as a regular one in browsers that
+		// don't support it.
+		if ( nodeName( elem, "template" ) ) {
+			elem = elem.content || elem;
+		}
 
-        return jQuery.merge( [], elem.childNodes );
+		return jQuery.merge( [], elem.childNodes );
 	}
 }, function( name, fn ) {
 	jQuery.fn[ name ] = function( until, selector ) {
@@ -4468,6 +4491,26 @@ var rcssNum = new RegExp( "^(?:([+-])=|)(" + pnum + ")([a-z%]*)$", "i" );
 
 var cssExpand = [ "Top", "Right", "Bottom", "Left" ];
 
+var documentElement = document.documentElement;
+
+
+
+	var isAttached = function( elem ) {
+			return jQuery.contains( elem.ownerDocument, elem );
+		},
+		composed = { composed: true };
+
+	// Support: IE 9 - 11+, Edge 12 - 18+, iOS 10.0 - 10.2 only
+	// Check attachment across shadow DOM boundaries when possible (gh-3504)
+	// Support: iOS 10.0-10.2 only
+	// Early iOS 10 versions support `attachShadow` but not `getRootNode`,
+	// leading to errors. We need to check for `getRootNode`.
+	if ( documentElement.getRootNode ) {
+		isAttached = function( elem ) {
+			return jQuery.contains( elem.ownerDocument, elem ) ||
+				elem.getRootNode( composed ) === elem.ownerDocument;
+		};
+	}
 var isHiddenWithinTree = function( elem, el ) {
 
 		// isHiddenWithinTree might be called from jQuery#filter function;
@@ -4482,7 +4525,7 @@ var isHiddenWithinTree = function( elem, el ) {
 			// Support: Firefox <=43 - 45
 			// Disconnected elements can have computed display: none, so first confirm that elem is
 			// in the document.
-			jQuery.contains( elem.ownerDocument, elem ) &&
+			isAttached( elem ) &&
 
 			jQuery.css( elem, "display" ) === "none";
 	};
@@ -4524,7 +4567,8 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 		unit = valueParts && valueParts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
 
 		// Starting value computation is required for potential unit mismatches
-		initialInUnit = ( jQuery.cssNumber[ prop ] || unit !== "px" && +initial ) &&
+		initialInUnit = elem.nodeType &&
+			( jQuery.cssNumber[ prop ] || unit !== "px" && +initial ) &&
 			rcssNum.exec( jQuery.css( elem, prop ) );
 
 	if ( initialInUnit && initialInUnit[ 3 ] !== unit ) {
@@ -4671,7 +4715,7 @@ jQuery.fn.extend( {
 } );
 var rcheckableType = ( /^(?:checkbox|radio)$/i );
 
-var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]+)/i );
+var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]*)/i );
 
 var rscriptType = ( /^$|^module$|\/(?:java|ecma)script/i );
 
@@ -4743,7 +4787,7 @@ function setGlobalEval( elems, refElements ) {
 var rhtml = /<|&#?\w+;/;
 
 function buildFragment( elems, context, scripts, selection, ignored ) {
-	var elem, tmp, tag, wrap, contains, j,
+	var elem, tmp, tag, wrap, attached, j,
 		fragment = context.createDocumentFragment(),
 		nodes = [],
 		i = 0,
@@ -4807,13 +4851,13 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 			continue;
 		}
 
-		contains = jQuery.contains( elem.ownerDocument, elem );
+		attached = isAttached( elem );
 
 		// Append to fragment
 		tmp = getAll( fragment.appendChild( elem ), "script" );
 
 		// Preserve script evaluation history
-		if ( contains ) {
+		if ( attached ) {
 			setGlobalEval( tmp );
 		}
 
@@ -4856,8 +4900,6 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 	div.innerHTML = "<textarea>x</textarea>";
 	support.noCloneChecked = !!div.cloneNode( true ).lastChild.defaultValue;
 } )();
-var documentElement = document.documentElement;
-
 
 
 var
@@ -4873,8 +4915,19 @@ function returnFalse() {
 	return false;
 }
 
+// Support: IE <=9 - 11+
+// focus() and blur() are asynchronous, except when they are no-op.
+// So expect focus to be synchronous when the element is already active,
+// and blur to be synchronous when the element is not already active.
+// (focus and blur are always synchronous in other supported browsers,
+// this just defines when we can count on it).
+function expectSync( elem, type ) {
+	return ( elem === safeActiveElement() ) === ( type === "focus" );
+}
+
 // Support: IE <=9 only
-// See #13393 for more info
+// Accessing document.activeElement can throw unexpectedly
+// https://bugs.jquery.com/ticket/13393
 function safeActiveElement() {
 	try {
 		return document.activeElement;
@@ -5174,9 +5227,10 @@ jQuery.event = {
 			while ( ( handleObj = matched.handlers[ j++ ] ) &&
 				!event.isImmediatePropagationStopped() ) {
 
-				// Triggered event must either 1) have no namespace, or 2) have namespace(s)
-				// a subset or equal to those in the bound event (both can have no namespace).
-				if ( !event.rnamespace || event.rnamespace.test( handleObj.namespace ) ) {
+				// If the event is namespaced, then each handler is only invoked if it is
+				// specially universal or its namespaces are a superset of the event's.
+				if ( !event.rnamespace || handleObj.namespace === false ||
+					event.rnamespace.test( handleObj.namespace ) ) {
 
 					event.handleObj = handleObj;
 					event.data = handleObj.data;
@@ -5300,39 +5354,51 @@ jQuery.event = {
 			// Prevent triggered image.load events from bubbling to window.load
 			noBubble: true
 		},
-		focus: {
-
-			// Fire native event if possible so blur/focus sequence is correct
-			trigger: function() {
-				if ( this !== safeActiveElement() && this.focus ) {
-					this.focus();
-					return false;
-				}
-			},
-			delegateType: "focusin"
-		},
-		blur: {
-			trigger: function() {
-				if ( this === safeActiveElement() && this.blur ) {
-					this.blur();
-					return false;
-				}
-			},
-			delegateType: "focusout"
-		},
 		click: {
 
-			// For checkbox, fire native event so checked state will be right
-			trigger: function() {
-				if ( this.type === "checkbox" && this.click && nodeName( this, "input" ) ) {
-					this.click();
-					return false;
+			// Utilize native event to ensure correct state for checkable inputs
+			setup: function( data ) {
+
+				// For mutual compressibility with _default, replace `this` access with a local var.
+				// `|| data` is dead code meant only to preserve the variable through minification.
+				var el = this || data;
+
+				// Claim the first handler
+				if ( rcheckableType.test( el.type ) &&
+					el.click && nodeName( el, "input" ) ) {
+
+					// dataPriv.set( el, "click", ... )
+					leverageNative( el, "click", returnTrue );
 				}
+
+				// Return false to allow normal processing in the caller
+				return false;
+			},
+			trigger: function( data ) {
+
+				// For mutual compressibility with _default, replace `this` access with a local var.
+				// `|| data` is dead code meant only to preserve the variable through minification.
+				var el = this || data;
+
+				// Force setup before triggering a click
+				if ( rcheckableType.test( el.type ) &&
+					el.click && nodeName( el, "input" ) ) {
+
+					leverageNative( el, "click" );
+				}
+
+				// Return non-false to allow normal event-path propagation
+				return true;
 			},
 
-			// For cross-browser consistency, don't fire native .click() on links
+			// For cross-browser consistency, suppress native .click() on links
+			// Also prevent it if we're currently inside a leveraged native-event stack
 			_default: function( event ) {
-				return nodeName( event.target, "a" );
+				var target = event.target;
+				return rcheckableType.test( target.type ) &&
+					target.click && nodeName( target, "input" ) &&
+					dataPriv.get( target, "click" ) ||
+					nodeName( target, "a" );
 			}
 		},
 
@@ -5348,6 +5414,93 @@ jQuery.event = {
 		}
 	}
 };
+
+// Ensure the presence of an event listener that handles manually-triggered
+// synthetic events by interrupting progress until reinvoked in response to
+// *native* events that it fires directly, ensuring that state changes have
+// already occurred before other listeners are invoked.
+function leverageNative( el, type, expectSync ) {
+
+	// Missing expectSync indicates a trigger call, which must force setup through jQuery.event.add
+	if ( !expectSync ) {
+		if ( dataPriv.get( el, type ) === undefined ) {
+			jQuery.event.add( el, type, returnTrue );
+		}
+		return;
+	}
+
+	// Register the controller as a special universal handler for all event namespaces
+	dataPriv.set( el, type, false );
+	jQuery.event.add( el, type, {
+		namespace: false,
+		handler: function( event ) {
+			var notAsync, result,
+				saved = dataPriv.get( this, type );
+
+			if ( ( event.isTrigger & 1 ) && this[ type ] ) {
+
+				// Interrupt processing of the outer synthetic .trigger()ed event
+				// Saved data should be false in such cases, but might be a leftover capture object
+				// from an async native handler (gh-4350)
+				if ( !saved.length ) {
+
+					// Store arguments for use when handling the inner native event
+					// There will always be at least one argument (an event object), so this array
+					// will not be confused with a leftover capture object.
+					saved = slice.call( arguments );
+					dataPriv.set( this, type, saved );
+
+					// Trigger the native event and capture its result
+					// Support: IE <=9 - 11+
+					// focus() and blur() are asynchronous
+					notAsync = expectSync( this, type );
+					this[ type ]();
+					result = dataPriv.get( this, type );
+					if ( saved !== result || notAsync ) {
+						dataPriv.set( this, type, false );
+					} else {
+						result = {};
+					}
+					if ( saved !== result ) {
+
+						// Cancel the outer synthetic event
+						event.stopImmediatePropagation();
+						event.preventDefault();
+						return result.value;
+					}
+
+				// If this is an inner synthetic event for an event with a bubbling surrogate
+				// (focus or blur), assume that the surrogate already propagated from triggering the
+				// native event and prevent that from happening again here.
+				// This technically gets the ordering wrong w.r.t. to `.trigger()` (in which the
+				// bubbling surrogate propagates *after* the non-bubbling base), but that seems
+				// less bad than duplication.
+				} else if ( ( jQuery.event.special[ type ] || {} ).delegateType ) {
+					event.stopPropagation();
+				}
+
+			// If this is a native event triggered above, everything is now in order
+			// Fire an inner synthetic event with the original arguments
+			} else if ( saved.length ) {
+
+				// ...and capture the result
+				dataPriv.set( this, type, {
+					value: jQuery.event.trigger(
+
+						// Support: IE <=9 - 11+
+						// Extend with the prototype to reset the above stopImmediatePropagation()
+						jQuery.extend( saved[ 0 ], jQuery.Event.prototype ),
+						saved.slice( 1 ),
+						this
+					)
+				} );
+
+				// Abort handling of the native event
+				event.stopImmediatePropagation();
+			}
+		}
+	} );
+}
 
 jQuery.removeEvent = function( elem, type, handle ) {
 
@@ -5461,6 +5614,7 @@ jQuery.each( {
 	shiftKey: true,
 	view: true,
 	"char": true,
+	code: true,
 	charCode: true,
 	key: true,
 	keyCode: true,
@@ -5506,6 +5660,33 @@ jQuery.each( {
 		return event.which;
 	}
 }, jQuery.event.addProp );
+
+jQuery.each( { focus: "focusin", blur: "focusout" }, function( type, delegateType ) {
+	jQuery.event.special[ type ] = {
+
+		// Utilize native event if possible so blur/focus sequence is correct
+		setup: function() {
+
+			// Claim the first handler
+			// dataPriv.set( this, "focus", ... )
+			// dataPriv.set( this, "blur", ... )
+			leverageNative( this, type, expectSync );
+
+			// Return false to allow normal processing in the caller
+			return false;
+		},
+		trigger: function() {
+
+			// Force setup before trigger
+			leverageNative( this, type );
+
+			// Return non-false to allow normal event-path propagation
+			return true;
+		},
+
+		delegateType: delegateType
+	};
+} );
 
 // Create mouseenter/leave events using mouseover/out and event-time checks
 // so that event delegation works in jQuery.
@@ -5757,11 +5938,13 @@ function domManip( collection, args, callback, ignored ) {
 						if ( node.src && ( node.type || "" ).toLowerCase()  !== "module" ) {
 
 							// Optional AJAX dependency, but won't run scripts if not present
-							if ( jQuery._evalUrl ) {
-								jQuery._evalUrl( node.src );
+							if ( jQuery._evalUrl && !node.noModule ) {
+								jQuery._evalUrl( node.src, {
+									nonce: node.nonce || node.getAttribute( "nonce" )
+								} );
 							}
 						} else {
-							DOMEval( node.textContent.replace( rcleanScript, "" ), doc, node );
+							DOMEval( node.textContent.replace( rcleanScript, "" ), node, doc );
 						}
 					}
 				}
@@ -5783,7 +5966,7 @@ function remove( elem, selector, keepData ) {
 		}
 
 		if ( node.parentNode ) {
-			if ( keepData && jQuery.contains( node.ownerDocument, node ) ) {
+			if ( keepData && isAttached( node ) ) {
 				setGlobalEval( getAll( node, "script" ) );
 			}
 			node.parentNode.removeChild( node );
@@ -5801,7 +5984,7 @@ jQuery.extend( {
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
 		var i, l, srcElements, destElements,
 			clone = elem.cloneNode( true ),
-			inPage = jQuery.contains( elem.ownerDocument, elem );
+			inPage = isAttached( elem );
 
 		// Fix IE cloning issues
 		if ( !support.noCloneChecked && ( elem.nodeType === 1 || elem.nodeType === 11 ) &&
@@ -6097,8 +6280,10 @@ var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
 
 		// Support: IE 9 only
 		// Detect overflow:scroll screwiness (gh-3699)
+		// Support: Chrome <=64
+		// Don't get tricked when zoom affects offsetWidth (gh-4029)
 		div.style.position = "absolute";
-		scrollboxSizeVal = div.offsetWidth === 36 || "absolute";
+		scrollboxSizeVal = roundPixelMeasures( div.offsetWidth / 3 ) === 12;
 
 		documentElement.removeChild( container );
 
@@ -6169,7 +6354,7 @@ function curCSS( elem, name, computed ) {
 	if ( computed ) {
 		ret = computed.getPropertyValue( name ) || computed[ name ];
 
-		if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
+		if ( ret === "" && !isAttached( elem ) ) {
 			ret = jQuery.style( elem, name );
 		}
 
@@ -6225,29 +6410,12 @@ function addGetHookIf( conditionFn, hookFn ) {
 }
 
 
-var
+var cssPrefixes = [ "Webkit", "Moz", "ms" ],
+	emptyStyle = document.createElement( "div" ).style,
+	vendorProps = {};
 
-	// Swappable if display is none or starts with table
-	// except "table", "table-cell", or "table-caption"
-	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
-	rdisplayswap = /^(none|table(?!-c[ea]).+)/,
-	rcustomProp = /^--/,
-	cssShow = { position: "absolute", visibility: "hidden", display: "block" },
-	cssNormalTransform = {
-		letterSpacing: "0",
-		fontWeight: "400"
-	},
-
-	cssPrefixes = [ "Webkit", "Moz", "ms" ],
-	emptyStyle = document.createElement( "div" ).style;
-
-// Return a css property mapped to a potentially vendor prefixed property
+// Return a vendor-prefixed property or undefined
 function vendorPropName( name ) {
-
-	// Shortcut for names that are not vendor prefixed
-	if ( name in emptyStyle ) {
-		return name;
-	}
 
 	// Check for vendor prefixed names
 	var capName = name[ 0 ].toUpperCase() + name.slice( 1 ),
@@ -6261,15 +6429,32 @@ function vendorPropName( name ) {
 	}
 }
 
-// Return a property mapped along what jQuery.cssProps suggests or to
-// a vendor prefixed property.
+// Return a potentially-mapped jQuery.cssProps or vendor prefixed property
 function finalPropName( name ) {
-	var ret = jQuery.cssProps[ name ];
-	if ( !ret ) {
-		ret = jQuery.cssProps[ name ] = vendorPropName( name ) || name;
+	var final = jQuery.cssProps[ name ] || vendorProps[ name ];
+
+	if ( final ) {
+		return final;
 	}
-	return ret;
+	if ( name in emptyStyle ) {
+		return name;
+	}
+	return vendorProps[ name ] = vendorPropName( name ) || name;
 }
+
+
+var
+
+	// Swappable if display is none or starts with table
+	// except "table", "table-cell", or "table-caption"
+	// See here for display values: https://developer.mozilla.org/en-US/docs/CSS/display
+	rdisplayswap = /^(none|table(?!-c[ea]).+)/,
+	rcustomProp = /^--/,
+	cssShow = { position: "absolute", visibility: "hidden", display: "block" },
+	cssNormalTransform = {
+		letterSpacing: "0",
+		fontWeight: "400"
+	};
 
 function setPositiveNumber( elem, value, subtract ) {
 
@@ -6342,7 +6527,10 @@ function boxModelAdjustment( elem, dimension, box, isBorderBox, styles, computed
 			delta -
 			extra -
 			0.5
-		) );
+
+		// If offsetWidth/offsetHeight is unknown, then we can't determine content-box scroll gutter
+		// Use an explicit zero to avoid NaN (gh-3964)
+		) ) || 0;
 	}
 
 	return delta;
@@ -6352,9 +6540,16 @@ function getWidthOrHeight( elem, dimension, extra ) {
 
 	// Start with computed style
 	var styles = getStyles( elem ),
+
+		// To avoid forcing a reflow, only fetch boxSizing if we need it (gh-4322).
+		// Fake content-box until we know it's needed to know the true value.
+		boxSizingNeeded = !support.boxSizingReliable() || extra,
+		isBorderBox = boxSizingNeeded &&
+			jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+		valueIsBorderBox = isBorderBox,
+
 		val = curCSS( elem, dimension, styles ),
-		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
-		valueIsBorderBox = isBorderBox;
+		offsetProp = "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 );
 
 	// Support: Firefox <=54
 	// Return a confounding non-pixel value or feign ignorance, as appropriate.
@@ -6365,22 +6560,29 @@ function getWidthOrHeight( elem, dimension, extra ) {
 		val = "auto";
 	}
 
-	// Check for style in case a browser which returns unreliable values
-	// for getComputedStyle silently falls back to the reliable elem.style
-	valueIsBorderBox = valueIsBorderBox &&
-		( support.boxSizingReliable() || val === elem.style[ dimension ] );
 
 	// Fall back to offsetWidth/offsetHeight when value is "auto"
 	// This happens for inline elements with no explicit setting (gh-3571)
 	// Support: Android <=4.1 - 4.3 only
 	// Also use offsetWidth/offsetHeight for misreported inline dimensions (gh-3602)
-	if ( val === "auto" ||
-		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) {
+	// Support: IE 9-11 only
+	// Also use offsetWidth/offsetHeight for when box sizing is unreliable
+	// We use getClientRects() to check for hidden/disconnected.
+	// In those cases, the computed value can be trusted to be border-box
+	if ( ( !support.boxSizingReliable() && isBorderBox ||
+		val === "auto" ||
+		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) &&
+		elem.getClientRects().length ) {
 
-		val = elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ];
+		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
 
-		// offsetWidth/offsetHeight provide border-box values
-		valueIsBorderBox = true;
+		// Where available, offsetWidth/offsetHeight approximate border box dimensions.
+		// Where not available (e.g., SVG), assume unreliable box-sizing and interpret the
+		// retrieved value as a content box dimension.
+		valueIsBorderBox = offsetProp in elem;
+		if ( valueIsBorderBox ) {
+			val = elem[ offsetProp ];
+		}
 	}
 
 	// Normalize "" and auto
@@ -6426,6 +6628,13 @@ jQuery.extend( {
 		"flexGrow": true,
 		"flexShrink": true,
 		"fontWeight": true,
+		"gridArea": true,
+		"gridColumn": true,
+		"gridColumnEnd": true,
+		"gridColumnStart": true,
+		"gridRow": true,
+		"gridRowEnd": true,
+		"gridRowStart": true,
 		"lineHeight": true,
 		"opacity": true,
 		"order": true,
@@ -6481,7 +6690,9 @@ jQuery.extend( {
 			}
 
 			// If a number was passed in, add the unit (except for certain CSS properties)
-			if ( type === "number" ) {
+			// The isCustomProp check can be removed in jQuery 4.0 when we only auto-append
+			// "px" to a few hardcoded values.
+			if ( type === "number" && !isCustomProp ) {
 				value += ret && ret[ 3 ] || ( jQuery.cssNumber[ origName ] ? "" : "px" );
 			}
 
@@ -6581,18 +6792,29 @@ jQuery.each( [ "height", "width" ], function( i, dimension ) {
 		set: function( elem, value, extra ) {
 			var matches,
 				styles = getStyles( elem ),
-				isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
-				subtract = extra && boxModelAdjustment(
-					elem,
-					dimension,
-					extra,
-					isBorderBox,
-					styles
-				);
+
+				// Only read styles.position if the test has a chance to fail
+				// to avoid forcing a reflow.
+				scrollboxSizeBuggy = !support.scrollboxSize() &&
+					styles.position === "absolute",
+
+				// To avoid forcing a reflow, only fetch boxSizing if we need it (gh-3991)
+				boxSizingNeeded = scrollboxSizeBuggy || extra,
+				isBorderBox = boxSizingNeeded &&
+					jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				subtract = extra ?
+					boxModelAdjustment(
+						elem,
+						dimension,
+						extra,
+						isBorderBox,
+						styles
+					) :
+					0;
 
 			// Account for unreliable border-box dimensions by comparing offset* to computed and
 			// faking a content-box to get border and padding (gh-3699)
-			if ( isBorderBox && support.scrollboxSize() === styles.position ) {
+			if ( isBorderBox && scrollboxSizeBuggy ) {
 				subtract -= Math.ceil(
 					elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
 					parseFloat( styles[ dimension ] ) -
@@ -6760,9 +6982,9 @@ Tween.propHooks = {
 			// Use .style if available and use plain properties where available.
 			if ( jQuery.fx.step[ tween.prop ] ) {
 				jQuery.fx.step[ tween.prop ]( tween );
-			} else if ( tween.elem.nodeType === 1 &&
-				( tween.elem.style[ jQuery.cssProps[ tween.prop ] ] != null ||
-					jQuery.cssHooks[ tween.prop ] ) ) {
+			} else if ( tween.elem.nodeType === 1 && (
+					jQuery.cssHooks[ tween.prop ] ||
+					tween.elem.style[ finalPropName( tween.prop ) ] != null ) ) {
 				jQuery.style( tween.elem, tween.prop, tween.now + tween.unit );
 			} else {
 				tween.elem[ tween.prop ] = tween.now;
@@ -8469,6 +8691,10 @@ jQuery.param = function( a, traditional ) {
 				encodeURIComponent( value == null ? "" : value );
 		};
 
+	if ( a == null ) {
+		return "";
+	}
+
 	// If an array was passed in, assume that it is an array of form elements.
 	if ( Array.isArray( a ) || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
 
@@ -8971,12 +9197,14 @@ jQuery.extend( {
 						if ( !responseHeaders ) {
 							responseHeaders = {};
 							while ( ( match = rheaders.exec( responseHeadersString ) ) ) {
-								responseHeaders[ match[ 1 ].toLowerCase() ] = match[ 2 ];
+								responseHeaders[ match[ 1 ].toLowerCase() + " " ] =
+									( responseHeaders[ match[ 1 ].toLowerCase() + " " ] || [] )
+										.concat( match[ 2 ] );
 							}
 						}
-						match = responseHeaders[ key.toLowerCase() ];
+						match = responseHeaders[ key.toLowerCase() + " " ];
 					}
-					return match == null ? null : match;
+					return match == null ? null : match.join( ", " );
 				},
 
 				// Raw string
@@ -9365,7 +9593,7 @@ jQuery.each( [ "get", "post" ], function( i, method ) {
 } );
 
 
-jQuery._evalUrl = function( url ) {
+jQuery._evalUrl = function( url, options ) {
 	return jQuery.ajax( {
 		url: url,
 
@@ -9375,7 +9603,16 @@ jQuery._evalUrl = function( url ) {
 		cache: true,
 		async: false,
 		global: false,
-		"throws": true
+
+		// Only evaluate the response if it is successful (gh-4126)
+		// dataFilter is not invoked for failure responses, so using it instead
+		// of the default converter is kludgy but it works.
+		converters: {
+			"text script": function() {}
+		},
+		dataFilter: function( response ) {
+			jQuery.globalEval( response, options );
+		}
 	} );
 };
 
@@ -9658,24 +9895,21 @@ jQuery.ajaxPrefilter( "script", function( s ) {
 // Bind script tag hack transport
 jQuery.ajaxTransport( "script", function( s ) {
 
-	// This transport only deals with cross domain requests
-	if ( s.crossDomain ) {
+	// This transport only deals with cross domain or forced-by-attrs requests
+	if ( s.crossDomain || s.scriptAttrs ) {
 		var script, callback;
 		return {
 			send: function( _, complete ) {
-				script = jQuery( "<script>" ).prop( {
-					charset: s.scriptCharset,
-					src: s.url
-				} ).on(
-					"load error",
-					callback = function( evt ) {
+				script = jQuery( "<script>" )
+					.attr( s.scriptAttrs || {} )
+					.prop( { charset: s.scriptCharset, src: s.url } )
+					.on( "load error", callback = function( evt ) {
 						script.remove();
 						callback = null;
 						if ( evt ) {
 							complete( evt.type === "error" ? 404 : 200, evt.type );
 						}
-					}
-				);
+					} );
 
 				// Use native DOM manipulation to avoid our domManip AJAX trickery
 				document.head.appendChild( script[ 0 ] );
@@ -60768,6 +61002,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
       'NO_SINGLE_WILDCARD': 'There is no single character wildcard equievelent, so an unlimited matching length wildcard has been used instead',
       'NO_OPTIONAL_WILDCARD': 'There is no optional single character wildcard equievelent, so an unlimited matching length wildcard has been used instead'
     },
+    variables: {
+      no_field_tag: [] // Stores offsets for phrases with no field tags (for replacement)
+
+    },
 
     /**
     * List of templates
@@ -60946,6 +61184,8 @@ var polyglot_1 = createCommonjsModule(function (module) {
         transposeLines: true
       });
 
+      polyglot.no_field_tag = []; // Empty array of offsets each time the query is parsed
+
       var q = query + ''; // Clone query
 
       var tree = {
@@ -61037,7 +61277,9 @@ var polyglot_1 = createCommonjsModule(function (module) {
       leaf = branch.nodes;
       var lineNumber = 1; // Variable to store whether there is user entered line numbering
 
-      var userLineNumber = false;
+      var userLineNumber = false; // Variable to store byte offset of string at current point
+
+      var offset = 0;
 
       while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -61057,7 +61299,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           lastGroup = branch;
           branch = branchStack.pop();
           leaf = branch.nodes;
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))?/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) {
           // 1-7/OR
           branch.nodes.push({
             type: 'ref',
@@ -61065,9 +61307,21 @@ var polyglot_1 = createCommonjsModule(function (module) {
             cond: match[3].toUpperCase(),
             nodes: []
           });
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR|NOT)/i.exec(q))) {
+        } else if (settings.transposeLines && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) {
+          // OR/1-7
+          branch.nodes.push({
+            type: 'ref',
+            ref: lodash.range(match[2], (match[3] + 1) / 10),
+            cond: match[1].toUpperCase(),
+            nodes: []
+          });
+          offset += match[0].length;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) {
           // 1 AND ...
           branch.nodes.push({
             type: 'ref',
@@ -61075,6 +61329,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             cond: '',
             nodes: []
           });
+          offset += match[1].length;
           q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
 
           cropString = false;
@@ -61110,6 +61365,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             cond: '',
             nodes: []
           });
+          offset += match[0].length;
           q = q.substr(match[0].length);
         } else if (settings.transposeLines && (match = /^([0-9]+\.?)\s+/i.exec(q))) {
           // 1 or 1. (Line number)
@@ -61117,6 +61373,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
           branch.number = lineNumber;
           branch.isNumbered = true;
           userLineNumber = true;
+          offset += match[0].length - 1;
           q = q.substr(match[0].length - 1);
         } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
           trimLastLeaf();
@@ -61124,6 +61381,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             type: 'joinAnd'
           });
           leaf = undefined;
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
@@ -61132,6 +61390,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             type: 'joinOr'
           });
           leaf = undefined;
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
@@ -61140,6 +61399,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             type: 'joinNot'
           });
           leaf = undefined;
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
@@ -61149,6 +61409,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             proximity: lodash.toNumber(match[2])
           });
           leaf = undefined;
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
@@ -61157,16 +61418,18 @@ var polyglot_1 = createCommonjsModule(function (module) {
           leaf.recurse = !match[2];
           if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
 
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
-        } else if ((match = /^exp "(.*?)"\/\s*/i.exec(q)) || (match = /^exp (.*?)\/\s*/i.exec(q))) {
+        } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) {
           // Mesh term - Ovid syntax (exploded)
           branch.nodes.push({
             type: 'mesh',
             recurse: true,
-            content: match[1]
+            content: match[2]
           });
-          q = q.substr(match[0].length);
+          offset += match[1].length;
+          q = q.substr(match[1].length);
           cropString = false;
           afterWhitespace = true;
         } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) {
@@ -61178,19 +61441,22 @@ var polyglot_1 = createCommonjsModule(function (module) {
             type: 'template',
             content: match[1].toLowerCase()
           });
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
-        } else if (match = /^(\n+)/.exec(q)) {
+        } else if (match = /^(\n|\r)+/.exec(q)) {
           if (settings.preserveNewlines) {
+            var number_newline = match[0].length;
             branch.nodes.push({
               type: 'raw',
-              content: match[0]
+              content: '\n'.repeat(number_newline)
             });
             leaf = undefined;
           }
 
           lineNumber += match[0].length;
           newLine(lineNumber);
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
           afterWhitespace = true;
@@ -61254,6 +61520,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
                 break;
             }
 
+            offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
           } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
@@ -61298,6 +61565,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
               break;
           }
 
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else if (match = /^#([^\)\n]+)/.exec(q)) {
@@ -61307,6 +61575,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
             content: match[1]
           });
           leaf = undefined;
+          offset += match[0].length;
           q = q.substr(match[0].length);
           cropString = false;
         } else {
@@ -61318,25 +61587,30 @@ var polyglot_1 = createCommonjsModule(function (module) {
               // First character is a speachmark - slurp until we see the next one
               leaf = {
                 type: 'phrase',
-                content: match[1]
+                content: match[1],
+                offset: offset
               };
               branch.nodes.push(leaf);
+              offset += match[0].length;
               q = q.substr(match[0].length);
               cropString = false;
             } else if (match = /^[^\s\W]+/.exec(q)) {
               // Slurp the phrase until the space or close brackets
               leaf = {
                 type: 'phrase',
-                content: match[0]
+                content: match[0],
+                offset: offset
               };
               branch.nodes.push(leaf);
+              offset += match[0].length;
               q = q.substr(match[0].length);
               cropString = false;
             } else {
               // All other first chars - just dump into a buffer and let it fill slowly
               leaf = {
                 type: 'phrase',
-                content: nextChar
+                content: nextChar,
+                offset: offset
               };
               branch.nodes.push(leaf);
             }
@@ -61347,7 +61621,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
           afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
         }
 
-        if (cropString) q = q.substr(1); // Crop 1 character
+        if (cropString) {
+          offset += 1; // Increment offset by 1
+
+          q = q.substr(1); // Crop 1 character
+        }
       }
 
       if (settings.transposeLines) {
@@ -61469,7 +61747,16 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' : branch.field == 'abstract' ? settings.highlighting ? polyglot.tools.createTooltip('<font color="LightSeaGreen">[tiab]</font>', 'PubMed cannot search abstract field term independently') : '[tiab]' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                    // If no field tag exists create popover with ability to replace field tag
+                    if (polyglot.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {
+                      polyglot.no_field_tag.push(branch.offset + branch.content.length);
+                    }
+
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting));
+                    } else {
+                      buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                    }
                   }
 
                   break;
@@ -61943,7 +62230,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
                 case 'mesh':
                   if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+                    buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
                   } else {
                     buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
                   }
@@ -62542,154 +62829,111 @@ var polyglot_1 = createCommonjsModule(function (module) {
         */
         compile: function compile(tree, options) {
           return tree;
-        }
-      },
-      // }}}
-      // MongoDB {{{
-      mongodb: {
-        id: 'mongodb',
-        title: 'MongoDB Query Format',
-        aliases: ['mongo'],
-        debugging: true,
-        // Mark this module for debugging only
-
-        /**
-        * Compile a tree structure to a MongoDB query
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @return {Object} The compiled MongoDB query output
-        */
-        compile: function compile(tree, options) {
-          var settings = lodash.defaults(options, {
-            replaceWildcards: true,
-            translatePhraseField: function translatePhraseField(t) {
-              return {
-                'title': t
-              };
-            },
-            meshField: 'mesh',
-            translateTitleAbstract: function translateTitleAbstract(t) {
-              return {
-                $or: [{
-                  title: t
-                }, {
-                  abstract: t
-                }]
-              };
-            }
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /[\?\$]/g,
-            value: '*'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return lodash(tree).map(function (branch, branchIndex) {
-              var buffer = {};
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  if (branch.field && branch.field == 'title+abstract') {
-                    // FIXME: Not yet properly supported
-                    buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
-                  } else if (branch.field) {
-                    buffer[branch.field] = compileWalker(branch.nodes);
-                  } else {
-                    buffer = settings.translatePhraseField(compileWalker(branch.nodes));
-                  }
-
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field && branch.field == 'title+abstract') {
-                    buffer = settings.translateTitleAbstract(branch.content);
-                  } else if (branch.field) {
-                    buffer[branch.field] = branch.content;
-                  } else {
-                    buffer = settings.translatePhraseField(branch.content);
-                  }
-
-                  break;
-
-                case 'joinNear':
-                case 'joinAnd':
-                  buffer = {
-                    $and: []
-                  };
-                  break;
-
-                case 'joinOr':
-                  buffer = {
-                    $or: []
-                  };
-                  break;
-
-                case 'joinNot':
-                  buffer = {
-                    $not: {}
-                  };
-                  break;
-
-                case 'mesh':
-                  // FIXME: No ability to recurse
-                  buffer[settings.meshField] = {
-                    $in: [branch.content]
-                  };
-                  break;
-
-                case 'raw':
-                  // Do nothing
-                  break;
-
-                case 'template':
-                  buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer;
-            }) // Renest + combine $or/$and conditions {{{
-
-            /* NOTE: Highly experimental - causes bugs under some circumstances
-            .thru(tree => polyglot.tools.renestConditions(tree))
-            .thru(tree => polyglot.tools.combineConditions(tree))
-            */
-            // }}}
-            // Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-            .thru(function (tree) {
-              if (lodash.isArray(tree) && tree.length == 1) tree = tree[0];
-              return tree;
-            }) // }}}
-            .value();
-          };
-
-          return compileWalker(tree);
         } // }}}
+        // MongoDB {{{
+        // mongodb: {
+        // 	id: 'mongodb',
+        // 	title: 'MongoDB Query Format',
+        // 	aliases: ['mongo'],
+        // 	debugging: true, // Mark this module for debugging only
+        // 	/**
+        // 	* Compile a tree structure to a MongoDB query
+        // 	* @param {array} tree The parsed tree to process
+        // 	* @param {Object} [options] Optional options to use when compiling
+        // 	* @return {Object} The compiled MongoDB query output
+        // 	*/
+        // 	compile: (tree, options) => {
+        // 		var settings = _.defaults(options, {
+        // 			replaceWildcards: true,
+        // 			translatePhraseField: t => ({'title': t}),
+        // 			meshField: 'mesh',
+        // 			translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
+        // 		});
+        // 		// Apply wildcard replacements
+        // 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
+        // 			{subject: /[\?\$]/g, value: '*'},
+        // 		]);
+        // 		var compileWalker = tree =>
+        // 			_(tree)
+        // 				.map((branch, branchIndex) => {
+        // 					var buffer = {};
+        // 					switch (branch.type) {
+        // 						case 'line':
+        // 							buffer += compileWalker(branch.nodes);
+        // 							break;
+        // 						case 'group':
+        // 							if (branch.field && branch.field == 'title+abstract') {
+        // 								// FIXME: Not yet properly supported
+        // 								buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+        // 							} else if (branch.field) {
+        // 								buffer[branch.field] = compileWalker(branch.nodes);
+        // 							} else {
+        // 								buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+        // 							}
+        // 							break;
+        // 						case 'ref':
+        // 							var node;
+        // 							for (node in branch.nodes) {
+        // 								if (node == 0) {
+        // 									buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+        // 								} else {
+        // 									buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+        // 								}	
+        // 							}
+        // 							break;
+        // 						case 'phrase':
+        // 							if (branch.field && branch.field == 'title+abstract') {
+        // 								buffer = settings.translateTitleAbstract(branch.content);
+        // 							} else if (branch.field) {
+        // 								buffer[branch.field] = branch.content;
+        // 							} else {
+        // 								buffer = settings.translatePhraseField(branch.content);
+        // 							}
+        // 							break;
+        // 						case 'joinNear':
+        // 						case 'joinAnd':
+        // 							buffer = {$and: []};
+        // 							break;
+        // 						case 'joinOr':
+        // 							buffer = {$or: []};
+        // 							break;
+        // 						case 'joinNot':
+        // 							buffer = {$not: {}};
+        // 							break;
+        // 						case 'mesh':
+        // 							// FIXME: No ability to recurse
+        // 							buffer[settings.meshField] = {$in: [branch.content]};
+        // 							break;
+        // 						case 'raw':
+        // 							// Do nothing
+        // 							break;
+        // 						case 'template':
+        // 							buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
+        // 							break;
+        // 						case 'comment':
+        // 							// Do nothing
+        // 							break;
+        // 						default:
+        // 							throw new Error('Unsupported object tree type: ' + branch.type);
+        // 					}
+        // 					return buffer;
+        // 				})
+        // 				// Renest + combine $or/$and conditions {{{
+        // 				// NOTE: Highly experimental - causes bugs under some circumstances
+        // 				// .thru(tree => polyglot.tools.renestConditions(tree))
+        // 				// .thru(tree => polyglot.tools.combineConditions(tree))
+        // 				// }}}
+        // 				// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+        // 				.thru(tree => {
+        // 					if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+        // 					return tree;
+        // 				})
+        // 				// }}}
+        // 				.value();
+        // 		return compileWalker(tree);
+        // 	},
+        // },
+        // }}}
 
       }
     },
@@ -62880,8 +63124,22 @@ var polyglot_1 = createCommonjsModule(function (module) {
         });
         return tree;
       },
+
+      /**
+      * Create a tooltip with a specified message
+      * @param {string} content Content to append tooltip to
+      * @param {string} message Message to contain inside tooltip
+      */
       createTooltip: function createTooltip(content, message) {
-        return '<span class="myTooltip">' + content + '<span class="myTooltiptext">' + message + '</span></span>';
+        return "<span class=\"black-underline\" v-tooltip=\"'" + message + "'\">" + content + '</span>';
+      },
+
+      /**
+      * Create a popover with options to replace empty field tags with specified field tag
+      * @param {string} content Content to append popover to
+      */
+      createPopover: function createPopover(content) {
+        return '<v-popover offset="8" placement="right">' + '<span class="blue-underline">' + content + '</span>' + '<template slot="popover">' + '<h3 class="popover-header">Add Field Tag</h3>' + '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />' + '<input type="checkbox" id="checkbox" v-model="replaceAll">' + '<label for="checkbox">Replace All</label>' + '<button v-on:click="replaceFields(customField, replaceAll)" type="button" class="btn btn-primary">Replace</button>' + '<button v-close-popover type="button" class="btn btn-dark">Close</button>' + '</template>' + '</v-popover>';
       }
     }
   };
@@ -62889,14 +63147,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
 var polyglot_2 = polyglot_1.polyglot;
 var polyglot_3 = polyglot_1.examples;
 var polyglot_4 = polyglot_1.messages;
-var polyglot_5 = polyglot_1.templates;
-var polyglot_6 = polyglot_1.translate;
-var polyglot_7 = polyglot_1.translateAll;
-var polyglot_8 = polyglot_1.preProcess;
-var polyglot_9 = polyglot_1.postProcess;
-var polyglot_10 = polyglot_1.parse;
-var polyglot_11 = polyglot_1.engines;
-var polyglot_12 = polyglot_1.tools;
+var polyglot_5 = polyglot_1.variables;
+var polyglot_6 = polyglot_1.templates;
+var polyglot_7 = polyglot_1.translate;
+var polyglot_8 = polyglot_1.translateAll;
+var polyglot_9 = polyglot_1.preProcess;
+var polyglot_10 = polyglot_1.postProcess;
+var polyglot_11 = polyglot_1.parse;
+var polyglot_12 = polyglot_1.engines;
+var polyglot_13 = polyglot_1.tools;
 
 //
 //
@@ -63420,10 +63679,14 @@ __vue_render__._withStripped = true;
     undefined
   );
 
+var t=function(t,o,e){if(!o.hasOwnProperty(e)){var r=Object.getOwnPropertyDescriptor(t,e);Object.defineProperty(o,e,r);}};var VRuntimeTemplate = {props:{template:String,parent:Object,templateProps:{type:Object,default:function(){return {}}}},render:function(o){if(this.template){var e=this.parent||this.$parent,r=e.$data;void 0===r&&(r={});var n=e.$props;void 0===n&&(n={});var a=e.$options;void 0===a&&(a={});var p=a.components;void 0===p&&(p={});var c=a.computed;void 0===c&&(c={});var i=a.methods;void 0===i&&(i={});var s=this.$data;void 0===s&&(s={});var d=this.$props;void 0===d&&(d={});var v=this.$options;void 0===v&&(v={});var f=v.methods;void 0===f&&(f={});var m=v.computed;void 0===m&&(m={});var u=v.components;void 0===u&&(u={});var h={$data:{},$props:{},$options:{},components:{},computed:{},methods:{}};Object.keys(r).forEach(function(t){void 0===s[t]&&(h.$data[t]=r[t]);}),Object.keys(n).forEach(function(t){void 0===d[t]&&(h.$props[t]=n[t]);}),Object.keys(i).forEach(function(t){void 0===f[t]&&(h.methods[t]=i[t]);}),Object.keys(c).forEach(function(t){void 0===m[t]&&(h.computed[t]=c[t]);}),Object.keys(p).forEach(function(t){void 0===u[t]&&(h.components[t]=p[t]);});var O=Object.keys(h.methods||{}),$=Object.keys(h.$data||{}),b=Object.keys(h.$props||{}),j=Object.keys(this.templateProps),y=$.concat(b).concat(O).concat(j),k=(E=e,P={},O.forEach(function(o){return t(E,P,o)}),P),l=function(o){var e={};return o.forEach(function(o){o&&Object.getOwnPropertyNames(o).forEach(function(r){return t(o,e,r)});}),e}([h.$data,h.$props,k,this.templateProps]);return o({template:this.template||"<div></div>",props:y,computed:h.computed,components:h.components,provide:this.$parent._provided},{props:l})}var E,P;}};
+
 var script$1 = {
   data: function data() {
     return {
       query: '',
+      customField: '',
+      replaceAll: false,
       editorOptions: {
         showPrintMargin: false,
         wrap: true
@@ -63445,7 +63708,8 @@ var script$1 = {
   },
   components: {
     editor: vue2AceEditor,
-    jsontree: JsonTree
+    jsontree: JsonTree,
+    VRuntimeTemplate: VRuntimeTemplate
   },
   methods: {
     clear: function clear() {
@@ -63456,6 +63720,27 @@ var script$1 = {
       var el = document.createElement('textarea'); // Set value (string to be copied)
 
       el.value = this.query; // Set non-editable to avoid focus and move outside of view
+
+      el.setAttribute('readonly', '');
+      el.style = {
+        position: 'absolute',
+        left: '-9999px'
+      };
+      document.body.appendChild(el); // Select text inside element
+
+      el.select(); // Copy text to clipboard
+
+      document.execCommand('copy'); // Remove temporary element
+
+      document.body.removeChild(el);
+    },
+    copyContent: function copyContent(id) {
+      // Create new element
+      var el = document.createElement('textarea'); // Set value (string to be copied)
+
+      el.value = polyglot_1.translate(this.query, id, {
+        html: false
+      }); // Set non-editable to avoid focus and move outside of view
 
       el.setAttribute('readonly', '');
       el.style = {
@@ -63492,21 +63777,32 @@ var script$1 = {
       var myFile = ev.target.files[0];
       var reader = new FileReader();
 
-      var _this = this; // reader.readAsText(myFile);
-
-      /* reader.onload = function() {
-      	console.log(reader.result);
-      	this.query = reader.result
-      } */
-
+      var _this = this;
 
       reader.onload = function (f) {
         return function (e) {
-          _this.query = reader.result;
+          _this.query = reader.result.replace(/\r/g, '');
         };
       }(myFile);
 
       reader.readAsText(myFile);
+    },
+    replaceFields: function replaceFields(field, replace_all) {
+      if (replace_all) {
+        var itemsToReplace = polyglot_1.no_field_tag.slice(0).reverse(); // Work backwards through items
+
+        for (var x in itemsToReplace) {
+          // If original query is quoted, 2 must be added to offset
+          itemsToReplace[x] = /(\W)/.test(this.query[itemsToReplace[x]]) ? itemsToReplace[x] : itemsToReplace[x] + 2;
+          console.log(this.query[itemsToReplace[x]]);
+
+          if (/(\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === "undefined") {
+            this.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);
+          }
+        }
+      } else {
+        console.log('stub');
+      }
     }
   },
   watch: {
@@ -63567,7 +63863,12 @@ var __vue_render__$1 = function() {
                   }
                 }
               },
-              [_c("i", { staticClass: "fa fa-eraser" })]
+              [
+                _c("i", {
+                  staticClass: "fa fa-eraser",
+                  attrs: { title: "Clear search" }
+                })
+              ]
             ),
             _vm._v(" "),
             _c(
@@ -63580,7 +63881,12 @@ var __vue_render__$1 = function() {
                   }
                 }
               },
-              [_c("i", { staticClass: "fa fa-clipboard" })]
+              [
+                _c("i", {
+                  staticClass: "fa fa-clipboard",
+                  attrs: { title: "Copy to clipboard" }
+                })
+              ]
             ),
             _vm._v(" "),
             _c(
@@ -63596,7 +63902,7 @@ var __vue_render__$1 = function() {
               [
                 _c("i", {
                   staticClass: "fa fa-random",
-                  attrs: { tooltip: "Show a random example" }
+                  attrs: { title: "Show a random example" }
                 })
               ]
             )
@@ -63672,6 +63978,29 @@ var __vue_render__$1 = function() {
                   _vm._v(
                     "\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t"
                   )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "pull-right" }, [
+                  engine.id != "lexicalTreeJSON"
+                    ? _c(
+                        "a",
+                        {
+                          staticClass: "btn btn-sm btn-default",
+                          on: {
+                            click: function($event) {
+                              $event.stopPropagation();
+                              return _vm.copyContent(engine.id)
+                            }
+                          }
+                        },
+                        [
+                          _c("i", {
+                            staticClass: "fa fa-clipboard",
+                            attrs: { title: "Copy to clipboard" }
+                          })
+                        ]
+                      )
+                    : _vm._e()
                 ])
               ]
             ),
@@ -63686,9 +64015,11 @@ var __vue_render__$1 = function() {
                 _vm.enginesQuery[engine.id] &&
                 engine.id != "lexicalTreeJSON" &&
                 engine.id != "mongodb"
-                  ? _c("pre", {
-                      domProps: {
-                        innerHTML: _vm._s(_vm.enginesQuery[engine.id])
+                  ? _c("v-runtime-template", {
+                      staticClass: "preview",
+                      attrs: {
+                        template:
+                          "<div>" + _vm.enginesQuery[engine.id] + "</div>"
                       }
                     })
                   : _vm._e(),
@@ -63725,11 +64056,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-bdde4d4a_0", { source: "\n.text-reader[data-v-bdde4d4a] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-bdde4d4a] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-bdde4d4a]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-bdde4d4a] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA0JA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport JsonTree from 'vue-json-tree'\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: polyglot.engines,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(polyglot.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\timport('brace/theme/chrome');\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\t// reader.readAsText(myFile);\r\n\t\t\t/* reader.onload = function() {\r\n\t\t\t\tconsole.log(reader.result);\r\n\t\t\t\tthis.query = reader.result\r\n\t\t\t} */\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" tooltip=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<pre v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre>\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-ba3db460_0", { source: "\n.text-reader[data-v-ba3db460] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-ba3db460] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-ba3db460]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-ba3db460] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA4LA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: polyglot.engines,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(polyglot.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\timport('brace/theme/chrome');\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is quoted, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2\r\n\t\t\t\t\tconsole.log(this.query[itemsToReplace[x]]);\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\tconsole.log('stub');\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-bdde4d4a";
+  const __vue_scope_id__$1 = "data-v-ba3db460";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
