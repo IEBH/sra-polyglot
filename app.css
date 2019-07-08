@@ -55,12 +55,25 @@ a:hover {
 	border-bottom: 1px blue dashed;
 }
 
+.tooltip-content {
+	margin-bottom: 10px;
+}
+
+.btn-dark {
+	margin-left: 10px;
+}
+
+#checkbox {
+	margin-right: 5px;
+}
+
 .tooltip {
 	display: block !important;
 	z-index: 10000;
   }
   
   .tooltip .tooltip-inner {
+	max-width: 210px;
 	background: black;
 	color: white;
 	border-radius: 16px;

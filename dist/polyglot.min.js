@@ -794,7 +794,7 @@ var polyglot = module.exports = {
                   }
 
                   if (settings.highlighting) {
-                    buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting));
+                    buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
                   } else {
                     buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
                   }
@@ -2180,8 +2180,8 @@ var polyglot = module.exports = {
     * Create a popover with options to replace empty field tags with specified field tag
     * @param {string} content Content to append popover to
     */
-    createPopover: function createPopover(content) {
-      return '<v-popover offset="8" placement="right">' + '<span class="blue-underline">' + content + '</span>' + '<template slot="popover">' + '<h3 class="popover-header">Add Field Tag</h3>' + '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />' + '<input type="checkbox" id="checkbox" v-model="replaceAll">' + '<label for="checkbox">Replace All</label>' + '<button v-on:click="replaceFields(customField, replaceAll)" type="button" class="btn btn-primary">Replace</button>' + '<button v-close-popover type="button" class="btn btn-dark">Close</button>' + '</template>' + '</v-popover>';
+    createPopover: function createPopover(content, offset) {
+      return '<v-popover offset="8" placement="right">' + '<span class="blue-underline">' + content + '</span>' + '<template slot="popover">' + '<h3 class="popover-header">Add Field Tag</h3>' + '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />' + '<div class="replace-all">' + '<input type="checkbox" id="checkbox" v-model="replaceAll">' + '<label for="checkbox">Replace All</label>' + '</div>' + '<div class="replace-buttons">' + '<button v-on:click="replaceFields(customField, replaceAll, ' + offset + ')" type="button" class="btn btn-primary">Replace</button>' + '<button v-close-popover type="button" class="btn btn-dark">Close</button>' + '</div>' + '</template>' + '</v-popover>';
     }
   }
 };
