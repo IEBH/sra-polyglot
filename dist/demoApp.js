@@ -61886,7 +61886,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += branch.content + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
                     );
                   } else {
-                    buffer += branch.content;
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
+                    } else {
+                      buffer += branch.content;
+                    }
                   }
 
                   break;
@@ -62036,7 +62040,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
+                    } else {
+                      buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
+                    }
                   }
 
                   break;
@@ -62204,7 +62212,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                     buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
                     );
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
+                    } else {
+                      buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
+                    }
                   }
 
                   break;
@@ -62491,7 +62503,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   } else if (branch.field) {
                     buffer += lodash.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
                   } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
+                    } else {
+                      buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+                    }
                   }
 
                   break;
@@ -62616,7 +62632,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   if (branch.field) {
                     buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
                   } else {
-                    buffer += branch.content;
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
+                    } else {
+                      buffer += branch.content;
+                    }
                   }
 
                   break;
@@ -62744,7 +62764,11 @@ var polyglot_1 = createCommonjsModule(function (module) {
                   if (branch.field) {
                     buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
                   } else {
-                    buffer += '"' + branch.content + '"';
+                    if (settings.highlighting) {
+                      buffer += polyglot.tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+                    } else {
+                      buffer += '"' + branch.content + '"';
+                    }
                   }
 
                   break;
