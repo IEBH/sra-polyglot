@@ -96,19 +96,22 @@ export default {
 			})(myFile);
 			reader.readAsText(myFile);
 		},
-		replaceFields(field, replace_all) {
+		replaceFields(field, replace_all, offset) {
 			if (replace_all) {
 				var itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items
 				for (var x in itemsToReplace) {
-					// If original query is quoted, 2 must be added to offset
-					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2
-					console.log(this.query[itemsToReplace[x]]);
+					// If original query is surrounded by quotation marks, 2 must be added to offset
+					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;
 					if (/(\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === "undefined") {
 						this.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);
 					}
 				}
 			} else {
-				console.log('stub');
+				// If original query is surrounded by quotation marks, 2 must be added to offset
+				offset = (/(\W)/.test(this.query[offset]))? offset : offset+2;
+				if (/(\W)/.test(this.query[offset]) || typeof this.query[offset] === "undefined") {
+					this.query = this.query.slice(0, offset) + field + this.query.slice(offset);
+				}
 			}
 		},
 	},

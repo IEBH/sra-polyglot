@@ -412,7 +412,7 @@ var polyglot = module.exports = {
 				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
-			} else if (match = /^(\n|\r)+/.exec(q)) {
+			} else if (match = /^(\n)+/.exec(q)) {
 				if (settings.preserveNewlines) {
 					var number_newline = match[0].length
 					branch.nodes.push({type: 'raw', content: '\n'.repeat(number_newline)});
@@ -420,6 +420,11 @@ var polyglot = module.exports = {
 				}
 				lineNumber += match[0].length;
 				newLine(lineNumber);
+				offset += match[0].length;
+				q = q.substr(match[0].length);
+				cropString = false;
+				afterWhitespace = true;
+			} else if (match = /^(\r)+/.exec(q)) {
 				offset += match[0].length;
 				q = q.substr(match[0].length);
 				cropString = false;
@@ -456,8 +461,11 @@ var polyglot = module.exports = {
 						useLeaf.field = 'abstract';
 						break;
 					case 'fs':
-					case 'sh':
 						useLeaf.field = 'floatingSubheading';
+						break;
+					case 'sh':
+						useLeaf.type = 'mesh';
+						useLeaf.recurse = false;
 						break;
 					case 'nm':
 						useLeaf.field = 'substance';
@@ -641,15 +649,15 @@ var polyglot = module.exports = {
 									} 
 									buffer += '(' + compileWalker(branch.nodes) + ')';					
 									break;
-								case 'ref':
-									var node;
-									for (node in branch.nodes) {
-										if (node == 0) {
-											buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-										} else {
-											buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-										}	
-									}
+									case 'ref':
+										var node;
+										for (node in branch.nodes) {
+											if (node == 0) {
+												buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+											} else {
+												buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+											}	
+										}
 									break;
 								case 'phrase':
 									if (branch.field) {
@@ -672,7 +680,7 @@ var polyglot = module.exports = {
 											polyglot.no_field_tag.push(branch.offset + branch.content.length);
 										}
 										if (settings.highlighting) {
-											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting));
+											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
 										} else {
 											buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
 										}
@@ -2012,16 +2020,20 @@ var polyglot = module.exports = {
 		* Create a popover with options to replace empty field tags with specified field tag
 		* @param {string} content Content to append popover to
 		*/
-		createPopover(content) {
+		createPopover(content, offset) {
 			return '<v-popover offset="8" placement="right">'
 					+ '<span class="blue-underline">' + content + '</span>'
 					+ '<template slot="popover">'
 					+ '<h3 class="popover-header">Add Field Tag</h3>'
 					+ '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />'
+					+ '<div class="replace-all">'
 					+ '<input type="checkbox" id="checkbox" v-model="replaceAll">'
 					+ '<label for="checkbox">Replace All</label>'
-					+ '<button v-on:click="replaceFields(customField, replaceAll)" type="button" class="btn btn-primary">Replace</button>'
+					+ '</div>'
+					+ '<div class="replace-buttons">'
+					+ '<button v-on:click="replaceFields(customField, replaceAll, ' + offset + ')" type="button" class="btn btn-primary">Replace</button>'
 					+ '<button v-close-popover type="button" class="btn btn-dark">Close</button>'
+					+ '</div>'
 					+ '</template>'
 					+ '</v-popover>';
 		},
