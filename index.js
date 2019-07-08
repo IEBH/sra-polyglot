@@ -818,7 +818,11 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for Ovid
 											)
 									} else {
-										buffer += branch.content;
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
+										} else {
+											buffer += branch.content;
+										}
 									}
 									break;
 								case 'joinAnd':
@@ -967,7 +971,11 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for PubMed
 											);
 									} else {
-										buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
+										} else {
+											buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
+										}
 									}
 									break;
 								case 'joinAnd':
@@ -1134,7 +1142,11 @@ var polyglot = module.exports = {
 												'' // Unsupported field suffix for EmBase
 											);
 									} else {
-										buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
+										} else {
+											buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
+										}
 									}
 									break;
 								case 'joinAnd':
@@ -1398,7 +1410,11 @@ var polyglot = module.exports = {
 										);
 
 									} else {
-										buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
+										} else {
+											buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+										}
 									}
 									break;
 								case 'joinAnd':
@@ -1518,7 +1534,11 @@ var polyglot = module.exports = {
 												''
 											)
 									} else {
-										buffer += branch.content;
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
+										} else {
+											buffer += branch.content;
+										}
 									}
 									break;
 								case 'joinAnd':
@@ -1637,7 +1657,11 @@ var polyglot = module.exports = {
 											'"' + branch.content + '"'
 										);
 									} else {
-										buffer += '"' + branch.content + '"';
+										if (settings.highlighting) {
+											buffer += polyglot.tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+										} else {
+											buffer += '"' + branch.content + '"';										
+										}
 									}
 									break;
 								case 'joinAnd':
