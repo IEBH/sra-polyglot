@@ -48,7 +48,7 @@ var polyglot = module.exports = {
       debugging: true,
       description: 'The current output engine',
       engines: {
-        "default": 'unknown',
+        default: 'unknown',
         cinahl: 'cinahl',
         cochrane: 'cochrane',
         embase: 'embase',
@@ -2073,7 +2073,7 @@ var polyglot = module.exports = {
     resolveTemplate: function resolveTemplate(template, engine) {
       if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
       if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-      if (polyglot.templates[template].engines["default"]) return polyglot.translate(polyglot.templates[template].engines["default"], engine);
+      if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
       return '';
     },
 

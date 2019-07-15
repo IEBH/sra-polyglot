@@ -1,6 +1,6 @@
 'use strict';
 
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -10671,7 +10671,7 @@ function isValidArrayIndex(val) {
 }
 
 function isPromise(val) {
-  return isDef(val) && typeof val.then === 'function' && typeof val["catch"] === 'function';
+  return isDef(val) && typeof val.then === 'function' && typeof val.catch === 'function';
 }
 /**
  * Convert a value to a string that is actually rendered.
@@ -12156,8 +12156,8 @@ function mergeOptions(parent, child, vm) {
   // Only merged options has the _base property.
 
   if (!child._base) {
-    if (child["extends"]) {
-      parent = mergeOptions(parent, child["extends"], vm);
+    if (child.extends) {
+      parent = mergeOptions(parent, child.extends, vm);
     }
 
     if (child.mixins) {
@@ -12279,7 +12279,7 @@ function getPropDefaultValue(vm, prop, key) {
     return undefined;
   }
 
-  var def = prop["default"]; // warn against non-factory defaults for Object & Array
+  var def = prop.default; // warn against non-factory defaults for Object & Array
 
   if (isObject(def)) {
     warn('Invalid default value for prop "' + key + '": ' + 'Props with type Object/Array must use a factory function ' + 'to return the default value.', vm);
@@ -12490,7 +12490,7 @@ function invokeWithErrorHandling(handler, context, args, vm, info) {
     res = args ? handler.apply(context, args) : handler.call(context);
 
     if (res && !res._isVue && isPromise(res) && !res._handled) {
-      res["catch"](function (e) {
+      res.catch(function (e) {
         return handleError(e, vm, info + " (Promise/async)");
       }); // issue #9511
       // avoid catch triggering multiple times when nested calls
@@ -13102,7 +13102,7 @@ function resolveInject(inject, vm) {
 
       if (!source) {
         if ('default' in inject[key]) {
-          var provideDefault = inject[key]["default"];
+          var provideDefault = inject[key].default;
           result[key] = typeof provideDefault === 'function' ? provideDefault.call(vm) : provideDefault;
         } else {
           warn("Injection \"" + key + "\" not found", vm);
@@ -13147,7 +13147,7 @@ function resolveSlots(children, context) {
         slot.push(child);
       }
     } else {
-      (slots["default"] || (slots["default"] = [])).push(child);
+      (slots.default || (slots.default = [])).push(child);
     }
   } // ignore slots that contains only whitespace
 
@@ -13827,7 +13827,7 @@ function createComponent(Ctor, data, context, children, tag) {
 
   data.on = data.nativeOn;
 
-  if (isTrue(Ctor.options["abstract"])) {
+  if (isTrue(Ctor.options.abstract)) {
     // abstract components do not keep anything
     // other than props & listeners & slot
     // work around flow
@@ -13963,7 +13963,7 @@ function _createElement(context, tag, data, children, normalizationType) {
   if (Array.isArray(children) && typeof children[0] === 'function') {
     data = data || {};
     data.scopedSlots = {
-      "default": children[0]
+      default: children[0]
     };
     children.length = 0;
   }
@@ -14042,8 +14042,8 @@ function registerDeepBindings(data) {
     traverse(data.style);
   }
 
-  if (isObject(data["class"])) {
-    traverse(data["class"]);
+  if (isObject(data.class)) {
+    traverse(data.class);
   }
 }
 /*  */
@@ -14165,7 +14165,7 @@ function renderMixin(Vue) {
 
 function ensureCtor(comp, base) {
   if (comp.__esModule || hasSymbol && comp[Symbol.toStringTag] === 'Module') {
-    comp = comp["default"];
+    comp = comp.default;
   }
 
   return isObject(comp) ? base.extend(comp) : comp;
@@ -14488,8 +14488,8 @@ function initLifecycle(vm) {
 
   var parent = options.parent;
 
-  if (parent && !options["abstract"]) {
-    while (parent.$options["abstract"] && parent.$parent) {
+  if (parent && !options.abstract) {
+    while (parent.$options.abstract && parent.$parent) {
       parent = parent.$parent;
     }
 
@@ -14565,7 +14565,7 @@ function lifecycleMixin(Vue) {
 
     var parent = vm.$parent;
 
-    if (parent && !parent._isBeingDestroyed && !vm.$options["abstract"]) {
+    if (parent && !parent._isBeingDestroyed && !vm.$options.abstract) {
       remove(parent.$children, vm);
     } // teardown watchers
 
@@ -15633,8 +15633,8 @@ function initInternalComponent(vm, options) {
 function resolveConstructorOptions(Ctor) {
   var options = Ctor.options;
 
-  if (Ctor["super"]) {
-    var superOptions = resolveConstructorOptions(Ctor["super"]);
+  if (Ctor.super) {
+    var superOptions = resolveConstructorOptions(Ctor.super);
     var cachedSuperOptions = Ctor.superOptions;
 
     if (superOptions !== cachedSuperOptions) {
@@ -15903,7 +15903,7 @@ function pruneCacheEntry(cache, key, keys, current) {
 var patternTypes = [String, RegExp, Array];
 var KeepAlive = {
   name: 'keep-alive',
-  "abstract": true,
+  abstract: true,
   props: {
     include: patternTypes,
     exclude: patternTypes,
@@ -15932,7 +15932,7 @@ var KeepAlive = {
     });
   },
   render: function render() {
-    var slot = this.$slots["default"];
+    var slot = this.$slots.default;
     var vnode = getFirstComponentChild(slot);
     var componentOptions = vnode && vnode.componentOptions;
 
@@ -16006,7 +16006,7 @@ function initGlobalAPI(Vue) {
     defineReactive: defineReactive$$1
   };
   Vue.set = set$1;
-  Vue["delete"] = del;
+  Vue.delete = del;
   Vue.nextTick = nextTick; // 2.6 explicit observable API
 
   Vue.observable = function (obj) {
@@ -16099,13 +16099,13 @@ function genClassForVnode(vnode) {
     }
   }
 
-  return renderClass(data.staticClass, data["class"]);
+  return renderClass(data.staticClass, data.class);
 }
 
 function mergeClassData(child, parent) {
   return {
     staticClass: concat(child.staticClass, parent.staticClass),
-    "class": isDef(child["class"]) ? [child["class"], parent["class"]] : parent["class"]
+    class: isDef(child.class) ? [child.class, parent.class] : parent.class
   };
 }
 
@@ -17422,7 +17422,7 @@ function updateClass(oldVnode, vnode) {
   var data = vnode.data;
   var oldData = oldVnode.data;
 
-  if (isUndef(data.staticClass) && isUndef(data["class"]) && (isUndef(oldData) || isUndef(oldData.staticClass) && isUndef(oldData["class"]))) {
+  if (isUndef(data.staticClass) && isUndef(data.class) && (isUndef(oldData) || isUndef(oldData.staticClass) && isUndef(oldData.class))) {
     return;
   }
 
@@ -17699,8 +17699,8 @@ function addHandler(el, name, value, modifiers, important, warn, range, dynamic)
 
   var events;
 
-  if (modifiers["native"]) {
-    delete modifiers["native"];
+  if (modifiers.native) {
+    delete modifiers.native;
     events = el.nativeEvents || (el.nativeEvents = {});
   } else {
     events = el.events || (el.events = {});
@@ -19258,7 +19258,7 @@ var transitionProps = {
 function getRealChild(vnode) {
   var compOptions = vnode && vnode.componentOptions;
 
-  if (compOptions && compOptions.Ctor.options["abstract"]) {
+  if (compOptions && compOptions.Ctor.options.abstract) {
     return getRealChild(getFirstComponentChild(compOptions.children));
   } else {
     return vnode;
@@ -19315,10 +19315,10 @@ var isVShowDirective = function isVShowDirective(d) {
 var Transition = {
   name: 'transition',
   props: transitionProps,
-  "abstract": true,
+  abstract: true,
   render: function render(h) {
     var this$1 = this;
-    var children = this.$slots["default"];
+    var children = this.$slots.default;
 
     if (!children) {
       return;
@@ -19442,7 +19442,7 @@ var TransitionGroup = {
     var tag = this.tag || this.$vnode.data.tag || 'span';
     var map = Object.create(null);
     var prevChildren = this.prevChildren = this.children;
-    var rawChildren = this.$slots["default"] || [];
+    var rawChildren = this.$slots.default || [];
     var children = this.children = [];
     var transitionData = extractTransitionData(this);
 
@@ -20209,7 +20209,7 @@ function parse(template, options) {
 
     if (!stack.length && element !== root) {
       // allow root elements with v-if, v-else-if and v-else
-      if (root["if"] && (element.elseif || element["else"])) {
+      if (root.if && (element.elseif || element.else)) {
         {
           checkRootConstraints(element);
         }
@@ -20226,7 +20226,7 @@ function parse(template, options) {
     }
 
     if (currentParent && !element.forbidden) {
-      if (element.elseif || element["else"]) {
+      if (element.elseif || element.else) {
         processIfConditions(element, currentParent);
       } else {
         if (element.slotScope) {
@@ -20548,7 +20548,7 @@ function processKey(el) {
         warn$2("<template> cannot be keyed. Place the key on real elements instead.", getRawBindingAttr(el, 'key'));
       }
 
-      if (el["for"]) {
+      if (el.for) {
         var iterator = el.iterator2 || el.iterator1;
         var parent = el.parent;
 
@@ -20595,7 +20595,7 @@ function parseFor(exp) {
   }
 
   var res = {};
-  res["for"] = inMatch[2].trim();
+  res.for = inMatch[2].trim();
   var alias = inMatch[1].trim().replace(stripParensRE, '');
   var iteratorMatch = alias.match(forIteratorRE);
 
@@ -20617,14 +20617,14 @@ function processIf(el) {
   var exp = getAndRemoveAttr(el, 'v-if');
 
   if (exp) {
-    el["if"] = exp;
+    el.if = exp;
     addIfCondition(el, {
       exp: exp,
       block: el
     });
   } else {
     if (getAndRemoveAttr(el, 'v-else') != null) {
-      el["else"] = true;
+      el.else = true;
     }
 
     var elseif = getAndRemoveAttr(el, 'v-else-if');
@@ -20638,7 +20638,7 @@ function processIf(el) {
 function processIfConditions(el, parent) {
   var prev = findPrevElement(parent.children);
 
-  if (prev && prev["if"]) {
+  if (prev && prev.if) {
     addIfCondition(prev, {
       exp: el.elseif,
       block: el
@@ -20952,7 +20952,7 @@ function checkInFor(el) {
   var parent = el;
 
   while (parent) {
-    if (parent["for"] !== undefined) {
+    if (parent.for !== undefined) {
       return true;
     }
 
@@ -21020,7 +21020,7 @@ function checkForAliasModel(el, value) {
   var _el = el;
 
   while (_el) {
-    if (_el["for"] && _el.alias === value) {
+    if (_el.for && _el.alias === value) {
       warn$2("<" + el.tag + " v-model=\"" + value + "\">: " + "You are binding v-model directly to a v-for iteration alias. " + "This will not be able to modify the v-for source array because " + "writing to the alias is like modifying a function local variable. " + "Consider using an array of objects and use v-model on an object property instead.", el.rawAttrsMap['v-model']);
     }
 
@@ -21061,9 +21061,9 @@ function preTransformNode(el, options) {
       processElement(branch0, options);
       branch0.processed = true; // prevent it from double-processed
 
-      branch0["if"] = "(" + typeBinding + ")==='checkbox'" + ifConditionExtra;
+      branch0.if = "(" + typeBinding + ")==='checkbox'" + ifConditionExtra;
       addIfCondition(branch0, {
-        exp: branch0["if"],
+        exp: branch0.if,
         block: branch0
       }); // 2. add radio else-if condition
 
@@ -21086,7 +21086,7 @@ function preTransformNode(el, options) {
       });
 
       if (hasElse) {
-        branch0["else"] = true;
+        branch0.else = true;
       } else if (elseIfCondition) {
         branch0.elseif = elseIfCondition;
       }
@@ -21174,7 +21174,7 @@ function genStaticKeys$1(keys) {
 }
 
 function markStatic$1(node) {
-  node["static"] = isStatic(node);
+  node.static = isStatic(node);
 
   if (node.type === 1) {
     // do not make component slot content static. this avoids
@@ -21188,8 +21188,8 @@ function markStatic$1(node) {
       var child = node.children[i];
       markStatic$1(child);
 
-      if (!child["static"]) {
-        node["static"] = false;
+      if (!child.static) {
+        node.static = false;
       }
     }
 
@@ -21198,8 +21198,8 @@ function markStatic$1(node) {
         var block = node.ifConditions[i$1].block;
         markStatic$1(block);
 
-        if (!block["static"]) {
-          node["static"] = false;
+        if (!block.static) {
+          node.static = false;
         }
       }
     }
@@ -21208,14 +21208,14 @@ function markStatic$1(node) {
 
 function markStaticRoots(node, isInFor) {
   if (node.type === 1) {
-    if (node["static"] || node.once) {
+    if (node.static || node.once) {
       node.staticInFor = isInFor;
     } // For a node to qualify as a static root, it should have children that
     // are not just static text. Otherwise the cost of hoisting out will
     // outweigh the benefits and it's better off to just always render it fresh.
 
 
-    if (node["static"] && node.children.length && !(node.children.length === 1 && node.children[0].type === 3)) {
+    if (node.static && node.children.length && !(node.children.length === 1 && node.children[0].type === 3)) {
       node.staticRoot = true;
       return;
     } else {
@@ -21224,7 +21224,7 @@ function markStaticRoots(node, isInFor) {
 
     if (node.children) {
       for (var i = 0, l = node.children.length; i < l; i++) {
-        markStaticRoots(node.children[i], isInFor || !!node["for"]);
+        markStaticRoots(node.children[i], isInFor || !!node.for);
       }
     }
 
@@ -21248,7 +21248,7 @@ function isStatic(node) {
   }
 
   return !!(node.pre || !node.hasBindings && // no dynamic bindings
-  !node["if"] && !node["for"] && // not v-if or v-for or v-else
+  !node.if && !node.for && // not v-if or v-for or v-else
   !isBuiltInTag(node.tag) && // not a built-in
   isPlatformReservedTag(node.tag) && // not a component
   !isDirectChildOfTemplateFor(node) && Object.keys(node).every(isStaticKey));
@@ -21262,7 +21262,7 @@ function isDirectChildOfTemplateFor(node) {
       return false;
     }
 
-    if (node["for"]) {
+    if (node.for) {
       return true;
     }
   }
@@ -21490,9 +21490,9 @@ function genElement(el, state) {
     return genStatic(el, state);
   } else if (el.once && !el.onceProcessed) {
     return genOnce(el, state);
-  } else if (el["for"] && !el.forProcessed) {
+  } else if (el.for && !el.forProcessed) {
     return genFor(el, state);
-  } else if (el["if"] && !el.ifProcessed) {
+  } else if (el.if && !el.ifProcessed) {
     return genIf(el, state);
   } else if (el.tag === 'template' && !el.slotTarget && !state.pre) {
     return genChildren(el, state) || 'void 0';
@@ -21545,14 +21545,14 @@ function genStatic(el, state) {
 function genOnce(el, state) {
   el.onceProcessed = true;
 
-  if (el["if"] && !el.ifProcessed) {
+  if (el.if && !el.ifProcessed) {
     return genIf(el, state);
   } else if (el.staticInFor) {
     var key = '';
     var parent = el.parent;
 
     while (parent) {
-      if (parent["for"]) {
+      if (parent.for) {
         key = parent.key;
         break;
       }
@@ -21597,7 +21597,7 @@ function genIfConditions(conditions, state, altGen, altEmpty) {
 }
 
 function genFor(el, state, altGen, altHelper) {
-  var exp = el["for"];
+  var exp = el.for;
   var alias = el.alias;
   var iterator1 = el.iterator1 ? "," + el.iterator1 : '';
   var iterator2 = el.iterator2 ? "," + el.iterator2 : '';
@@ -21772,16 +21772,16 @@ function genScopedSlots(el, slots, state) {
   // components with only scoped slots to skip forced updates from parent.
   // but in some cases we have to bail-out of this optimization
   // for example if the slot contains dynamic names, has v-if or v-for on them...
-  var needsForceUpdate = el["for"] || Object.keys(slots).some(function (key) {
+  var needsForceUpdate = el.for || Object.keys(slots).some(function (key) {
     var slot = slots[key];
-    return slot.slotTargetDynamic || slot["if"] || slot["for"] || containsSlotChild(slot) // is passing down slot from parent which may be dynamic
+    return slot.slotTargetDynamic || slot.if || slot.for || containsSlotChild(slot) // is passing down slot from parent which may be dynamic
     ;
   }); // #9534: if a component with scoped slots is inside a conditional branch,
   // it's possible for the same component to be reused but with different
   // compiled slot content. To avoid that, we generate a unique key based on
   // the generated code of all the slot contents.
 
-  var needsKey = !!el["if"]; // OR when it is inside another scoped slot or v-for (the reactivity may be
+  var needsKey = !!el.if; // OR when it is inside another scoped slot or v-for (the reactivity may be
   // disconnected due to the intermediate scope variable)
   // #9438, #9506
   // TODO: this can be further optimized by properly analyzing in-scope bindings
@@ -21791,12 +21791,12 @@ function genScopedSlots(el, slots, state) {
     var parent = el.parent;
 
     while (parent) {
-      if (parent.slotScope && parent.slotScope !== emptySlotScopeToken || parent["for"]) {
+      if (parent.slotScope && parent.slotScope !== emptySlotScopeToken || parent.for) {
         needsForceUpdate = true;
         break;
       }
 
-      if (parent["if"]) {
+      if (parent.if) {
         needsKey = true;
       }
 
@@ -21836,16 +21836,16 @@ function containsSlotChild(el) {
 function genScopedSlot(el, state) {
   var isLegacySyntax = el.attrsMap['slot-scope'];
 
-  if (el["if"] && !el.ifProcessed && !isLegacySyntax) {
+  if (el.if && !el.ifProcessed && !isLegacySyntax) {
     return genIf(el, state, genScopedSlot, "null");
   }
 
-  if (el["for"] && !el.forProcessed) {
+  if (el.for && !el.forProcessed) {
     return genFor(el, state, genScopedSlot);
   }
 
   var slotScope = el.slotScope === emptySlotScopeToken ? "" : String(el.slotScope);
-  var fn = "function(" + slotScope + "){" + "return " + (el.tag === 'template' ? el["if"] && isLegacySyntax ? "(" + el["if"] + ")?" + (genChildren(el, state) || 'undefined') + ":undefined" : genChildren(el, state) || 'undefined' : genElement(el, state)) + "}"; // reverse proxy v-slot without scope on this.$slots
+  var fn = "function(" + slotScope + "){" + "return " + (el.tag === 'template' ? el.if && isLegacySyntax ? "(" + el.if + ")?" + (genChildren(el, state) || 'undefined') + ":undefined" : genChildren(el, state) || 'undefined' : genElement(el, state)) + "}"; // reverse proxy v-slot without scope on this.$slots
 
   var reverseProxy = slotScope ? "" : ",proxy:true";
   return "{key:" + (el.slotTarget || "\"default\"") + ",fn:" + fn + reverseProxy + "}";
@@ -21857,7 +21857,7 @@ function genChildren(el, state, checkSkip, altGenElement, altGenNode) {
   if (children.length) {
     var el$1 = children[0]; // optimize single v-for
 
-    if (children.length === 1 && el$1["for"] && el$1.tag !== 'template' && el$1.tag !== 'slot') {
+    if (children.length === 1 && el$1.for && el$1.tag !== 'template' && el$1.tag !== 'slot') {
       var normalizationType = checkSkip ? state.maybeComponent(el$1) ? ",1" : ",0" : "";
       return "" + (altGenElement || genElement)(el$1, state) + normalizationType;
     }
@@ -21902,7 +21902,7 @@ function getNormalizationType(children, maybeComponent) {
 }
 
 function needsNormalization(el) {
-  return el["for"] !== undefined || el.tag === 'template' || el.tag === 'slot';
+  return el.for !== undefined || el.tag === 'template' || el.tag === 'slot';
 }
 
 function genNode(node, state) {
@@ -22046,7 +22046,7 @@ function checkEvent(exp, text, warn, range) {
 }
 
 function checkFor(node, text, warn, range) {
-  checkExpression(node["for"] || '', text, warn, range);
+  checkExpression(node.for || '', text, warn, range);
   checkIdentifier(node.alias, 'v-for alias', text, warn, range);
   checkIdentifier(node.iterator1, 'v-for iterator', text, warn, range);
   checkIdentifier(node.iterator2, 'v-for iterator', text, warn, range);
@@ -22449,7 +22449,7 @@ var lodash = createCommonjsModule(function (module, exports) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.14';
+  var VERSION = '4.17.11';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -25108,10 +25108,16 @@ var lodash = createCommonjsModule(function (module, exports) {
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-      } else if (isMap(value)) {
+
+        return result;
+      }
+
+      if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
+
+        return result;
       }
 
       var keysFunc = isFull
@@ -26035,8 +26041,8 @@ var lodash = createCommonjsModule(function (module, exports) {
         return;
       }
       baseFor(source, function(srcValue, key) {
-        stack || (stack = new Stack);
         if (isObject(srcValue)) {
+          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -27853,7 +27859,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision && nativeIsFinite(number)) {
+        if (precision) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -29036,7 +29042,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
+     * Gets the value at `key`, unless `key` is "__proto__".
      *
      * @private
      * @param {Object} object The object to query.
@@ -29044,10 +29050,6 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
-      if (key === 'constructor' && typeof object[key] === 'function') {
-        return;
-      }
-
       if (key == '__proto__') {
         return;
       }
@@ -32848,7 +32850,6 @@ var lodash = createCommonjsModule(function (module, exports) {
           }
           if (maxing) {
             // Handle invocations in a tight loop.
-            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -37235,12 +37236,9 @@ var lodash = createCommonjsModule(function (module, exports) {
       , 'g');
 
       // Use a sourceURL for easier debugging.
-      // The sourceURL gets injected into the source that's eval-ed, so be careful
-      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
-      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        (hasOwnProperty.call(options, 'sourceURL')
-          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
+        ('sourceURL' in options
+          ? options.sourceURL
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -37273,9 +37271,7 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      // Like with sourceURL, we take care to not check the option's prototype,
-      // as this configuration is a code injection vector.
-      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
+      var variable = options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -39480,11 +39476,10 @@ var lodash = createCommonjsModule(function (module, exports) {
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = lodashFunc.name + '';
-        if (!hasOwnProperty.call(realNames, key)) {
-          realNames[key] = [];
-        }
-        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
+        var key = (lodashFunc.name + ''),
+            names = realNames[key] || (realNames[key] = []);
+
+        names.push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -61017,7 +61012,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
         debugging: true,
         description: 'The current output engine',
         engines: {
-          "default": 'unknown',
+          default: 'unknown',
           cinahl: 'cinahl',
           cochrane: 'cochrane',
           embase: 'embase',
@@ -63036,7 +63031,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
       resolveTemplate: function resolveTemplate(template, engine) {
         if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
         if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-        if (polyglot.templates[template].engines["default"]) return polyglot.translate(polyglot.templates[template].engines["default"], engine);
+        if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
         return '';
       },
 
@@ -63683,7 +63678,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = function (inject) {
     if (!inject) return
-    inject("data-v-e5a98cf8_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["H:\\Profile\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
+    inject("data-v-3dacf241_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
@@ -64088,11 +64083,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-120d4758_0", { source: "\n.text-reader[data-v-120d4758] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-120d4758] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-120d4758]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-120d4758] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["H:\\Profile\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA+LA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: polyglot.engines,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(polyglot.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\timport('brace/theme/chrome');\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-f5586456_0", { source: "\n.text-reader[data-v-f5586456] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-f5586456] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-f5586456]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-f5586456] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA+LA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: polyglot.engines,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(polyglot.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\timport('brace/theme/chrome');\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-120d4758";
+  const __vue_scope_id__$1 = "data-v-f5586456";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
