@@ -21,15 +21,6 @@ It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot
 - [How Polyglot Works](#how-polyglot-works)
   * [Input/Output API](#input-output-api)
   * [Parsed Tree Object](#parsed-tree-object)
-    + [group](#group)
-    + [joinAnd](#joinand)
-    + [joinNear](#joinnear)
-    + [joinNot](#joinnot)
-    + [joinOr](#joinor)
-    + [mesh](#mesh)
-    + [phrase](#phrase)
-    + [raw](#raw)
-    + [template](#template)
 
 
 # Usage Guide
