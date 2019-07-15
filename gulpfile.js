@@ -139,6 +139,7 @@ function gh_page() {
 		'./node_modules/jquery/dist/jquery.js',
 		'./node_modules/font-awesome/**/*',
 		'./node_modules/popper.js/dist/umd/popper.js',
+		'./node_modules/v-tooltip/dist/v-tooltip.min.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
 			if (path.dirname == 'demo') { // Move all demo files into root
