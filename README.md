@@ -17,6 +17,7 @@ It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot
   * [Bracket Expansion](#bracket-expansion)
   * [Replacing Empty Field Tags](#replacing-empty-field-tags)
   * [Tooltips](#tooltips)
+  * [Templates](#templates)
   * [Comments](#comments)
 - [How Polyglot Works](#how-polyglot-works)
   * [Input/Output API](#input-output-api)
@@ -40,9 +41,9 @@ The following sub-headings break down each individual syntax.
 ## Plain-text phrases
 To search for basic phrases simply specify the words within the search term with or without being enclosed in speachmarks. Specific search fields can be specified by appending it to the term in any of the following supported formats:
 
-* `Term` (Generic search in all fields)
-* `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `ab`)
-* `Term.ti.` (Ovid MEDLINE field specification, fields also supported: `ti`, `ti,ab`, `tw`, `ab`, `pt`, `fs`, `sh`, `xm`)
+* `Term` (Generic search in all fields, polyglot will undeline the word in blue: [Replacing Empty Field Tags](#replacing-empty-field-tags))
+* `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `tw`, `ab`, `nm`, `sh`, `pt`)
+* `Term.ti.` or `Term:ti` (Ovid MEDLINE field specification, fields also supported: `tw`, `ti,ab`, `ab,ti`, `ti`, `ab`, `mp`, `nm`, `pt`, `fs`, `sh`, `xm`)
 
 
 ## Mesh Headings
@@ -104,7 +105,7 @@ While Ovid Medline supports using field tags on groups, PubMed doesn't, so any t
 
 
 ## Replacing Empty Field Tags
-Any time there is a phrase without a field tag, a dashed blue underline will appear underneath it. Clicking on the word will bring up a dialogue box which will allow you to specify a field tag to replace the missing field tag for either just that word or all phrases with no field tags. 
+Any time there is a phrase without a field tag (a generic search for all fields), a dashed blue underline will appear underneath it. Clicking on the word will bring up a dialogue box which will allow you to specify a field tag to replace the missing field tag for either just that word or all phrases with no field tags. 
 
 ![box](https://user-images.githubusercontent.com/25999161/61197578-07e54e00-a719-11e9-96b3-b64d0282fff3.png)
 
@@ -115,6 +116,18 @@ Any time a black dotted line appears underneath a word, howver over it to displa
 **e.g. When attempting to convert foo.ab. from and Ovid Medline Search to PubMed, because PubMed does not support searching the abstract field term by itself Polyglot translates it to the Title and Abstract field term.**
 
 ![tooltip](https://user-images.githubusercontent.com/25999161/61197414-2e56b980-a718-11e9-91ff-64979e3ea765.png)
+
+
+## Templates
+These are specified using the `<Template ID>` syntax.
+
+For example the "RCT Filter" template (specified via `<RCT Filter>` in Polglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the synax based on the output engine.
+
+| Template ID	| Description                  	|
+|---------------|-------------------------------|
+| `<rct filter>`| Standard Cochrane RCT Filter	|
+| `<sr filter>` | Standard Cochrane SR Filter	|
+| `<engine>` 	| The current output engine 	|
 
 
 ## Comments
