@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var polyglot = module.exports = {
 	/**
 	* List of example search queries
