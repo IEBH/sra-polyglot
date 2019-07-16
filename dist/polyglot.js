@@ -1,9 +1,5 @@
 "use strict";
 
-var _lodash = _interopRequireDefault(require("lodash"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 var polyglot = module.exports = {
   /**
   * List of example search queries
@@ -121,7 +117,7 @@ var polyglot = module.exports = {
     var tree = polyglot.parse(query, options);
     tree = polyglot.preProcess(tree, options);
 
-    _lodash.default.forEach(polyglot.engines, function (engine, id) {
+    _.forEach(polyglot.engines, function (engine, id) {
       if (id == "lexicalTreeJSON") {
         // Dont run postprocess for lexicalTreeJSON
         output[id] = engine.compile(tree, options), options;
@@ -141,7 +137,7 @@ var polyglot = module.exports = {
   * @see parse()
   */
   preProcess: function preProcess(tree, options) {
-    var settings = _lodash.default.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
+    var settings = _.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
 
 
     return tree;
@@ -161,7 +157,7 @@ var polyglot = module.exports = {
   * @see parse()
   */
   postProcess: function postProcess(text, options) {
-    var settings = _lodash.default.defaults(options, {
+    var settings = _.defaults(options, {
       forceString: true,
       html: true,
       highlighting: false,
@@ -169,7 +165,7 @@ var polyglot = module.exports = {
       transposeLines: true
     });
 
-    if (settings.forceString && !_lodash.default.isString(text)) text = JSON.stringify(text, null, '\t');
+    if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
     if (settings.highlighting) {
       text = text.replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>').replace(/\bNOT\b/g, '<font color="purple">NOT</font>');
@@ -177,7 +173,7 @@ var polyglot = module.exports = {
 
     if (settings.html) {
       text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
-    } else if (_lodash.default.isString(text)) {
+    } else if (_.isString(text)) {
       // Flatten HTML - Yes this is a horrible method, but its quick
       for (var i = 0; i < 10; i++) {
         text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
@@ -204,7 +200,7 @@ var polyglot = module.exports = {
   * @return {array} Array representing the parsed tree nodes
   */
   parse: function parse(query, options) {
-    var settings = _lodash.default.defaults(options, {
+    var settings = _.defaults(options, {
       groupLines: false,
       groupLinesAlways: false,
       removeNumbering: false,
@@ -252,7 +248,7 @@ var polyglot = module.exports = {
       if (settings.groupLines && (settings.groupLinesAlways || lines.length > 1)) {
         // Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
         lines = lines.map(function (line) {
-          return _lodash.default.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
+          return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
         });
       } // }}}
 
@@ -268,7 +264,7 @@ var polyglot = module.exports = {
 
 
     function trimLastLeaf() {
-      if (leaf && _lodash.default.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
+      if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
         leaf.content = leaf.content.substr(0, leaf.content.length - 1);
         if (!leaf.content) branch.nodes.pop();
       }
@@ -337,7 +333,7 @@ var polyglot = module.exports = {
         // 1-7/OR
         branch.nodes.push({
           type: 'ref',
-          ref: _lodash.default.range(match[1], (match[2] + 1) / 10),
+          ref: _.range(match[1], (match[2] + 1) / 10),
           cond: match[3].toUpperCase(),
           nodes: []
         });
@@ -348,7 +344,7 @@ var polyglot = module.exports = {
         // OR/1-7
         branch.nodes.push({
           type: 'ref',
-          ref: _lodash.default.range(match[2], (match[3] + 1) / 10),
+          ref: _.range(match[2], (match[3] + 1) / 10),
           cond: match[1].toUpperCase(),
           nodes: []
         });
@@ -440,7 +436,7 @@ var polyglot = module.exports = {
         trimLastLeaf();
         branch.nodes.push({
           type: 'joinNear',
-          proximity: _lodash.default.toNumber(match[2])
+          proximity: _.toNumber(match[2])
         });
         leaf = undefined;
         offset += match[0].length;
@@ -507,9 +503,9 @@ var polyglot = module.exports = {
           // Figure out the leaf to use (usually the last one) or the previously used group {{{
           var useLeaf = {};
 
-          if (_lodash.default.isObject(leaf) && leaf.type == 'phrase') {
+          if (_.isObject(leaf) && leaf.type == 'phrase') {
             useLeaf = leaf;
-          } else if (_lodash.default.isArray(leaf) && lastGroup) {
+          } else if (_.isArray(leaf) && lastGroup) {
             useLeaf = lastGroup;
           } // }}}
 
@@ -571,9 +567,9 @@ var polyglot = module.exports = {
         // Figure out the leaf to use (usually the last one) or the previously used group {{{
         var useLeaf;
 
-        if (_lodash.default.isObject(leaf) && leaf.type == 'phrase') {
+        if (_.isObject(leaf) && leaf.type == 'phrase') {
           useLeaf = leaf;
-        } else if (_lodash.default.isArray(leaf) && lastGroup) {
+        } else if (_.isArray(leaf) && lastGroup) {
           useLeaf = lastGroup;
         } // }}}
 
@@ -624,7 +620,7 @@ var polyglot = module.exports = {
       } else {
         var nextChar = q.substr(0, 1);
 
-        if ((_lodash.default.isUndefined(leaf) || _lodash.default.isArray(leaf)) && nextChar != ' ') {
+        if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
           // Leaf pointing to array entity - probably not created fallback leaf to append to
           if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
             // First character is a speachmark - slurp until we see the next one
@@ -657,7 +653,7 @@ var polyglot = module.exports = {
             };
             branch.nodes.push(leaf);
           }
-        } else if (_lodash.default.isObject(leaf) && leaf.type == 'phrase') {
+        } else if (_.isObject(leaf) && leaf.type == 'phrase') {
           leaf.content += nextChar;
         }
 
@@ -732,7 +728,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -878,7 +874,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1018,7 +1014,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1198,7 +1194,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1345,7 +1341,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1499,7 +1495,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1545,7 +1541,7 @@ var polyglot = module.exports = {
                 if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
                   buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
                 } else if (branch.field) {
-                  buffer += _lodash.default.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
+                  buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
                 } else {
                   if (settings.highlighting) {
                     buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
@@ -1633,7 +1629,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -1762,7 +1758,7 @@ var polyglot = module.exports = {
       * @return {string} The compiled output
       */
       compile: function compile(tree, options) {
-        var settings = _lodash.default.defaults(options, {
+        var settings = _.defaults(options, {
           replaceWildcards: true
         }); // Apply wildcard replacements
 
@@ -2044,7 +2040,7 @@ var polyglot = module.exports = {
         tree.forEach(function (branch, branchKey) {
           var nodePath = path.concat(branchKey); // Fire callback if it matches
 
-          if (!types || _lodash.default.includes(types, branch.type)) {
+          if (!types || _.includes(types, branch.type)) {
             var result = callback(branch, nodePath);
             if (result === 'DEL') removals.push(nodePath);
           } // Walk down nodes if its a group
@@ -2059,7 +2055,7 @@ var polyglot = module.exports = {
       removals.reverse() // Walk in reverse order so we don't screw up arrays
       .forEach(function (path) {
         var nodeName = path.pop();
-        var parent = path.length ? _lodash.default.get(tree, path) : tree;
+        var parent = path.length ? _.get(tree, path) : tree;
         delete parent[nodeName];
       });
       return tree;
@@ -2089,7 +2085,7 @@ var polyglot = module.exports = {
     quotePhrase: function quotePhrase(branch, engine) {
       var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-      var text = _lodash.default.trimEnd(branch.content);
+      var text = _.trimEnd(branch.content);
 
       return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
     },
@@ -2101,11 +2097,11 @@ var polyglot = module.exports = {
     * @returns {Object} The recombined tree
     */
     renestConditions: function renestConditions(tree) {
-      if (!_lodash.default.isArray(tree)) return tree; // Not an array - skip
+      if (!_.isArray(tree)) return tree; // Not an array - skip
       // Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
 
       return tree.reduce(function (res, branch, index, arr) {
-        var firstKey = (0, _lodash.default)(branch).keys().first();
+        var firstKey = _(branch).keys().first();
 
         if (firstKey == '$or' || firstKey == '$and') {
           // Is a combinator
@@ -2135,7 +2131,7 @@ var polyglot = module.exports = {
     * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
     */
     combineConditions: function combineConditions(tree, options) {
-      var settings = _lodash.default.defaults(options, {
+      var settings = _.defaults(options, {
         depth: 10
       });
 
@@ -2145,14 +2141,14 @@ var polyglot = module.exports = {
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
         // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
-        _lodash.default.forEach(branch, function (v, k) {
+        _.forEach(branch, function (v, k) {
           // Use _.map if its an array and _.mapValues if we're examining an object
-          if (_lodash.default.isObject(v)) {
-            var firstKey = (0, _lodash.default)(branch).keys().first();
+          if (_.isObject(v)) {
+            var firstKey = _(branch).keys().first();
 
             if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
               // Mark for cleanup later (when we can do a bottom-up traversal)
-              var lastKey = _lodash.default.findLast(collapses, function (i) {
+              var lastKey = _.findLast(collapses, function (i) {
                 return i.key == '$and' || i.key == '$or';
               }); // Collapse only identical keys
 
@@ -2174,20 +2170,21 @@ var polyglot = module.exports = {
 
       traverseTree(tree);
       collapses.forEach(function (collapse) {
-        var parent = _lodash.default.get(tree, collapse.path.slice(0, -1));
+        var parent = _.get(tree, collapse.path.slice(0, -1));
 
-        var child = _lodash.default.get(tree, collapse.path.concat([collapse.key]));
+        var child = _.get(tree, collapse.path.concat([collapse.key]));
 
         if (!child || !parent || !parent.length) return;
         var child2 = parent[1];
         if (child2) child.push(child2); // Wrap $or conditions (that have an '$and' parent) in an object {{{
 
-        var lastParent = (0, _lodash.default)(collapse.path).slice(0, -1).findLast(_lodash.default.isString);
+        var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
+
         if (lastParent && lastParent == '$and' && collapse.key == '$or') child = {
           $or: child
         }; // }}}
 
-        _lodash.default.set(tree, collapse.path.slice(0, -1), child);
+        _.set(tree, collapse.path.slice(0, -1), child);
       });
       return tree;
     },
