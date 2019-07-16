@@ -78,11 +78,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'respir*',
+										offset: 158,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'bronch*',
+										offset: 169,
 									},
 								],
 							},
@@ -96,16 +98,19 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'insuffic*',
+										offset: 184,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'fail*',
+										offset: 197,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'distress*',
+										offset: 206,
 									},
 								],
 							},
@@ -119,11 +124,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'acute lung injur*',
+								offset: 226,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'ali',
+								offset: 247,
 							},
 						],
 					},
@@ -135,11 +142,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'ards',
+								offset: 260,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'rds',
+								offset: 268,
 							},
 						],
 					},
@@ -151,6 +160,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'respiratory',
+								offset: 281,
 							},
 							{
 								type: 'joinNear',
@@ -159,6 +169,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'infect*',
+								offset: 298,
 							},
 						],
 					},
@@ -170,11 +181,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'pneumon*',
+								offset: 315,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'bronchopneumon*',
+								offset: 327,
 							},
 						],
 					},
@@ -186,11 +199,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'bronchit*',
+								offset: 352,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'bronchiolit*',
+								offset: 365,
 							},
 						],
 					},
@@ -205,11 +220,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'neonatal lung',
+										offset: 388,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'neonatal respiratory',
+										offset: 405,
 									},
 								],
 							},
@@ -223,21 +240,25 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'diseas*',
+										offset: 433,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'injur*',
+										offset: 444,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'infect*',
+										offset: 454,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'illness*',
+										offset: 465,
 									},
 								],
 							},
@@ -248,12 +269,14 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 						type: 'phrase',
 						field: 'title+abstract+tw',
 						content: 'hyaline membrane diseas*',
+						offset: 483,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						field: 'title+abstract+tw',
 						content: 'bronchopulmonary dysplasia',
+						offset: 515,
 					},
 					{type: 'joinOr'},
 					{
@@ -263,26 +286,31 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'croup',
+								offset: 550,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'laryngotracheobronchit*',
+								offset: 559,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'epiglottit*',
+								offset: 586,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'whooping cough',
+								offset: 601,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'legionel*',
+								offset: 619,
 							},
 						],
 					},
@@ -294,6 +322,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'laryng*',
+								offset: 638,
 							},
 							{
 								type: 'joinNear',
@@ -302,6 +331,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'infect*',
+								offset: 651,
 							},
 						],
 					},
@@ -313,6 +343,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'acute',
+								offset: 668,
 							},
 							{
 								type: 'joinNear',
@@ -324,11 +355,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'episode',
+										offset: 680,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'exacerbation*',
+										offset: 691,
 									},
 								],
 							},
@@ -342,16 +375,19 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'asthma',
+										offset: 712,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'bronchiectasis',
+										offset: 722,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'cystic fibrosis',
+										offset: 740,
 									},
 								],
 							},
@@ -362,18 +398,21 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 						type: 'mesh',
 						recurse: false,
 						content: 'respiratory syncytial viruses',
+						offset: 765,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
 						recurse: false,
 						content: 'respiratory syncytial virus, human',
+						offset: 799,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
 						recurse: false,
 						content: 'Respiratory Syncytial Virus Infections',
+						offset: 838,
 					},
 					{type: 'joinOr'},
 					{
@@ -383,11 +422,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'respiratory syncytial virus*',
+								offset: 882,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'rsv',
+								offset: 914,
 							},
 						],
 					},
@@ -444,11 +485,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'postur*',
+								offset: 956,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'position*',
+								offset: 967,
 							},
 						],
 					},
@@ -460,16 +503,19 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'supine',
+								offset: 986,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'prone',
+								offset: 996,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'semi-prone',
+								offset: 1005,
 							},
 						],
 					},
@@ -484,11 +530,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'face',
+										offset: 1026,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'facing',
+										offset: 1034,
 									},
 								],
 							},
@@ -499,6 +547,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'down*',
+								offset: 1047,
 							},
 						],
 					},
@@ -510,6 +559,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'side',
+								offset: 1062,
 							},
 							{
 								type: 'joinNear',
@@ -521,31 +571,37 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'lay',
+										offset: 1073,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'laying',
+										offset: 1080,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'laid',
+										offset: 1090,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'lays',
+										offset: 1098,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'lying',
+										offset: 1106,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'lies',
+										offset: 1115,
 									},
 								],
 							},
@@ -555,12 +611,14 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{
 						type: 'phrase',
 						content: 'lateral',
+						offset: 1129,
 						field: 'title+abstract+tw',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						content: 'upright',
+						offset: 1144,
 						field: 'title+abstract+tw',
 					},
 					{type: 'joinOr'},
@@ -571,31 +629,37 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'semi-recumbent',
+								offset: 1160,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'semirecumbent',
+								offset: 1178,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'semi-reclin*',
+								offset: 1195,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'semireclin*',
+								offset: 1211,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'reclin*',
+								offset: 1226,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'recumbent',
+								offset: 1237,
 							},
 						],
 					},
@@ -610,26 +674,31 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'high',
+										offset: 1257,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'erect',
+										offset: 1265,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'non-erect',
+										offset: 1274,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'lean*',
+										offset: 1287,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'forward',
+										offset: 1296,
 									},
 								],
 							},
@@ -643,11 +712,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 									{
 										type: 'phrase',
 										content: 'sit',
+										offset: 1311,
 									},
 									{type: 'joinOr'},
 									{
 										type: 'phrase',
 										content: 'sitting',
+										offset: 1318,
 									},
 								],
 							},
@@ -661,6 +732,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'body',
+								offset: 1336,
 							},
 							{
 								type: 'joinNear',
@@ -669,6 +741,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'tilt*',
+								offset: 1346,
 							},
 						],
 					},
@@ -680,6 +753,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'elevat*',
+								offset: 1361,
 							},
 							{
 								type: 'joinNear',
@@ -688,6 +762,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 							{
 								type: 'phrase',
 								content: 'head*',
+								offset: 1374,
 							},
 						],
 					},

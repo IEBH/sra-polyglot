@@ -13,11 +13,13 @@ describe('Check that comments are ignored', ()=> {
 					{
 						type: 'phrase',
 						content: 'term1',
+						offset: 0,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						content: 'term2',
+						offset: 9,
 					},
 					{
 						type: 'raw',
@@ -75,11 +77,13 @@ describe('Check that comments are ignored', ()=> {
 					{
 						type: 'phrase',
 						content: 'term3',
+						offset: 42,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						content: 'term4',
+						offset: 51,
 					},
 					{
 						type: 'comment',

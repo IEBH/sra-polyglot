@@ -13,6 +13,7 @@ describe('Parse', ()=> {
 					{
 						type: 'phrase',
 						content: 'foo bar baz',
+						offset: 0,
 					}
 				]
 			},
@@ -32,16 +33,19 @@ describe('Parse', ()=> {
 							{
 								type: 'phrase',
 								content: 'foo',
+								offset: 1,
 							},
 							{type: 'joinAnd'},
 							{
 								type: 'phrase',
 								content: 'bar',
+								offset: 9,
 							},
 							{type: 'joinAnd'},
 							{
 								type: 'phrase',
 								content: 'baz',
+								offset: 17,
 							},
 						],
 					},
@@ -63,11 +67,13 @@ describe('Parse', ()=> {
 							{
 								type: 'phrase',
 								content: 'foo',
+								offset: 1,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'bar',
+								offset: 8,
 							},
 						],
 					},
@@ -78,16 +84,19 @@ describe('Parse', ()=> {
 							{
 								type: 'phrase',
 								content: 'baz',
+								offset: 18,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'quz',
+								offset: 25,
 							},
 							{type: 'joinOr'},
 							{
 								type: 'phrase',
 								content: 'quuz',
+								offset: 32,
 							},
 						],
 					},
@@ -107,18 +116,21 @@ describe('Parse', ()=> {
 						type: 'mesh',
 						content: 'foo',
 						recurse: true,
+						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'bar baz',
 						recurse: false,
+						offset: 14,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'quz quuz',
 						recurse: true,
+						offset: 40,
 					},
 				]
 			}
@@ -148,12 +160,14 @@ describe('Parse', ()=> {
 						type: 'mesh',
 						content: 'quz',
 						recurse: false,
+						offset: 30,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'quz quuz',
 						recurse: false,
+						offset: 39,
 					},
 				]
 			}
@@ -171,18 +185,21 @@ describe('Parse', ()=> {
 						type: 'phrase',
 						field: 'title+abstract',
 						content: 'foo',
+						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
 						field: 'title',
 						content: 'bar baz',
+						offset: 14,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
 						field: 'abstract',
 						content: 'quz',
+						offset: 30,
 					},
 					{type: 'joinAnd'},
 					{
@@ -192,11 +209,13 @@ describe('Parse', ()=> {
 							{
 								type: 'phrase',
 								content: 'thud',
+								offset: 43,
 							},
 							{type: 'joinAnd'},
 							{
 								type: 'phrase',
 								content: 'waldo',
+								offset: 52,
 							},
 						],
 					},
@@ -216,18 +235,21 @@ describe('Parse', ()=> {
 						type: 'phrase',
 						field: 'title+abstract+tw',
 						content: 'foo',
+						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
 						field: 'publicationType',
 						content: 'bar baz',
+						offset: 12,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
 						field: 'abstract',
 						content: 'quz',
+						offset: 28,
 					},
 					{type: 'joinAnd'},
 					{
@@ -237,11 +259,13 @@ describe('Parse', ()=> {
 							{
 								type: 'phrase',
 								content: 'thud',
+								offset: 41,
 							},
 							{type: 'joinAnd'},
 							{
 								type: 'phrase',
 								content: 'waldo',
+								offset: 50,
 							},
 						],
 					},
@@ -260,6 +284,7 @@ describe('Parse', ()=> {
 					{
 						type: 'phrase',
 						content: 'foo',
+						offset: 0,
 					},
 					{
 						type: 'joinNear',
@@ -268,6 +293,7 @@ describe('Parse', ()=> {
 					{
 						type: 'phrase',
 						content: 'bar',
+						offset: 10,
 					},
 					{
 						type: 'raw',
@@ -295,11 +321,13 @@ describe('Parse', ()=> {
 					{
 						type: 'phrase',
 						content: 'baz',
+						offset: 20,
 					},
 					{type: 'joinNot'},
 					{
 						type: 'phrase',
 						content: 'quz',
+						offset: 28,
 					},
 				],
 			},
