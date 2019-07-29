@@ -1,11 +1,11 @@
 # Polyglot Search Syntax Translator
-This module is part of the [Bond University Centre for Research in Evidence-Based Practice](https://github.com/CREBP) Systematic Review Assistant suite of tools.
+This module is part of the [Bond University Centre for Research in Evidence-Based Practice](https://github.com/IEBH) Systematic Review Assistant suite of tools.
 
 When given a complex search query in either PubMed or Ovid MEDLINE format it will attempt to translate it to any of the supported search engine formats.
 
-It forms the [Polyglot Search Syntax Translator](http://crebp-sra.com/#/polyglot) module of the [Systematic Review Accelerator](http://crebp-sra.com).
+It forms the [Polyglot Search Syntax Translator](http://sr-accelerator.com/#/polyglot) module of the [Systematic Review Accelerator](http://sr-accelerator.com).
 
-[DEMO](https://crebp.github.io/sra-polyglot)
+[DEMO](https://iebh.github.io/sra-polyglot/)
 
 # Table of Contents
 - [Usage Guide](#usage-guide)
