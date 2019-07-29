@@ -37,6 +37,42 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 
 });
 
+describe('Translate title + abstract searches (PubMed -> *)', ()=> {
+
+	it('translate `term[Title/Abstract]` -> PM `term[tiab]`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'pubmed')).to.equal('term[tiab]');
+	});
+
+	it('translate `term[Title/Abstract]` -> OV `term.ti,ab`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'ovid')).to.equal('term.ti,ab.');
+	});
+
+	it('translate `term[Title/Abstract]` -> CO `term:ti,ab`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'cochrane')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term[Title/Abstract]` -> EM `term:ti,ab`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'embase')).to.equal('term:ti,ab');
+	});
+
+	it('translate `term[Title/Abstract]` -> CI `TI term OR AB term2`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'cinahl')).to.equal('TI term OR AB term');
+	});
+
+	it('translate `term[Title/Abstract]` -> PY `term.ti,ab`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'psycinfo')).to.equal('term.ti,ab');
+	});
+
+	it('translate `term[Title/Abstract]` -> SC `TITLE-ABS(term)`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'scopus')).to.equal('TITLE-ABS("term")');
+	});
+
+	it('translate `term[Title/Abstract]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term[tiab]', 'wos')).to.equal('term');
+	});
+
+});
+
 describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)', ()=> {
 
 	it('translate `term:ti,ab` -> PM `term[tiab]`', ()=> {
