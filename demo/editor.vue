@@ -2,6 +2,8 @@
 import _ from 'lodash';
 import ace from 'vue2-ace-editor';
 import polyglot from 'polyglot';
+import enginesImport from '../modules/engines.js'
+import global from '../modules/global.js'
 import JsonTree from 'vue-json-tree'
 import VRuntimeTemplate from "v-runtime-template";
 
@@ -14,7 +16,7 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		engines: polyglot.engines,
+		engines: enginesImport,
 		enginesExpanded: {},
 		enginesQuery: {},
 		polyglotOptions: {
@@ -72,7 +74,7 @@ export default {
 		showExample() {
 			var chosenExample;
 			do {
-				chosenExample = _.sample(polyglot.examples);
+				chosenExample = _.sample(global.examples);
 			} while (this.exampleLast == chosenExample.title)
 			this.exampleLast = chosenExample;
 			this.query = chosenExample.query;
@@ -81,7 +83,6 @@ export default {
 			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
 		},
 		editorInit() { // Ace editor settings
-			import('brace/theme/chrome');
 			
 			window.ace.config.set('modePath', 'syntax/ace');
 		},
@@ -98,7 +99,7 @@ export default {
 		},
 		replaceFields(field, replace_all, offset) {
 			if (replace_all) {
-				var itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items
+				var itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items
 				for (var x in itemsToReplace) {
 					// If original query is surrounded by quotation marks, 2 must be added to offset
 					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;
