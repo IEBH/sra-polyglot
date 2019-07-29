@@ -2,8 +2,16 @@
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
+}
+
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
 }
 
 var jquery = createCommonjsModule(function (module) {
@@ -60964,91 +60972,2318 @@ var vue2AceEditor = {
     }
 };
 
-var polyglot_1 = createCommonjsModule(function (module) {
+var global$2 = {
+  /**
+  * List of example search queries
+  * See tests/examples.js for the outputs in each case
+  * @var {array}
+  */
+  examples: [{
+    title: 'Failure of antibiotic prescribing for bacterial infections',
+    query: '"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic'
+  }, {
+    title: 'Clinical prediction guides for whiplash',
+    query: '"Neck"[Mesh] OR Neck OR Necks OR "Cervical Vertebrae"[Mesh] OR "Cervical Vertebrae" OR "Neck Muscles"[Mesh] OR "Neck Muscles" OR "Neck Injuries"[Mesh] OR "Whiplash Injuries"[Mesh] OR "Radiculopathy"[Mesh] OR "Neck Injuries" OR "Neck Injury" OR Whiplash OR Radiculopathies OR Radiculopathy\n\n AND\n\n "Pain"[Mesh] OR Pain OR Pains OR Aches OR Ache OR Sore\n\n AND\n\n "Decision Support Techniques"[Mesh] OR "Predictive Value of Tests"[Mesh] OR "Observer Variation"[Mesh] OR Decision Support OR Decision Aids OR Decision Aid OR Decision Analysis OR Decision Modeling OR Decision modelling OR Prediction OR Predictions OR Predictor OR Predicting OR Predicted'
+  }, {
+    title: 'Prevalence of Thyroid Disease in Australia',
+    query: '"Thyroid Diseases"[Mesh] OR "Thyroid diseases" OR "Thyroid disease" OR "Thyroid disorder" OR "Thyroid disorders" OR Goiter OR Goitre OR Hypothyroidism OR Hyperthyroidism OR Thyroiditis OR "Graves disease" OR Hyperthyroxinemia OR Thyrotoxicosis OR  "Thyroid dysgenesis" OR "Thyroid cancer" OR "Thyroid cancers" OR "Thyroid neoplasm" OR "Thyroid neoplasms" OR "Thyroid nodule" OR "Thyroid nodules" OR "Thyroid tumor" OR "Thyroid tumour" OR "Thyroid tumors" OR "Thyroid tumours" OR "Thyroid cyst" OR "Thyroid cysts" OR "Cancer of the thyroid"\n\n AND\n\n "Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR "Prevalence" OR "Prevalences" OR Epidemiology OR Epidemiological\n\n AND\n\n "Australia"[Mesh] OR Australia OR Australian OR Australasian OR Australasia OR Queensland OR Victoria OR "New South Wales" OR "Northern Territory"'
+  }, {
+    title: 'Prevalence of incidental thyroid cancer: A systematic review of autopsy studies',
+    query: '(("Thyroid Neoplasms"[Mesh] OR "Adenocarcinoma, Follicular"[Mesh] OR "Adenocarcinoma, Papillary"[Mesh] OR OPTC)) OR (((Thyroid OR Follicular OR Papillary OR hurtle cell)) AND (cancer OR cancers OR carcinoma OR carcinomas OR Adenocarcinoma OR Adenocarcinomas neoplasm OR neoplasms OR nodule OR nodules OR tumor OR tumour OR Tumors OR Tumours OR cyst OR cysts))\n\nAND\n\n"Autopsy"[Mesh] OR "Autopsy" OR "Autopsies" OR Postmortem OR Post-mortem OR (Post AND mortem)\n\nAND\n\n"Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR Prevalence OR Prevalences OR Epidemiology OR Epidemiological OR Frequency\n\nAND\n\n"Incidental Findings"[Mesh] OR Incidental OR Unsuspected OR Discovery OR Discoveries OR Findings OR Finding OR Occult OR Hidden'
+  }, {
+    title: 'Positioning for acute respiratory distress in hospitalised infants and children',
+    query: '# Lung diseases or other infections\nexp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.\n\nAND\n\n# Posture\nexp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.\n\nAND\n\n# RCTs\n<RCT Filter>'
+  }],
+  messages: {
+    'NO_SINGLE_WILDCARD': 'There is no single character wildcard equievelent, so an unlimited matching length wildcard has been used instead',
+    'NO_OPTIONAL_WILDCARD': 'There is no optional single character wildcard equievelent, so an unlimited matching length wildcard has been used instead'
+  },
+  variables: {
+    no_field_tag: [] // Stores offsets for phrases with no field tags (for replacement)
 
-  var polyglot = module.exports = {
-    /**
-    * List of example search queries
-    * See tests/examples.js for the outputs in each case
-    * @var {array}
-    */
-    examples: [{
-      title: 'Failure of antibiotic prescribing for bacterial infections',
-      query: '"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic'
-    }, {
-      title: 'Clinical prediction guides for whiplash',
-      query: '"Neck"[Mesh] OR Neck OR Necks OR "Cervical Vertebrae"[Mesh] OR "Cervical Vertebrae" OR "Neck Muscles"[Mesh] OR "Neck Muscles" OR "Neck Injuries"[Mesh] OR "Whiplash Injuries"[Mesh] OR "Radiculopathy"[Mesh] OR "Neck Injuries" OR "Neck Injury" OR Whiplash OR Radiculopathies OR Radiculopathy\n\n AND\n\n "Pain"[Mesh] OR Pain OR Pains OR Aches OR Ache OR Sore\n\n AND\n\n "Decision Support Techniques"[Mesh] OR "Predictive Value of Tests"[Mesh] OR "Observer Variation"[Mesh] OR Decision Support OR Decision Aids OR Decision Aid OR Decision Analysis OR Decision Modeling OR Decision modelling OR Prediction OR Predictions OR Predictor OR Predicting OR Predicted'
-    }, {
-      title: 'Prevalence of Thyroid Disease in Australia',
-      query: '"Thyroid Diseases"[Mesh] OR "Thyroid diseases" OR "Thyroid disease" OR "Thyroid disorder" OR "Thyroid disorders" OR Goiter OR Goitre OR Hypothyroidism OR Hyperthyroidism OR Thyroiditis OR "Graves disease" OR Hyperthyroxinemia OR Thyrotoxicosis OR  "Thyroid dysgenesis" OR "Thyroid cancer" OR "Thyroid cancers" OR "Thyroid neoplasm" OR "Thyroid neoplasms" OR "Thyroid nodule" OR "Thyroid nodules" OR "Thyroid tumor" OR "Thyroid tumour" OR "Thyroid tumors" OR "Thyroid tumours" OR "Thyroid cyst" OR "Thyroid cysts" OR "Cancer of the thyroid"\n\n AND\n\n "Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR "Prevalence" OR "Prevalences" OR Epidemiology OR Epidemiological\n\n AND\n\n "Australia"[Mesh] OR Australia OR Australian OR Australasian OR Australasia OR Queensland OR Victoria OR "New South Wales" OR "Northern Territory"'
-    }, {
-      title: 'Prevalence of incidental thyroid cancer: A systematic review of autopsy studies',
-      query: '(("Thyroid Neoplasms"[Mesh] OR "Adenocarcinoma, Follicular"[Mesh] OR "Adenocarcinoma, Papillary"[Mesh] OR OPTC)) OR (((Thyroid OR Follicular OR Papillary OR hurtle cell)) AND (cancer OR cancers OR carcinoma OR carcinomas OR Adenocarcinoma OR Adenocarcinomas neoplasm OR neoplasms OR nodule OR nodules OR tumor OR tumour OR Tumors OR Tumours OR cyst OR cysts))\n\nAND\n\n"Autopsy"[Mesh] OR "Autopsy" OR "Autopsies" OR Postmortem OR Post-mortem OR (Post AND mortem)\n\nAND\n\n"Prevalence"[Mesh] OR "Epidemiology"[Mesh] OR Prevalence OR Prevalences OR Epidemiology OR Epidemiological OR Frequency\n\nAND\n\n"Incidental Findings"[Mesh] OR Incidental OR Unsuspected OR Discovery OR Discoveries OR Findings OR Finding OR Occult OR Hidden'
-    }, {
-      title: 'Positioning for acute respiratory distress in hospitalised infants and children',
-      query: '# Lung diseases or other infections\nexp Lung Diseases/ OR exp Bronchial Diseases/ OR exp Respiratory Tract Infections/ OR exp Respiratory Insufficiency/ OR ((respir* or bronch*) adj3 (insuffic* or fail* or distress*)).tw. OR (acute lung injur* or ali).tw. OR (ards or rds).tw. OR (respiratory adj5 infect*).tw. OR (pneumon* or bronchopneumon*).tw. OR (bronchit* or bronchiolit*).tw. OR ((neonatal lung or neonatal respiratory) adj1 (diseas* or injur* or infect* or illness*)).tw. OR hyaline membrane diseas*.tw. OR bronchopulmonary dysplasia.tw. OR (croup or laryngotracheobronchit* or epiglottit* or whooping cough or legionel*).tw. OR (laryng* adj2 infect*).tw. OR (acute adj2 (episode or exacerbation*) adj3 (asthma or bronchiectasis or cystic fibrosis)).tw. OR respiratory syncytial viruses/ OR respiratory syncytial virus, human/ OR Respiratory Syncytial Virus Infections/ OR (respiratory syncytial virus* or rsv).tw.\n\nAND\n\n# Posture\nexp Posture/ OR (postur* or position*).tw. OR (supine or prone or semi-prone).tw. OR ((face or facing) adj5 down*).tw. OR (side adj5 (lay or laying or laid or lays or lying or lies)).tw. OR lateral.tw. OR upright.tw. OR (semi-recumbent or semirecumbent or semi-reclin* or semireclin* or reclin* or recumbent).tw. OR ((high or erect or non-erect or lean* or forward) adj5 (sit or sitting)).tw. OR (body adj3 tilt*).tw. OR (elevat* adj3 head*).tw.\n\nAND\n\n# RCTs\n<RCT Filter>'
-    }],
-    messages: {
-      'NO_SINGLE_WILDCARD': 'There is no single character wildcard equievelent, so an unlimited matching length wildcard has been used instead',
-      'NO_OPTIONAL_WILDCARD': 'There is no optional single character wildcard equievelent, so an unlimited matching length wildcard has been used instead'
-    },
-    variables: {
-      no_field_tag: [] // Stores offsets for phrases with no field tags (for replacement)
+  },
 
-    },
-
-    /**
-    * List of templates
-    * Each key is the (case insensitive; specify in lowercase) keyword used in angular brackets
-    * Each value is an object containing 'name', 'description', 'debugging' and an engines object with an additional 'default' key
-    * @var {Object}
-    * @example
-    * {rct: {engines: {default: 'foo', ovid: 'bar'}}} // `<rct>` => 'foo' in most databases and 'bar' in Ovid MEDLINE
-    */
-    templates: {
-      // Meta `<engine>` template will output the current engine (useful for tests)
-      'engine': {
-        name: 'Engine name',
-        debugging: true,
-        description: 'The current output engine',
-        engines: {
-          default: 'unknown',
-          cinahl: 'cinahl',
-          cochrane: 'cochrane',
-          embase: 'embase',
-          mongodb: 'mongodb',
-          ovid: 'ovid',
-          psycinfo: 'psycinfo',
-          pubmed: 'pubmed',
-          scopus: 'scopus',
-          wos: 'wos'
-        }
-      },
-      'rct filter': {
-        name: 'RCT Filter',
-        description: 'Standard Cochrane RCT Filter',
-        engines: {
-          cinahl: '(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial',
-          embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
-          ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
-          psycinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
-          pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
-          wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)'
-        }
-      },
-      'sr filter': {
-        name: 'SR Filter',
-        description: 'Standard Cochrane SR Filter',
-        engines: {
-          cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
-          embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
-          ovid: 'search:.tw.OR meta analysis.mp,pt.OR review.pt.OR di.xs. OR associated.tw.',
-          pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
-          wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane'
-        }
+  /**
+  * List of templates
+  * Each key is the (case insensitive; specify in lowercase) keyword used in angular brackets
+  * Each value is an object containing 'name', 'description', 'debugging' and an engines object with an additional 'default' key
+  * @var {Object}
+  * @example
+  * {rct: {engines: {default: 'foo', ovid: 'bar'}}} // `<rct>` => 'foo' in most databases and 'bar' in Ovid MEDLINE
+  */
+  templates: {
+    // Meta `<engine>` template will output the current engine (useful for tests)
+    'engine': {
+      name: 'Engine name',
+      debugging: true,
+      description: 'The current output engine',
+      engines: {
+        default: 'unknown',
+        cinahl: 'cinahl',
+        cochrane: 'cochrane',
+        embase: 'embase',
+        mongodb: 'mongodb',
+        ovid: 'ovid',
+        psycinfo: 'psycinfo',
+        pubmed: 'pubmed',
+        scopus: 'scopus',
+        wos: 'wos'
       }
     },
+    'rct filter': {
+      name: 'RCT Filter',
+      description: 'Standard Cochrane RCT Filter',
+      engines: {
+        cinahl: '(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial',
+        embase: "random* OR factorial OR crossover OR placebo OR blind OR blinded OR assign OR assigned OR allocate OR allocated OR 'crossover procedure'/exp OR 'double-blind procedure'/exp OR 'randomized controlled trial'/exp OR 'single-blind procedure'/exp NOT ('animal'/exp NOT ('animal'/exp AND 'human'/exp))",
+        ovid: '((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)',
+        psycinfo: 'SU.EXACT("Treatment Effectiveness Evaluation") OR SU.EXACT.EXPLODE("Treatment Outcomes") OR SU.EXACT("Placebo") OR SU.EXACT("Followup Studies") OR placebo* OR random* OR "comparative stud*" OR  clinical NEAR/3 trial* OR research NEAR/3 design OR evaluat* NEAR/3 stud* OR prospectiv* NEAR/3 stud* OR (singl* OR doubl* OR trebl* OR tripl*) NEAR/3 (blind* OR mask*)',
+        pubmed: 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
+        wos: 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)'
+      }
+    },
+    'sr filter': {
+      name: 'SR Filter',
+      description: 'Standard Cochrane SR Filter',
+      engines: {
+        cinahl: 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
+        embase: 'Medline:ti,ab OR Pubmed:ti,ab OR (systematic:ti,ab AND review:ti,ab) OR meta-analysis:pt OR CDSR:jt',
+        ovid: 'search:.tw.OR meta analysis.mp,pt.OR review.pt.OR di.xs. OR associated.tw.',
+        pubmed: 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
+        wos: 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane'
+      }
+    }
+  }
+};
 
+/**
+* Collection of utility functions to apply common behaviour to a compiled tree
+* @var {Object}
+*/
+
+var tools = {
+  /**
+  * Visit the given node types within a deeply nested tree and run a function
+  * This function may mutate the input tree depending on the actions of the callbacks
+  * NOTE: If the return value of the callback is `"DEL"` the node is deleted
+  * @param {array} tree The tree sturcture to operate on
+  * @param {null|array} types Node filter to apply to (if falsy all are used)
+  * @param {function} callback The callback to call with each node. Called as (node, path)
+  * @return {array} The input tree
+  */
+  visit: function visit(tree, types, callback) {
+    var removals = []; // Stack of removal paths we are performing when done
+
+    var treeWalker = function treeWalker(tree, path) {
+      tree.forEach(function (branch, branchKey) {
+        var nodePath = path.concat(branchKey); // Fire callback if it matches
+
+        if (!types || _.includes(types, branch.type)) {
+          var result = callback(branch, nodePath);
+          if (result === 'DEL') removals.push(nodePath);
+        } // Walk down nodes if its a group
+
+
+        if (branch.type == 'group' || branch.type == 'line') treeWalker(branch.nodes, nodePath.concat(['nodes']));
+      });
+    };
+
+    treeWalker(tree, []); // Crop all items marked as removals
+
+    removals.reverse() // Walk in reverse order so we don't screw up arrays
+    .forEach(function (path) {
+      var nodeName = path.pop();
+      var parent = path.length ? _.get(tree, path) : tree;
+      delete parent[nodeName];
+    });
+    return tree;
+  },
+
+  /**
+  * Apply a series of text replacements to every matching node object within a tree
+  * This function mutates tree
+  * @param {array} tree The tree sturcture to operate on
+  * @param {null|array} types Type filter to apply. If falsy all are used
+  * @param {array} replacements Array of replacements to apply. Each must be of the form `{subject: STRING|REGEXP, value: STRING|FUNCTION}`
+  * @return {array} The input tree element with the replacements applied
+  */
+  replaceContent: function replaceContent(tree, types, replacements) {
+    this.visit(tree, types, function (branch) {
+      if (!branch.content) return;
+      replacements.forEach(function (replacement) {
+        branch.content = branch.content.replace(replacement.subject, replacement.value);
+      });
+    });
+    return tree;
+  },
+
+  /**
+  * Retrieve the contents of a template by its ID
+  * NOTE: If the specific engine definition is not found 'default' is used (and it will be pre-parsed via .translate())
+  * @param {string} template The template to resolve
+  * @param {string} engine The current engine (used to get the correct sub-templating string)
+  * @return {string} The resolved template
+  */
+  resolveTemplate: function resolveTemplate(template, engine) {
+    if (!global$2.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
+    if (global$2.templates[template].engines[engine]) return global$2.templates[template].engines[engine];
+    if (global$2.templates[template].engines.default) return polyglot.translate(global$2.templates[template].engines.default, engine);
+    return '';
+  },
+
+  /**
+  * Determine if a phrase needs to be enclosed within speachmarks and return the result
+  * @param {Object} branch Phrase branch to examine
+  * @param {string} engine Optional engine ID to examine for other enclose methods
+  * @param {boolean} highlighting Optional bool to determine if html color styling is added
+  * @return {string} The phrase enclosed as needed
+  */
+  quotePhrase: function quotePhrase(branch, engine) {
+    var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    var text = _.trimEnd(branch.content);
+
+    return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
+  },
+
+  /**
+  * Convert the '$or' / '$and' nodes within a tree into a nested structure
+  * This function will also flatten identical branches (i.e. run-on multiple $and / $or into one array)
+  * @param {Object} tree The object tree to recombine
+  * @returns {Object} The recombined tree
+  */
+  renestConditions: function renestConditions(tree) {
+    if (!_.isArray(tree)) return tree; // Not an array - skip
+    // Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
+
+    return tree.reduce(function (res, branch, index, arr) {
+      var firstKey = _(branch).keys().first();
+
+      if (firstKey == '$or' || firstKey == '$and') {
+        // Is a combinator
+        var expression = {};
+        expression[firstKey] = [res.pop(), // Right side is the last thing we added to the buffer
+        arr.splice(index + 1, 1)[0]];
+        res.push(expression);
+      } else {
+        // Unknown - just push to array and carry on processing
+        res.push(branch);
+      }
+
+      return res;
+    }, []);
+  },
+
+  /**
+  * Combine multiple run-on $and / $or conditional branches into one branch
+  * This function is a companion function to renestConditions and should be called directly afterwards if needed
+  * @param {Object} tree The tree to traverse
+  * @param {Object} [options] Additional options to accept
+  * @param {number} [options.depth=10] The maximum depth to traverse before giving up, set to 0 to infinitely recurse
+  * @return {Object} The collapsed tree
+  * @example
+  * {left, joinAnd, right} => {joinAnd: [left, right]}
+  * @example
+  * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
+  */
+  combineConditions: function combineConditions(tree, options) {
+    var settings = _.defaults(options, {
+      depth: 10
+    });
+
+    var collapses = [];
+
+    var traverseTree = function traverseTree(branch) {
+      var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
+      _.forEach(branch, function (v, k) {
+        // Use _.map if its an array and _.mapValues if we're examining an object
+        if (_.isObject(v)) {
+          var firstKey = _(branch).keys().first();
+
+          if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
+            // Mark for cleanup later (when we can do a bottom-up traversal)
+            var lastKey = _.findLast(collapses, function (i) {
+              return i.key == '$and' || i.key == '$or';
+            }); // Collapse only identical keys
+
+
+            if (!lastKey || lastKey.key == firstKey) {
+              collapses.push({
+                key: firstKey,
+                path: path
+              });
+            }
+          }
+
+          if (settings.depth && path.length > settings.depth) return; // Stop recursing after depth has been reached
+
+          traverseTree(v, path.concat([k]));
+        }
+      });
+    };
+
+    traverseTree(tree);
+    collapses.forEach(function (collapse) {
+      var parent = _.get(tree, collapse.path.slice(0, -1));
+
+      var child = _.get(tree, collapse.path.concat([collapse.key]));
+
+      if (!child || !parent || !parent.length) return;
+      var child2 = parent[1];
+      if (child2) child.push(child2); // Wrap $or conditions (that have an '$and' parent) in an object {{{
+
+      var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
+
+      if (lastParent && lastParent == '$and' && collapse.key == '$or') child = {
+        $or: child
+      }; // }}}
+
+      _.set(tree, collapse.path.slice(0, -1), child);
+    });
+    return tree;
+  },
+
+  /**
+  * Create a tooltip with a specified message
+  * @param {string} content Content to append tooltip to
+  * @param {string} message Message to contain inside tooltip
+  */
+  createTooltip: function createTooltip(content, message) {
+    return "<span class=\"black-underline\" v-tooltip=\"'" + message + "'\">" + content + '</span>';
+  },
+
+  /**
+  * Create a popover with options to replace empty field tags with specified field tag
+  * @param {string} content Content to append popover to
+  */
+  createPopover: function createPopover(content, offset) {
+    return '<v-popover offset="8" placement="right">' + '<span class="blue-underline">' + content + '</span>' + '<template slot="popover">' + '<h3 class="popover-header">Add Field Tag</h3>' + '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />' + '<div class="replace-all">' + '<input type="checkbox" id="checkbox" v-model="replaceAll">' + '<label for="checkbox">Replace All</label>' + '</div>' + '<div class="replace-buttons">' + '<button v-on:click="replaceFields(customField, replaceAll, ' + offset + ')" type="button" class="btn btn-primary">Replace</button>' + '<button v-close-popover type="button" class="btn btn-dark">Close</button>' + '</div>' + '</template>' + '</v-popover>';
+  }
+};
+
+/**
+* Parse a given string into a lexical object tree
+* This tree can then be recompiled via each engines compile()
+* @param {string} query The query string to compile. This can be multiline
+* @param {Object} [options] Optional options to use when parsing
+* @param {boolean} [options.groupLines=false] Wrap lines inside their own groups (only applies if multiple lines are present)
+* @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
+* @param {boolean} [options.transposeLines=true] Insert all line references where needed (e.g. `1 - 3/OR`)
+* @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
+* @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
+* @return {array} Array representing the parsed tree nodes
+*/
+
+var parse$1 = function parse(query, options) {
+  var settings = _.defaults(options, {
+    groupLines: false,
+    groupLinesAlways: false,
+    removeNumbering: false,
+    preserveNewlines: true,
+    transposeLines: true
+  });
+
+  global$2.variables.no_field_tag = []; // Empty array of offsets each time the query is parsed
+
+  var q = query + ''; // Clone query
+
+  var tree = {
+    nodes: []
+  }; // Tree is the full parsed tree
+
+  var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
+
+  var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
+
+  var lastGroup; // Optional reference to the previously created group (used to pin things)
+
+  var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
+
+  var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
+  // Operate in line-by-line mode? {{{
+
+  if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
+    var lines = q.split('\n'); // Remove numbering {{{
+
+    if (settings.removeNumbering) {
+      var match;
+      lines = lines.map(function (line) {
+        if (match = /^\s*\d+\.?\s(.*)$/.exec(line)) {
+          return match[1];
+        } else {
+          return line;
+        }
+      });
+    } // }}}
+    // Group line content {{{
+
+
+    if (settings.groupLines && (settings.groupLinesAlways || lines.length > 1)) {
+      // Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
+      lines = lines.map(function (line) {
+        return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
+      });
+    } // }}}
+
+
+    q = lines.join('\n'); // Join up lines again
+  } // }}}
+  // Utility functions {{{
+
+  /**
+  * Trim previous leaf content if it has any text
+  * The leaf will be removed completely if it is now blank
+  */
+
+
+  function trimLastLeaf() {
+    if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
+      leaf.content = leaf.content.substr(0, leaf.content.length - 1);
+      if (!leaf.content) branch.nodes.pop();
+    }
+  }
+  /**
+  * End the previous line branch and create a new one
+  * this function is run every time a new raw node is inserted
+  */
+
+  function newLine(currentNumber) {
+    lastGroup = branch;
+    branch = branchStack.pop();
+    leaf = branch.nodes;
+    var newGroup = {
+      type: 'line',
+      number: currentNumber,
+      isNumbered: false,
+      nodes: []
+    };
+    branch.nodes.push(newGroup);
+    branchStack.push(branch);
+    branch = newGroup;
+    leaf = branch.nodes;
+  }
+  // Create a group for the first line
+
+  var newGroup = {
+    type: 'line',
+    number: 1,
+    isNumbered: false,
+    nodes: []
+  };
+  branch.nodes.push(newGroup);
+  branchStack.push(branch);
+  branch = newGroup;
+  leaf = branch.nodes;
+  var lineNumber = 1; // Variable to store whether there is user entered line numbering
+
+  var userLineNumber = false; // Variable to store byte offset of string at current point
+
+  var offset = 0;
+
+  while (q.length) {
+    var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
+
+    var match;
+
+    if (/^\(/.test(q)) {
+      var newGroup = {
+        type: 'group',
+        nodes: []
+      };
+      branch.nodes.push(newGroup);
+      branchStack.push(branch);
+      branch = newGroup;
+      leaf = branch.nodes;
+    } else if (/^\)/.test(q)) {
+      lastGroup = branch;
+      branch = branchStack.pop();
+      leaf = branch.nodes;
+    } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) {
+      // 1-7/OR
+      branch.nodes.push({
+        type: 'ref',
+        ref: _.range(match[1], (match[2] + 1) / 10),
+        cond: match[3].toUpperCase(),
+        nodes: []
+      });
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (settings.transposeLines && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) {
+      // OR/1-7
+      branch.nodes.push({
+        type: 'ref',
+        ref: _.range(match[2], (match[3] + 1) / 10),
+        cond: match[1].toUpperCase(),
+        nodes: []
+      });
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) {
+      // 1 AND ...
+      branch.nodes.push({
+        type: 'ref',
+        ref: [match[1]],
+        cond: '',
+        nodes: []
+      });
+      offset += match[1].length;
+      q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+
+      cropString = false;
+    } else if (settings.transposeLines && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) {
+      // AND 2...
+      trimLastLeaf();
+
+      switch (match[1].toLowerCase()) {
+        case "and":
+          branch.nodes.push({
+            type: 'joinAnd'
+          });
+          break;
+
+        case "or":
+          branch.nodes.push({
+            type: 'joinOr'
+          });
+          break;
+
+        case "not":
+          branch.nodes.push({
+            type: 'joinNot'
+          });
+          break;
+      }
+
+      leaf = undefined;
+      cropString = false;
+      branch.nodes.push({
+        type: 'ref',
+        ref: [match[2]],
+        cond: '',
+        nodes: []
+      });
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+    } else if (settings.transposeLines && (match = /^([0-9]+\.?)\s+/i.exec(q))) {
+      // 1 or 1. (Line number)
+      lineNumber = parseInt(match[1], 10);
+      branch.number = lineNumber;
+      branch.isNumbered = true;
+      userLineNumber = true;
+      offset += match[0].length - 1;
+      q = q.substr(match[0].length - 1);
+    } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
+      trimLastLeaf();
+      branch.nodes.push({
+        type: 'joinAnd'
+      });
+      leaf = undefined;
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
+      trimLastLeaf();
+      branch.nodes.push({
+        type: 'joinOr'
+      });
+      leaf = undefined;
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
+      trimLastLeaf();
+      branch.nodes.push({
+        type: 'joinNot'
+      });
+      leaf = undefined;
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
+      trimLastLeaf();
+      branch.nodes.push({
+        type: 'joinNear',
+        proximity: _.toNumber(match[2])
+      });
+      leaf = undefined;
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
+      // Mesh term - PubMed syntax
+      leaf.type = 'mesh';
+      leaf.recurse = !match[2];
+      if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) {
+      // Mesh term - Ovid syntax (exploded)
+      branch.nodes.push({
+        type: 'mesh',
+        recurse: true,
+        content: match[2]
+      });
+      offset += match[1].length;
+      q = q.substr(match[1].length);
+      cropString = false;
+      afterWhitespace = true;
+    } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) {
+      // Mesh term - Ovid syntax (non-exploded)
+      leaf.type = 'mesh';
+      leaf.recurse = false;
+    } else if (match = /^<(.*?)>/.exec(q)) {
+      branch.nodes.push({
+        type: 'template',
+        content: match[1].toLowerCase()
+      });
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (match = /^(\n)+/.exec(q)) {
+      if (settings.preserveNewlines) {
+        var number_newline = match[0].length;
+        branch.nodes.push({
+          type: 'raw',
+          content: '\n'.repeat(number_newline)
+        });
+        leaf = undefined;
+      }
+
+      lineNumber += match[0].length;
+      newLine(lineNumber);
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+      afterWhitespace = true;
+    } else if (match = /^(\r)+/.exec(q)) {
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+      afterWhitespace = true;
+    } else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
+    match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
+    || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+    ) {
+        // Field specifier - Ovid syntax
+        // Figure out the leaf to use (usually the last one) or the previously used group {{{
+        var useLeaf = {};
+
+        if (_.isObject(leaf) && leaf.type == 'phrase') {
+          useLeaf = leaf;
+        } else if (_.isArray(leaf) && lastGroup) {
+          useLeaf = lastGroup;
+        } // }}}
+
+
+        switch (match[1].toLowerCase()) {
+          case 'ti':
+            useLeaf.field = 'title';
+            break;
+
+          case 'ab,ti':
+          case 'ti,ab':
+            useLeaf.field = 'title+abstract';
+            break;
+
+          case 'tw':
+            useLeaf.field = 'title+abstract+tw';
+            break;
+
+          case 'mp':
+            useLeaf.field = 'title+abstract+other';
+            break;
+
+          case 'ab':
+            useLeaf.field = 'abstract';
+            break;
+
+          case 'fs':
+            useLeaf.field = 'floatingSubheading';
+            break;
+
+          case 'sh':
+            useLeaf.type = 'mesh';
+            useLeaf.recurse = false;
+            break;
+
+          case 'nm':
+            useLeaf.field = 'substance';
+            break;
+
+          case 'pt':
+            useLeaf.field = 'publicationType';
+            break;
+
+          case 'kf':
+            useLeaf.field = 'author';
+            break;
+
+          case 'xm':
+            useLeaf.type = 'mesh';
+            useLeaf.recurse = true;
+            break;
+        }
+
+        offset += match[0].length;
+        q = q.substr(match[0].length);
+        cropString = false;
+      } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
+      // Field specifier - PubMed syntax
+      // Figure out the leaf to use (usually the last one) or the previously used group {{{
+      var useLeaf;
+
+      if (_.isObject(leaf) && leaf.type == 'phrase') {
+        useLeaf = leaf;
+      } else if (_.isArray(leaf) && lastGroup) {
+        useLeaf = lastGroup;
+      } // }}}
+
+
+      switch (match[1].toLowerCase()) {
+        case 'tiab':
+          useLeaf.field = 'title+abstract';
+          break;
+
+        case 'tw':
+          useLeaf.field = 'title+abstract+other';
+          break;
+
+        case 'ti':
+          useLeaf.field = 'title';
+          break;
+
+        case 'ab':
+          useLeaf.field = 'abstract';
+          break;
+
+        case 'nm':
+          useLeaf.field = 'substance';
+          break;
+
+        case 'sh':
+          useLeaf.field = 'floatingSubheading';
+          break;
+
+        case 'pt':
+          useLeaf.field = 'publicationType';
+          break;
+      }
+
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else if (match = /^#([^\)\n]+)/.exec(q)) {
+      trimLastLeaf();
+      branch.nodes.push({
+        type: 'comment',
+        content: match[1]
+      });
+      leaf = undefined;
+      offset += match[0].length;
+      q = q.substr(match[0].length);
+      cropString = false;
+    } else {
+      var nextChar = q.substr(0, 1);
+
+      if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
+        // Leaf pointing to array entity - probably not created fallback leaf to append to
+        if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
+          // First character is a speachmark - slurp until we see the next one
+          leaf = {
+            type: 'phrase',
+            content: match[1],
+            offset: offset
+          };
+          branch.nodes.push(leaf);
+          offset += match[0].length;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else if (match = /^[^\s\W]+/.exec(q)) {
+          // Slurp the phrase until the space or close brackets
+          leaf = {
+            type: 'phrase',
+            content: match[0],
+            offset: offset
+          };
+          branch.nodes.push(leaf);
+          offset += match[0].length;
+          q = q.substr(match[0].length);
+          cropString = false;
+        } else {
+          // All other first chars - just dump into a buffer and let it fill slowly
+          leaf = {
+            type: 'phrase',
+            content: nextChar,
+            offset: offset
+          };
+          branch.nodes.push(leaf);
+        }
+      } else if (_.isObject(leaf) && leaf.type == 'phrase') {
+        leaf.content += nextChar;
+      }
+
+      afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
+    }
+
+    if (cropString) {
+      offset += 1; // Increment offset by 1
+
+      q = q.substr(1); // Crop 1 character
+    }
+  }
+
+  if (settings.transposeLines) {
+    tools.visit(tree.nodes, ['ref'], function (node, path) {
+      var reference;
+      var line; // Find the matching line
+
+      for (reference in node.ref) {
+        for (line in tree.nodes) {
+          // If custom numbering is used only use nodes that are numbered by the user
+          if (userLineNumber) {
+            if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
+              // Copy the nodes from that line into the reference nodes
+              // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+              node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
+
+              node.nodes[reference].pop();
+              break;
+            }
+          } else {
+            if (tree.nodes[line].number == node.ref[reference]) {
+              // Copy the nodes from that line into the reference nodes
+              // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
+              node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
+
+              node.nodes[reference].pop();
+              break;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  return tree.nodes;
+};
+
+var parse$2 = /*#__PURE__*/Object.freeze({
+	parse: parse$1
+});
+
+ace.define("ace/theme/chrome",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
+
+exports.isDark = false;
+exports.cssClass = "ace-chrome";
+exports.cssText = ".ace-chrome .ace_gutter {\
+background: #ebebeb;\
+color: #333;\
+overflow : hidden;\
+}\
+.ace-chrome .ace_print-margin {\
+width: 1px;\
+background: #e8e8e8;\
+}\
+.ace-chrome {\
+background-color: #FFFFFF;\
+color: black;\
+}\
+.ace-chrome .ace_cursor {\
+color: black;\
+}\
+.ace-chrome .ace_invisible {\
+color: rgb(191, 191, 191);\
+}\
+.ace-chrome .ace_constant.ace_buildin {\
+color: rgb(88, 72, 246);\
+}\
+.ace-chrome .ace_constant.ace_language {\
+color: rgb(88, 92, 246);\
+}\
+.ace-chrome .ace_constant.ace_library {\
+color: rgb(6, 150, 14);\
+}\
+.ace-chrome .ace_invalid {\
+background-color: rgb(153, 0, 0);\
+color: white;\
+}\
+.ace-chrome .ace_fold {\
+}\
+.ace-chrome .ace_support.ace_function {\
+color: rgb(60, 76, 114);\
+}\
+.ace-chrome .ace_support.ace_constant {\
+color: rgb(6, 150, 14);\
+}\
+.ace-chrome .ace_support.ace_type,\
+.ace-chrome .ace_support.ace_class\
+.ace-chrome .ace_support.ace_other {\
+color: rgb(109, 121, 222);\
+}\
+.ace-chrome .ace_variable.ace_parameter {\
+font-style:italic;\
+color:#FD971F;\
+}\
+.ace-chrome .ace_keyword.ace_operator {\
+color: rgb(104, 118, 135);\
+}\
+.ace-chrome .ace_comment {\
+color: #236e24;\
+}\
+.ace-chrome .ace_comment.ace_doc {\
+color: #236e24;\
+}\
+.ace-chrome .ace_comment.ace_doc.ace_tag {\
+color: #236e24;\
+}\
+.ace-chrome .ace_constant.ace_numeric {\
+color: rgb(0, 0, 205);\
+}\
+.ace-chrome .ace_variable {\
+color: rgb(49, 132, 149);\
+}\
+.ace-chrome .ace_xml-pe {\
+color: rgb(104, 104, 91);\
+}\
+.ace-chrome .ace_entity.ace_name.ace_function {\
+color: #0000A2;\
+}\
+.ace-chrome .ace_heading {\
+color: rgb(12, 7, 255);\
+}\
+.ace-chrome .ace_list {\
+color:rgb(185, 6, 144);\
+}\
+.ace-chrome .ace_marker-layer .ace_selection {\
+background: rgb(181, 213, 255);\
+}\
+.ace-chrome .ace_marker-layer .ace_step {\
+background: rgb(252, 255, 0);\
+}\
+.ace-chrome .ace_marker-layer .ace_stack {\
+background: rgb(164, 229, 101);\
+}\
+.ace-chrome .ace_marker-layer .ace_bracket {\
+margin: -1px 0 0 -1px;\
+border: 1px solid rgb(192, 192, 192);\
+}\
+.ace-chrome .ace_marker-layer .ace_active-line {\
+background: rgba(0, 0, 0, 0.07);\
+}\
+.ace-chrome .ace_gutter-active-line {\
+background-color : #dcdcdc;\
+}\
+.ace-chrome .ace_marker-layer .ace_selected-word {\
+background: rgb(250, 250, 255);\
+border: 1px solid rgb(200, 200, 250);\
+}\
+.ace-chrome .ace_storage,\
+.ace-chrome .ace_keyword,\
+.ace-chrome .ace_meta.ace_tag {\
+color: rgb(147, 15, 128);\
+}\
+.ace-chrome .ace_string.ace_regex {\
+color: rgb(255, 0, 0)\
+}\
+.ace-chrome .ace_string {\
+color: #1A1AA6;\
+}\
+.ace-chrome .ace_entity.ace_other.ace_attribute-name {\
+color: #994409;\
+}\
+.ace-chrome .ace_indent-guide {\
+background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==\") right repeat-y;\
+}\
+";
+
+var dom = acequire("../lib/dom");
+dom.importCssString(exports.cssText, exports.cssClass);
+});
+
+var pubmedImport = {
+  id: 'pubmed',
+  title: 'PubMed',
+  aliases: ['pubmed', 'p', 'pm', 'pubm'],
+
+  /**
+  * Compile a tree structure to PubMed output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '?'
+    }, {
+      subject: /\$/g,
+      value: '*'
+    }, {
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            if (branch.field) {
+              // If the group has a filter decorate all its children with that field
+              // This mutates the tree for the other engine compile functions
+              branch.nodes = tools.visit(branch.nodes, ['phrase'], function (b) {
+                return b.field = branch.field;
+              });
+              branch.nodes = tools.visit(branch.nodes, ['group'], function (b) {
+                return b.field = branch.field;
+              });
+            }
+
+            buffer += '(' + compileWalker(branch.nodes) + ')';
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field) {
+              buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' : branch.field == 'abstract' ? settings.highlighting ? tools.createTooltip('<font color="LightSeaGreen">[tiab]</font>', 'PubMed cannot search abstract field term independently') : '[tiab]' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' : '' // Unsupported field suffix for PubMed
+              );
+            } else {
+              // If no field tag exists create popover with ability to replace field tag
+              if (global$2.variables.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {
+                global$2.variables.no_field_tag.push(branch.offset + branch.content.length);
+              }
+
+              if (settings.highlighting) {
+                buffer += tools.createPopover(tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
+              } else {
+                buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+              }
+            }
+
+            break;
+
+          case 'joinNear':
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+            } else {
+              buffer += tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'pubmed');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'GET',
+      action: 'https://www.ncbi.nlm.nih.gov/pubmed',
+      fields: {
+        term: query
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var ovidImport = {
+  id: 'ovid',
+  title: 'Ovid Medline / Ovid Embase',
+  aliases: ['ovid', 'o', 'ov'],
+
+  /**
+  * Compile a tree structure to Ovid MEDLINE output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '?'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            if (branch.field) {
+              buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+              if (expand) {
+                buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
+                ;
+              }
+            } else {
+              buffer += '(' + compileWalker(branch.nodes) + ')';
+            }
+
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field && expand) {
+              buffer += branch.content + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
+              );
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
+              } else {
+                buffer += branch.content;
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            if (settings.highlighting) buffer += '<font color="purple">';
+            buffer += 'ADJ' + branch.proximity;
+            if (settings.highlighting) buffer += '</font>';
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+            } else {
+              buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'ovid');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+      fields: {
+        textBox: query
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var cochraneImport = {
+  id: 'cochrane',
+  title: 'Cochrane Library',
+  aliases: ['cochrane', 'c', 'cl'],
+
+  /**
+  * Compile a tree structure to Cochrane Library output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
+    }, {
+      subject: /\$/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
+    }, {
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            if (branch.field && branch.field == 'floatingSubheading') {
+              if (settings.highlighting) buffer += '<font color="blue">';
+              buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
+              if (settings.highlighting) buffer += '</font>';
+            } else if (branch.field) {
+              buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+              if (expand) {
+                buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
+                ;
+              }
+            } else {
+              buffer += '(' + compileWalker(branch.nodes) + ')';
+            }
+
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field && branch.field == 'floatingSubheading') {
+              if (settings.highlighting) buffer += '<font color="blue">';
+              buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
+              if (settings.highlighting) buffer += '</font>';
+            } else if (branch.field && expand) {
+              buffer += tools.quotePhrase(branch, 'cochrane', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
+              );
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover(tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
+              } else {
+                buffer += tools.quotePhrase(branch, 'cochrane', settings.highlighting);
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            if (settings.highlighting) buffer += '<font color="purple">';
+            buffer += 'NEAR/' + branch.proximity;
+            if (settings.highlighting) buffer += '</font>';
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+            } else {
+              buffer += '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']';
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'cochrane');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
+      fields: {
+        'submitSearch': 'Go',
+        'searchRows[0].searchCriterias[0].fieldRestriction': null,
+        'searchRows[0].searchCriterias[0].term': query,
+        'searchRows[0].searchOptions.searchProducts': null,
+        'searchRows[0].searchOptions.searchStatuses': null,
+        'searchRows[0].searchOptions.searchType': 'All',
+        'searchRows[0].searchOptions.publicationStartYear': null,
+        'searchRows[0].searchOptions.publicationEndYear': null,
+        'searchRows[0].searchOptions.disableAutoStemming': null,
+        'searchRows[0].searchOptions.reviewGroupIds': null,
+        'searchRows[0].searchOptions.onlinePublicationStartYear': null,
+        'searchRows[0].searchOptions.onlinePublicationEndYear': null,
+        'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
+        'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
+        'searchRows[0].searchOptions.dateType:pubAllYears': null,
+        'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
+        'searchRow.ordinal': 0,
+        'hiddenFields.currentPage': 1,
+        'hiddenFields.strategySortBy': 'last-modified-date;desc',
+        'hiddenFields.showStrategies': 'false',
+        'hiddenFields.containerId': null,
+        'hiddenFields.etag': null,
+        'hiddenFields.originalContainerId': null,
+        'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
+        'hiddenFields.searchFilters.filterByIssue': 'all',
+        'hiddenFields.searchFilters.filterByType': 'All',
+        'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true'
+      }
+    };
+  },
+  openTerms: 'use search manager box'
+};
+
+var embaseImport = {
+  id: 'embase',
+  title: 'Embase',
+  aliases: ['embase', 'e', 'eb'],
+
+  /**
+  * Compile a tree structure to Embase output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
+    }, {
+      subject: /\$/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
+    }, {
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            if (branch.field) {
+              buffer += '(' + compileWalker(branch.nodes, false) + ')';
+
+              if (expand) {
+                buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
+                ;
+              }
+            } else {
+              buffer += '(' + compileWalker(branch.nodes) + ')';
+            }
+
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field && expand) {
+              buffer += tools.quotePhrase(branch, 'embase', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
+              );
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover(tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
+              } else {
+                buffer += tools.quotePhrase(branch, 'embase', settings.highlighting);
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            if (settings.highlighting) buffer += '<font color="purple">';
+            buffer += 'NEAR/' + branch.proximity;
+            if (settings.highlighting) buffer += '</font>';
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+            } else {
+              buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'embase');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'GET',
+      action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
+      fields: {
+        sb: 'y',
+        search_query: query.replace(/\n+/g, ' ')
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var wosImport = {
+  id: 'wos',
+  title: 'Web of Science',
+  aliases: ['webofscience', 'w', 'wos', 'websci'],
+
+  /**
+  * Compile a tree structure to Web of Science output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '$'
+    }, {
+      subject: /\$/g,
+      value: '*'
+    }, {
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            buffer += '(' + compileWalker(branch.nodes) + ')';
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            buffer += tools.quotePhrase(branch, 'wos', settings.highlighting);
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            buffer += 'NEAR/' + branch.proximity;
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting), "Web of Science does not support MeSH terms");
+            } else {
+              buffer += tools.quotePhrase(branch, 'wos');
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'wos');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
+      fields: {
+        fieldCount: '1',
+        action: 'search',
+        product: 'UA',
+        search_mode: 'GeneralSearch',
+        SID: 'W15WDD6M2xkKPbfGfGY',
+        max_field_count: '25',
+        max_field_notice: 'Notice: You cannot add another field.',
+        input_invalid_notice: 'Search Error: Please enter a search term.',
+        exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
+        input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
+        sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
+        formUpdated: 'true',
+        'value(input1)': query,
+        'value(select1)': 'TS',
+        x: '798',
+        y: '311',
+        'value(hidInput1)': null,
+        limitStatus: 'collapsed',
+        ss_lemmatization: 'On',
+        ss_spellchecking: 'Suggest',
+        SinceLastVisit_UTC: null,
+        SinceLastVisit_DATE: null,
+        period: 'Range Selection',
+        range: 'ALL',
+        startYear: '1900',
+        endYear: new Date().getYear(),
+        update_back2search_link_param: 'yes',
+        ssStatus: 'display:none',
+        ss_showsuggestions: 'ON',
+        ss_query_language: 'auto',
+        ss_numDefaultGeneralSearchFields: '1',
+        rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A'
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var cinahlImport = {
+  id: 'cinahl',
+  title: 'CINAHL',
+  aliases: ['cinahl', 'ci', 'cnal'],
+
+  /**
+  * Compile a tree structure to CINAHL output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
+    }, {
+      subject: /\?/g,
+      value: '#'
+    }, {
+      subject: /\$/g,
+      value: '*'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            buffer += '(' + compileWalker(branch.nodes) + ')';
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
+              buffer += 'TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+            } else if (branch.field) {
+              buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting));
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover(tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
+              } else {
+                buffer += tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            buffer += 'N' + branch.proximity;
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+            } else {
+              buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'cinahl');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
+      fields: {
+        bquery: query
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var psycinfoImport = {
+  id: 'psycinfo',
+  title: 'PsycInfo',
+  aliases: ['p', 'pi'],
+
+  /**
+  * Compile a tree structure to PsycInfo output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '?'
+    }, {
+      subject: /\$/g,
+      value: '*'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            buffer += '(' + compileWalker(branch.nodes) + ')';
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field) {
+              buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
+              } else {
+                buffer += branch.content;
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            buffer += 'ADJ' + branch.proximity;
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting), "PsycInfo does not support MeSH terms");
+            } else {
+              buffer += tools.quotePhrase(branch, 'psycinfo');
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'psycinfo');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+      fields: {
+        textBox: query
+      }
+    };
+  },
+  openTerms: 'any search box'
+};
+
+var scopusImport = {
+  id: 'scopus',
+  title: 'Scopus',
+  aliases: ['s', 'so'],
+
+  /**
+  * Compile a tree structure to Scopus output
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+  * @return {string} The compiled output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /\?/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
+    }, {
+      subject: /\$/g,
+      value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
+    }, {
+      subject: /#/g,
+      value: '<span msg="NO_SINGLE_WILDCARD">?</span>'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return tree.map(function (branch, branchIndex) {
+        var buffer = '';
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            buffer += '(' + compileWalker(branch.nodes) + ')';
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field) {
+              buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
+            } else {
+              if (settings.highlighting) {
+                buffer += tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+              } else {
+                buffer += '"' + branch.content + '"';
+              }
+            }
+
+            break;
+
+          case 'joinAnd':
+            buffer += 'AND';
+            break;
+
+          case 'joinOr':
+            buffer += 'OR';
+            break;
+
+          case 'joinNot':
+            buffer += 'NOT';
+            break;
+
+          case 'joinNear':
+            buffer += 'W/' + branch.proximity;
+            break;
+
+          case 'mesh':
+            if (settings.highlighting) {
+              buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+            } else {
+              buffer += 'INDEXTERMS("' + branch.content + '")';
+            }
+
+            break;
+
+          case 'raw':
+            buffer += branch.content;
+            break;
+
+          case 'template':
+            buffer += tools.resolveTemplate(branch.content, 'scopus');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
+        + (branch.type == 'raw' || // Its not a raw node
+        branch.type == 'line' || // Its not a line node
+        branchIndex == tree.length - 1 || // Its not the last item in the sequence
+        branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
+      }).join('');
+    };
+
+    return compileWalker(tree);
+  },
+  open: function open(query) {
+    return {
+      method: 'POST',
+      action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
+      fields: {
+        textBox: query
+      }
+    };
+  },
+  openTerms: 'use advanced search box'
+};
+
+var mongodbImport = {
+  id: 'mongodb',
+  title: 'MongoDB Query Format',
+  aliases: ['mongo'],
+  debugging: true,
+  // Mark this module for debugging only
+
+  /**
+  * Compile a tree structure to a MongoDB query
+  * @param {array} tree The parsed tree to process
+  * @param {Object} [options] Optional options to use when compiling
+  * @return {Object} The compiled MongoDB query output
+  */
+  compile: function compile(tree, options) {
+    var settings = _.defaults(options, {
+      replaceWildcards: true,
+      translatePhraseField: function translatePhraseField(t) {
+        return {
+          'title': t
+        };
+      },
+      meshField: 'mesh',
+      translateTitleAbstract: function translateTitleAbstract(t) {
+        return {
+          $or: [{
+            title: t
+          }, {
+            abstract: t
+          }]
+        };
+      }
+    }); // Apply wildcard replacements
+
+
+    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
+      subject: /[\?\$]/g,
+      value: '*'
+    }]);
+
+    var compileWalker = function compileWalker(tree) {
+      return _(tree).map(function (branch, branchIndex) {
+        var buffer = {};
+
+        switch (branch.type) {
+          case 'line':
+            buffer += compileWalker(branch.nodes);
+            break;
+
+          case 'group':
+            if (branch.field && branch.field == 'title+abstract') {
+              // FIXME: Not yet properly supported
+              buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
+            } else if (branch.field) {
+              buffer[branch.field] = compileWalker(branch.nodes);
+            } else {
+              buffer = settings.translatePhraseField(compileWalker(branch.nodes));
+            }
+
+            break;
+
+          case 'ref':
+            var node;
+
+            for (node in branch.nodes) {
+              if (node == 0) {
+                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+              } else {
+                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+              }
+            }
+
+            break;
+
+          case 'phrase':
+            if (branch.field && branch.field == 'title+abstract') {
+              buffer = settings.translateTitleAbstract(branch.content);
+            } else if (branch.field) {
+              buffer[branch.field] = branch.content;
+            } else {
+              buffer = settings.translatePhraseField(branch.content);
+            }
+
+            break;
+
+          case 'joinNear':
+          case 'joinAnd':
+            buffer = {
+              $and: []
+            };
+            break;
+
+          case 'joinOr':
+            buffer = {
+              $or: []
+            };
+            break;
+
+          case 'joinNot':
+            buffer = {
+              $not: {}
+            };
+            break;
+
+          case 'mesh':
+            // FIXME: No ability to recurse
+            buffer[settings.meshField] = {
+              $in: [branch.content]
+            };
+            break;
+
+          case 'raw':
+            // Do nothing
+            break;
+
+          case 'template':
+            buffer = tools.resolveTemplate(branch.content, 'mongodb');
+            break;
+
+          case 'comment':
+            // Do nothing
+            break;
+
+          default:
+            throw new Error('Unsupported object tree type: ' + branch.type);
+        }
+
+        return buffer;
+      }) // Renest + combine $or/$and conditions {{{
+      // NOTE: Highly experimental - causes bugs under some circumstances
+      // .thru(tree => tools.renestConditions(tree))
+      // .thru(tree => tools.combineConditions(tree))
+      // }}}
+      // Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
+      .thru(function (tree) {
+        if (_.isArray(tree) && tree.length == 1) tree = tree[0];
+        return tree;
+      }) // }}}
+      .value();
+    };
+
+    return compileWalker(tree);
+  }
+};
+
+/**
+* Collection of supported engines
+* Each engine should specify:
+*	title - Human readable name of the engine
+*	aliases - Alternative names for each engine
+*	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span msg=""></span> where @msg corresponds to an entry in messages
+*	open() - optional function that takes a query and provides the direct searching method
+*	debugging - optional boolean specifying that the engine is for debugging purposes only
+*
+* @var {array}
+*/
+
+var enginesImport = {
+  // PubMed {{{
+  pubmed: pubmedImport,
+  // }}}
+  // Ovid Medline {{{
+  ovid: ovidImport,
+  // }}}
+  // Cochrane Library {{{
+  cochrane: cochraneImport,
+  // }}}
+  // Embase {{{
+  embase: embaseImport,
+  // }}}
+  // Web of Science {{{
+  wos: wosImport,
+  // }}}
+  // CINAHL {{{
+  cinahl: cinahlImport,
+  // }}}
+  // PsycInfo {{{
+  psycinfo: psycinfoImport,
+  // }}}
+  // Scopus {{{
+  scopus: scopusImport,
+  // }}} 
+  // Lexical tree (JSON) {{{
+  lexicalTreeJSON: {
+    id: 'lexicalTreeJSON',
+    title: 'Lexical Tree (JSON)',
+    aliases: ['debug'],
+    debugging: true,
+    // Mark this module for debugging only
+
+    /**
+    * Compile a tree structure to JSON output
+    * @param {array} tree The parsed tree to process
+    * @param {Object} [options] Optional options to use when compiling
+    * @return {string} The compiled output
+    */
+    compile: function compile(tree, options) {
+      return tree;
+    }
+  },
+  // }}}
+  // MongoDB {{{
+  mongodb: mongodbImport // }}}
+
+};
+
+var engines = /*#__PURE__*/Object.freeze({
+	default: enginesImport
+});
+
+var _parse = getCjsExportFromNamespace(parse$2);
+
+var require$$0 = getCjsExportFromNamespace(engines);
+
+var polyglot_1 = createCommonjsModule(function (module) {
+
+  var _engines = _interopRequireDefault(require$$0);
+
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
+
+  var polyglot = module.exports = {
     /**
     * Translate the given query using the given engine ID
     * This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
@@ -61059,14 +63294,14 @@ var polyglot_1 = createCommonjsModule(function (module) {
     * @return {string} The translated search query
     */
     translate: function translate(query, engine, options) {
-      if (!polyglot.engines[engine]) throw new Error('Engine not found: ' + engine);
-      var tree = polyglot.parse(query, options);
+      if (!_engines.default[engine]) throw new Error('Engine not found: ' + engine);
+      var tree = (0, _parse.parse)(query, options);
       tree = polyglot.preProcess(tree, options);
 
       if (engine.id == "lexicalTreeJSON") {
-        return polyglot.engines[engine].compile(tree, options);
+        return _engines.default[engine].compile(tree, options);
       } else {
-        return polyglot.postProcess(polyglot.engines[engine].compile(tree, options), options);
+        return polyglot.postProcess(_engines.default[engine].compile(tree, options), options);
       }
     },
 
@@ -61080,10 +63315,10 @@ var polyglot_1 = createCommonjsModule(function (module) {
     */
     translateAll: function translateAll(query, options) {
       var output = {};
-      var tree = polyglot.parse(query, options);
+      var tree = (0, _parse.parse)(query, options);
       tree = polyglot.preProcess(tree, options);
 
-      _.forEach(polyglot.engines, function (engine, id) {
+      _.forEach(_engines.default, function (engine, id) {
         if (id == "lexicalTreeJSON") {
           // Dont run postprocess for lexicalTreeJSON
           output[id] = engine.compile(tree, options), options;
@@ -61151,2034 +63386,15 @@ var polyglot_1 = createCommonjsModule(function (module) {
       }
 
       return text;
-    },
-
-    /**
-    * Parse a given string into a lexical object tree
-    * This tree can then be recompiled via each engines compile()
-    * @param {string} query The query string to compile. This can be multiline
-    * @param {Object} [options] Optional options to use when parsing
-    * @param {boolean} [options.groupLines=false] Wrap lines inside their own groups (only applies if multiple lines are present)
-    * @param {boolean} [options.groupLinesAlways=true] Group lines even if there is only one apparent line (i.e. enclose single line queries within brackets)
-    * @param {boolean} [options.transposeLines=true] Insert all line references where needed (e.g. `1 - 3/OR`)
-    * @param {boolean} [options.removeNumbering=true] Remove any number prefixes from lines - this is a classic copy/paste error from certain online search engines (e.g. `1. Term` -> `term`)
-    * @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
-    * @return {array} Array representing the parsed tree nodes
-    */
-    parse: function parse(query, options) {
-      var settings = _.defaults(options, {
-        groupLines: false,
-        groupLinesAlways: false,
-        removeNumbering: false,
-        preserveNewlines: true,
-        transposeLines: true
-      });
-
-      polyglot.no_field_tag = []; // Empty array of offsets each time the query is parsed
-
-      var q = query + ''; // Clone query
-
-      var tree = {
-        nodes: []
-      }; // Tree is the full parsed tree
-
-      var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
-
-      var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
-
-      var lastGroup; // Optional reference to the previously created group (used to pin things)
-
-      var leaf = branch.nodes; // Leaf is the currently active leaf node (usually branch.nodes)
-
-      var afterWhitespace = true; // Set to true when the current character is following whitespace, a newline or the very start of the query
-      // Operate in line-by-line mode? {{{
-
-      if (settings.transposeLines || settings.groupLines || settings.removeNumbering) {
-        var lines = q.split('\n'); // Remove numbering {{{
-
-        if (settings.removeNumbering) {
-          var match;
-          lines = lines.map(function (line) {
-            if (match = /^\s*\d+\.?\s(.*)$/.exec(line)) {
-              return match[1];
-            } else {
-              return line;
-            }
-          });
-        } // }}}
-        // Group line content {{{
-
-
-        if (settings.groupLines && (settings.groupLinesAlways || lines.length > 1)) {
-          // Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
-          lines = lines.map(function (line) {
-            return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
-          });
-        } // }}}
-
-
-        q = lines.join('\n'); // Join up lines again
-      } // }}}
-      // Utility functions {{{
-
-      /**
-      * Trim previous leaf content if it has any text
-      * The leaf will be removed completely if it is now blank
-      */
-
-
-      function trimLastLeaf() {
-        if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
-          leaf.content = leaf.content.substr(0, leaf.content.length - 1);
-          if (!leaf.content) branch.nodes.pop();
-        }
-      }
-      /**
-      * End the previous line branch and create a new one
-      * this function is run every time a new raw node is inserted
-      */
-
-      function newLine(currentNumber) {
-        lastGroup = branch;
-        branch = branchStack.pop();
-        leaf = branch.nodes;
-        var newGroup = {
-          type: 'line',
-          number: currentNumber,
-          isNumbered: false,
-          nodes: []
-        };
-        branch.nodes.push(newGroup);
-        branchStack.push(branch);
-        branch = newGroup;
-        leaf = branch.nodes;
-      }
-      // Create a group for the first line
-
-      var newGroup = {
-        type: 'line',
-        number: 1,
-        isNumbered: false,
-        nodes: []
-      };
-      branch.nodes.push(newGroup);
-      branchStack.push(branch);
-      branch = newGroup;
-      leaf = branch.nodes;
-      var lineNumber = 1; // Variable to store whether there is user entered line numbering
-
-      var userLineNumber = false; // Variable to store byte offset of string at current point
-
-      var offset = 0;
-
-      while (q.length) {
-        var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
-
-        var match;
-
-        if (/^\(/.test(q)) {
-          var newGroup = {
-            type: 'group',
-            nodes: []
-          };
-          branch.nodes.push(newGroup);
-          branchStack.push(branch);
-          branch = newGroup;
-          leaf = branch.nodes;
-        } else if (/^\)/.test(q)) {
-          lastGroup = branch;
-          branch = branchStack.pop();
-          leaf = branch.nodes;
-        } else if (settings.transposeLines && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) {
-          // 1-7/OR
-          branch.nodes.push({
-            type: 'ref',
-            ref: _.range(match[1], (match[2] + 1) / 10),
-            cond: match[3].toUpperCase(),
-            nodes: []
-          });
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (settings.transposeLines && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) {
-          // OR/1-7
-          branch.nodes.push({
-            type: 'ref',
-            ref: _.range(match[2], (match[3] + 1) / 10),
-            cond: match[1].toUpperCase(),
-            nodes: []
-          });
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (settings.transposeLines && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) {
-          // 1 AND ...
-          branch.nodes.push({
-            type: 'ref',
-            ref: [match[1]],
-            cond: '',
-            nodes: []
-          });
-          offset += match[1].length;
-          q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
-
-          cropString = false;
-        } else if (settings.transposeLines && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) {
-          // AND 2...
-          trimLastLeaf();
-
-          switch (match[1].toLowerCase()) {
-            case "and":
-              branch.nodes.push({
-                type: 'joinAnd'
-              });
-              break;
-
-            case "or":
-              branch.nodes.push({
-                type: 'joinOr'
-              });
-              break;
-
-            case "not":
-              branch.nodes.push({
-                type: 'joinNot'
-              });
-              break;
-          }
-
-          leaf = undefined;
-          cropString = false;
-          branch.nodes.push({
-            type: 'ref',
-            ref: [match[2]],
-            cond: '',
-            nodes: []
-          });
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-        } else if (settings.transposeLines && (match = /^([0-9]+\.?)\s+/i.exec(q))) {
-          // 1 or 1. (Line number)
-          lineNumber = parseInt(match[1], 10);
-          branch.number = lineNumber;
-          branch.isNumbered = true;
-          userLineNumber = true;
-          offset += match[0].length - 1;
-          q = q.substr(match[0].length - 1);
-        } else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
-          trimLastLeaf();
-          branch.nodes.push({
-            type: 'joinAnd'
-          });
-          leaf = undefined;
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
-          trimLastLeaf();
-          branch.nodes.push({
-            type: 'joinOr'
-          });
-          leaf = undefined;
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
-          trimLastLeaf();
-          branch.nodes.push({
-            type: 'joinNot'
-          });
-          leaf = undefined;
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
-          trimLastLeaf();
-          branch.nodes.push({
-            type: 'joinNear',
-            proximity: _.toNumber(match[2])
-          });
-          leaf = undefined;
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (match = /^\[(mesh terms|mesh|mh)(:NoExp)?\]/i.exec(q)) {
-          // Mesh term - PubMed syntax
-          leaf.type = 'mesh';
-          leaf.recurse = !match[2];
-          if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
-
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) {
-          // Mesh term - Ovid syntax (exploded)
-          branch.nodes.push({
-            type: 'mesh',
-            recurse: true,
-            content: match[2]
-          });
-          offset += match[1].length;
-          q = q.substr(match[1].length);
-          cropString = false;
-          afterWhitespace = true;
-        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) {
-          // Mesh term - Ovid syntax (non-exploded)
-          leaf.type = 'mesh';
-          leaf.recurse = false;
-        } else if (match = /^<(.*?)>/.exec(q)) {
-          branch.nodes.push({
-            type: 'template',
-            content: match[1].toLowerCase()
-          });
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (match = /^(\n)+/.exec(q)) {
-          if (settings.preserveNewlines) {
-            var number_newline = match[0].length;
-            branch.nodes.push({
-              type: 'raw',
-              content: '\n'.repeat(number_newline)
-            });
-            leaf = undefined;
-          }
-
-          lineNumber += match[0].length;
-          newLine(lineNumber);
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-          afterWhitespace = true;
-        } else if (match = /^(\r)+/.exec(q)) {
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-          afterWhitespace = true;
-        } else if ((match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) || ( // term.INITIALS. [JUNK] (special case for Ovid automated output)
-        match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-        || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
-        ) {
-            // Field specifier - Ovid syntax
-            // Figure out the leaf to use (usually the last one) or the previously used group {{{
-            var useLeaf = {};
-
-            if (_.isObject(leaf) && leaf.type == 'phrase') {
-              useLeaf = leaf;
-            } else if (_.isArray(leaf) && lastGroup) {
-              useLeaf = lastGroup;
-            } // }}}
-
-
-            switch (match[1].toLowerCase()) {
-              case 'ti':
-                useLeaf.field = 'title';
-                break;
-
-              case 'ab,ti':
-              case 'ti,ab':
-                useLeaf.field = 'title+abstract';
-                break;
-
-              case 'tw':
-                useLeaf.field = 'title+abstract+tw';
-                break;
-
-              case 'mp':
-                useLeaf.field = 'title+abstract+other';
-                break;
-
-              case 'ab':
-                useLeaf.field = 'abstract';
-                break;
-
-              case 'fs':
-                useLeaf.field = 'floatingSubheading';
-                break;
-
-              case 'sh':
-                useLeaf.type = 'mesh';
-                useLeaf.recurse = false;
-                break;
-
-              case 'nm':
-                useLeaf.field = 'substance';
-                break;
-
-              case 'pt':
-                useLeaf.field = 'publicationType';
-                break;
-
-              case 'kf':
-                useLeaf.field = 'author';
-                break;
-
-              case 'xm':
-                useLeaf.type = 'mesh';
-                useLeaf.recurse = true;
-                break;
-            }
-
-            offset += match[0].length;
-            q = q.substr(match[0].length);
-            cropString = false;
-          } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
-          // Field specifier - PubMed syntax
-          // Figure out the leaf to use (usually the last one) or the previously used group {{{
-          var useLeaf;
-
-          if (_.isObject(leaf) && leaf.type == 'phrase') {
-            useLeaf = leaf;
-          } else if (_.isArray(leaf) && lastGroup) {
-            useLeaf = lastGroup;
-          } // }}}
-
-
-          switch (match[1].toLowerCase()) {
-            case 'tiab':
-              useLeaf.field = 'title+abstract';
-              break;
-
-            case 'tw':
-              useLeaf.field = 'title+abstract+other';
-              break;
-
-            case 'ti':
-              useLeaf.field = 'title';
-              break;
-
-            case 'ab':
-              useLeaf.field = 'abstract';
-              break;
-
-            case 'nm':
-              useLeaf.field = 'substance';
-              break;
-
-            case 'sh':
-              useLeaf.field = 'floatingSubheading';
-              break;
-
-            case 'pt':
-              useLeaf.field = 'publicationType';
-              break;
-          }
-
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else if (match = /^#([^\)\n]+)/.exec(q)) {
-          trimLastLeaf();
-          branch.nodes.push({
-            type: 'comment',
-            content: match[1]
-          });
-          leaf = undefined;
-          offset += match[0].length;
-          q = q.substr(match[0].length);
-          cropString = false;
-        } else {
-          var nextChar = q.substr(0, 1);
-
-          if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
-            // Leaf pointing to array entity - probably not created fallback leaf to append to
-            if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
-              // First character is a speachmark - slurp until we see the next one
-              leaf = {
-                type: 'phrase',
-                content: match[1],
-                offset: offset
-              };
-              branch.nodes.push(leaf);
-              offset += match[0].length;
-              q = q.substr(match[0].length);
-              cropString = false;
-            } else if (match = /^[^\s\W]+/.exec(q)) {
-              // Slurp the phrase until the space or close brackets
-              leaf = {
-                type: 'phrase',
-                content: match[0],
-                offset: offset
-              };
-              branch.nodes.push(leaf);
-              offset += match[0].length;
-              q = q.substr(match[0].length);
-              cropString = false;
-            } else {
-              // All other first chars - just dump into a buffer and let it fill slowly
-              leaf = {
-                type: 'phrase',
-                content: nextChar,
-                offset: offset
-              };
-              branch.nodes.push(leaf);
-            }
-          } else if (_.isObject(leaf) && leaf.type == 'phrase') {
-            leaf.content += nextChar;
-          }
-
-          afterWhitespace = nextChar == ' '; // Is the nextChar whitespace? Then set the flag
-        }
-
-        if (cropString) {
-          offset += 1; // Increment offset by 1
-
-          q = q.substr(1); // Crop 1 character
-        }
-      }
-
-      if (settings.transposeLines) {
-        polyglot.tools.visit(tree.nodes, ['ref'], function (node, path) {
-          var reference;
-          var line; // Find the matching line
-
-          for (reference in node.ref) {
-            for (line in tree.nodes) {
-              // If custom numbering is used only use nodes that are numbered by the user
-              if (userLineNumber) {
-                if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
-                  // Copy the nodes from that line into the reference nodes
-                  // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
-                  node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
-
-                  node.nodes[reference].pop();
-                  break;
-                }
-              } else {
-                if (tree.nodes[line].number == node.ref[reference]) {
-                  // Copy the nodes from that line into the reference nodes
-                  // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
-                  node.nodes.push(Array.from(tree.nodes[line].nodes)); // Pop the raw node
-
-                  node.nodes[reference].pop();
-                  break;
-                }
-              }
-            }
-          }
-        });
-      }
-
-      return tree.nodes;
-    },
-
-    /**
-    * Collection of supported engines
-    * Each engine should specify:
-    *	title - Human readable name of the engine
-    *	aliases - Alternative names for each engine
-    *	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span msg=""></span> where @msg corresponds to an entry in messages
-    *	open() - optional function that takes a query and provides the direct searching method
-    *	debugging - optional boolean specifying that the engine is for debugging purposes only
-    *
-    * @var {array}
-    */
-    engines: {
-      // PubMed {{{
-      pubmed: {
-        id: 'pubmed',
-        title: 'PubMed',
-        aliases: ['pubmed', 'p', 'pm', 'pubm'],
-
-        /**
-        * Compile a tree structure to PubMed output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '?'
-          }, {
-            subject: /\$/g,
-            value: '*'
-          }, {
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  if (branch.field) {
-                    // If the group has a filter decorate all its children with that field
-                    // This mutates the tree for the other engine compile functions
-                    branch.nodes = polyglot.tools.visit(branch.nodes, ['phrase'], function (b) {
-                      return b.field = branch.field;
-                    });
-                    branch.nodes = polyglot.tools.visit(branch.nodes, ['group'], function (b) {
-                      return b.field = branch.field;
-                    });
-                  }
-
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">[ti]</font>' : '[ti]' : branch.field == 'abstract' ? settings.highlighting ? polyglot.tools.createTooltip('<font color="LightSeaGreen">[tiab]</font>', 'PubMed cannot search abstract field term independently') : '[tiab]' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' : '' // Unsupported field suffix for PubMed
-                    );
-                  } else {
-                    // If no field tag exists create popover with ability to replace field tag
-                    if (polyglot.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {
-                      polyglot.no_field_tag.push(branch.offset + branch.content.length);
-                    }
-
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
-                    } else {
-                      buffer += polyglot.tools.quotePhrase(branch, 'pubmed', settings.highlighting);
-                    }
-                  }
-
-                  break;
-
-                case 'joinNear':
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
-                  } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'pubmed');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'GET',
-            action: 'https://www.ncbi.nlm.nih.gov/pubmed',
-            fields: {
-              term: query
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // Ovid Medline {{{
-      ovid: {
-        id: 'ovid',
-        title: 'Ovid Medline / Ovid Embase',
-        aliases: ['ovid', 'o', 'ov'],
-
-        /**
-        * Compile a tree structure to Ovid MEDLINE output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '?'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
-
-                    if (expand) {
-                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
-                      ;
-                    }
-                  } else {
-                    buffer += '(' + compileWalker(branch.nodes) + ')';
-                  }
-
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field && expand) {
-                    buffer += branch.content + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' : '' // Unsupported field suffix for Ovid
-                    );
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
-                    } else {
-                      buffer += branch.content;
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  if (settings.highlighting) buffer += '<font color="purple">';
-                  buffer += 'ADJ' + branch.proximity;
-                  if (settings.highlighting) buffer += '</font>';
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
-                  } else {
-                    buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'ovid');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-            fields: {
-              textBox: query
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // Cochrane Library {{{
-      cochrane: {
-        id: 'cochrane',
-        title: 'Cochrane Library',
-        aliases: ['cochrane', 'c', 'cl'],
-
-        /**
-        * Compile a tree structure to Cochrane Library output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
-          }, {
-            subject: /\$/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
-          }, {
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  if (branch.field && branch.field == 'floatingSubheading') {
-                    if (settings.highlighting) buffer += '<font color="blue">';
-                    buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-                    if (settings.highlighting) buffer += '</font>';
-                  } else if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
-
-                    if (expand) {
-                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
-                      ;
-                    }
-                  } else {
-                    buffer += '(' + compileWalker(branch.nodes) + ')';
-                  }
-
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field && branch.field == 'floatingSubheading') {
-                    if (settings.highlighting) buffer += '<font color="blue">';
-                    buffer += '[mh /' + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-                    if (settings.highlighting) buffer += '</font>';
-                  } else if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' : '' // Unsupported field suffix for PubMed
-                    );
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
-                    } else {
-                      buffer += polyglot.tools.quotePhrase(branch, 'cochrane', settings.highlighting);
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  if (settings.highlighting) buffer += '<font color="purple">';
-                  buffer += 'NEAR/' + branch.proximity;
-                  if (settings.highlighting) buffer += '</font>';
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
-                  } else {
-                    buffer += '[mh ' + (branch.recurse ? '' : '^') + polyglot.tools.quotePhrase(branch, 'cochrane') + ']';
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'cochrane');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://onlinelibrary.wiley.com/cochranelibrary/search',
-            fields: {
-              'submitSearch': 'Go',
-              'searchRows[0].searchCriterias[0].fieldRestriction': null,
-              'searchRows[0].searchCriterias[0].term': query,
-              'searchRows[0].searchOptions.searchProducts': null,
-              'searchRows[0].searchOptions.searchStatuses': null,
-              'searchRows[0].searchOptions.searchType': 'All',
-              'searchRows[0].searchOptions.publicationStartYear': null,
-              'searchRows[0].searchOptions.publicationEndYear': null,
-              'searchRows[0].searchOptions.disableAutoStemming': null,
-              'searchRows[0].searchOptions.reviewGroupIds': null,
-              'searchRows[0].searchOptions.onlinePublicationStartYear': null,
-              'searchRows[0].searchOptions.onlinePublicationEndYear': null,
-              'searchRows[0].searchOptions.onlinePublicationStartMonth': 0,
-              'searchRows[0].searchOptions.onlinePublicationEndMonth': 0,
-              'searchRows[0].searchOptions.dateType:pubAllYears': null,
-              'searchRows[0].searchOptions.onlinePublicationLastNoOfMonths': 0,
-              'searchRow.ordinal': 0,
-              'hiddenFields.currentPage': 1,
-              'hiddenFields.strategySortBy': 'last-modified-date;desc',
-              'hiddenFields.showStrategies': 'false',
-              'hiddenFields.containerId': null,
-              'hiddenFields.etag': null,
-              'hiddenFields.originalContainerId': null,
-              'hiddenFields.searchFilters.filterByProduct:cochraneReviewsDoi': null,
-              'hiddenFields.searchFilters.filterByIssue': 'all',
-              'hiddenFields.searchFilters.filterByType': 'All',
-              'hiddenFields.searchFilters.displayIssuesAndTypesFilters': 'true'
-            }
-          };
-        },
-        openTerms: 'use search manager box'
-      },
-      // }}}
-      // Embase {{{
-      embase: {
-        id: 'embase',
-        title: 'Embase',
-        aliases: ['embase', 'e', 'eb'],
-
-        /**
-        * Compile a tree structure to Embase output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
-          }, {
-            subject: /\$/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
-          }, {
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            var expand = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  if (branch.field) {
-                    buffer += '(' + compileWalker(branch.nodes, false) + ')';
-
-                    if (expand) {
-                      buffer += branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
-                      ;
-                    }
-                  } else {
-                    buffer += '(' + compileWalker(branch.nodes) + ')';
-                  }
-
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field && expand) {
-                    buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting) + (branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' : branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' : branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' : branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' : branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' : branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' : branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' : '' // Unsupported field suffix for EmBase
-                    );
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
-                    } else {
-                      buffer += polyglot.tools.quotePhrase(branch, 'embase', settings.highlighting);
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  if (settings.highlighting) buffer += '<font color="purple">';
-                  buffer += 'NEAR/' + branch.proximity;
-                  if (settings.highlighting) buffer += '</font>';
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>', "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
-                  } else {
-                    buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'embase');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'GET',
-            action: 'http://www.embase.com.ezproxy.bond.edu.au/search',
-            fields: {
-              sb: 'y',
-              search_query: query.replace(/\n+/g, ' ')
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // Web of Science {{{
-      wos: {
-        id: 'wos',
-        title: 'Web of Science',
-        aliases: ['webofscience', 'w', 'wos', 'websci'],
-
-        /**
-        * Compile a tree structure to Web of Science output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '$'
-          }, {
-            subject: /\$/g,
-            value: '*'
-          }, {
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  buffer += polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting);
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  buffer += 'NEAR/' + branch.proximity;
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'wos', settings.highlighting), "Web of Science does not support MeSH terms");
-                  } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'wos');
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'wos');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://apps.webofknowledge.com.ezproxy.bond.edu.au/UA_GeneralSearch.do',
-            fields: {
-              fieldCount: '1',
-              action: 'search',
-              product: 'UA',
-              search_mode: 'GeneralSearch',
-              SID: 'W15WDD6M2xkKPbfGfGY',
-              max_field_count: '25',
-              max_field_notice: 'Notice: You cannot add another field.',
-              input_invalid_notice: 'Search Error: Please enter a search term.',
-              exp_notice: 'Search Error: Patent search term could be found in more than one family (unique patent number required for Expand option) ',
-              input_invalid_notice_limits: ' <br/>Note: Fields displayed in scrolling boxes must be combined with at least one other search field.',
-              sa_params: "UA||W15WDD6M2xkKPbfGfGY|http://apps.webofknowledge.com.ezproxy.bond.edu.au|'",
-              formUpdated: 'true',
-              'value(input1)': query,
-              'value(select1)': 'TS',
-              x: '798',
-              y: '311',
-              'value(hidInput1)': null,
-              limitStatus: 'collapsed',
-              ss_lemmatization: 'On',
-              ss_spellchecking: 'Suggest',
-              SinceLastVisit_UTC: null,
-              SinceLastVisit_DATE: null,
-              period: 'Range Selection',
-              range: 'ALL',
-              startYear: '1900',
-              endYear: new Date().getYear(),
-              update_back2search_link_param: 'yes',
-              ssStatus: 'display:none',
-              ss_showsuggestions: 'ON',
-              ss_query_language: 'auto',
-              ss_numDefaultGeneralSearchFields: '1',
-              rs_sort_by: 'PY.D;LD.D;SO.A;VL.D;PG.A;AU.A'
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // CINAHL {{{
-      cinahl: {
-        id: 'cinahl',
-        title: 'CINAHL',
-        aliases: ['cinahl', 'ci', 'cnal'],
-
-        /**
-        * Compile a tree structure to CINAHL output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">*</span>'
-          }, {
-            subject: /\?/g,
-            value: '#'
-          }, {
-            subject: /\$/g,
-            value: '*'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
-                    buffer += 'TI ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
-                  } else if (branch.field) {
-                    buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting));
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
-                    } else {
-                      buffer += polyglot.tools.quotePhrase(branch, 'cinahl', settings.highlighting);
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  buffer += 'N' + branch.proximity;
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
-                  } else {
-                    buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'cinahl');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://web.a.ebscohost.com.ezproxy.bond.edu.au/ehost/resultsadvanced',
-            fields: {
-              bquery: query
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // PsycInfo {{{
-      psycinfo: {
-        id: 'psycinfo',
-        title: 'PsycInfo',
-        aliases: ['p', 'pi'],
-
-        /**
-        * Compile a tree structure to PsycInfo output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '?'
-          }, {
-            subject: /\$/g,
-            value: '*'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field) {
-                    buffer += branch.content + (branch.field == 'title' ? '.ti' : branch.field == 'abstract' ? '.ab' : branch.field == 'title+abstract' ? '.ti,ab' : branch.field == 'title+abstract+tw' ? '.ti,ab' : branch.field == 'title+abstract+other' ? '.mp.' : branch.field == 'floatingSubheading' ? '.hw' : branch.field == 'publicationType' ? '.pt' : branch.field == 'substance' ? '.hw' : '');
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover(branch.content, branch.offset + branch.content.length);
-                    } else {
-                      buffer += branch.content;
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  buffer += 'ADJ' + branch.proximity;
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip(polyglot.tools.quotePhrase(branch, 'psycinfo', settings.highlighting), "PsycInfo does not support MeSH terms");
-                  } else {
-                    buffer += polyglot.tools.quotePhrase(branch, 'psycinfo');
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'psycinfo');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-            fields: {
-              textBox: query
-            }
-          };
-        },
-        openTerms: 'any search box'
-      },
-      // }}}
-      // Scopus {{{
-      scopus: {
-        id: 'scopus',
-        title: 'Scopus',
-        aliases: ['s', 'so'],
-
-        /**
-        * Compile a tree structure to Scopus output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          var settings = _.defaults(options, {
-            replaceWildcards: true
-          }); // Apply wildcard replacements
-
-
-          if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [{
-            subject: /\?/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'
-          }, {
-            subject: /\$/g,
-            value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'
-          }, {
-            subject: /#/g,
-            value: '<span msg="NO_SINGLE_WILDCARD">?</span>'
-          }]);
-
-          var compileWalker = function compileWalker(tree) {
-            return tree.map(function (branch, branchIndex) {
-              var buffer = '';
-
-              switch (branch.type) {
-                case 'line':
-                  buffer += compileWalker(branch.nodes);
-                  break;
-
-                case 'group':
-                  buffer += '(' + compileWalker(branch.nodes) + ')';
-                  break;
-
-                case 'ref':
-                  var node;
-
-                  for (node in branch.nodes) {
-                    if (node == 0) {
-                      buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                    } else {
-                      buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                    }
-                  }
-
-                  break;
-
-                case 'phrase':
-                  if (branch.field) {
-                    buffer += branch.field == 'title' ? 'TITLE("' + branch.content + '")' : branch.field == 'abstract' ? 'ABS("' + branch.content + '")' : branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' : branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' : branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' : branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' : branch.field == 'substance' ? 'CHEM("' + branch.content + '")' : '"' + branch.content + '"';
-                  } else {
-                    if (settings.highlighting) {
-                      buffer += polyglot.tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
-                    } else {
-                      buffer += '"' + branch.content + '"';
-                    }
-                  }
-
-                  break;
-
-                case 'joinAnd':
-                  buffer += 'AND';
-                  break;
-
-                case 'joinOr':
-                  buffer += 'OR';
-                  break;
-
-                case 'joinNot':
-                  buffer += 'NOT';
-                  break;
-
-                case 'joinNear':
-                  buffer += 'W/' + branch.proximity;
-                  break;
-
-                case 'mesh':
-                  if (settings.highlighting) {
-                    buffer += polyglot.tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>', "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
-                  } else {
-                    buffer += 'INDEXTERMS("' + branch.content + '")';
-                  }
-
-                  break;
-
-                case 'raw':
-                  buffer += branch.content;
-                  break;
-
-                case 'template':
-                  buffer += polyglot.tools.resolveTemplate(branch.content, 'scopus');
-                  break;
-
-                case 'comment':
-                  // Do nothing
-                  break;
-
-                default:
-                  throw new Error('Unsupported object tree type: ' + branch.type);
-              }
-
-              return buffer // Add spacing provided... its not a raw buffer or the last entity within the structure
-              + (branch.type == 'raw' || // Its not a raw node
-              branch.type == 'line' || // Its not a line node
-              branchIndex == tree.length - 1 || // Its not the last item in the sequence
-              branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw' ? '' : ' ');
-            }).join('');
-          };
-
-          return compileWalker(tree);
-        },
-        open: function open(query) {
-          return {
-            method: 'POST',
-            action: 'http://ovidsp.tx.ovid.com.ezproxy.bond.edu.au/sp-3.17.0a/ovidweb.cgi',
-            fields: {
-              textBox: query
-            }
-          };
-        },
-        openTerms: 'use advanced search box'
-      },
-      // }}} 
-      // Lexical tree (JSON) {{{
-      lexicalTreeJSON: {
-        id: 'lexicalTreeJSON',
-        title: 'Lexical Tree (JSON)',
-        aliases: ['debug'],
-        debugging: true,
-        // Mark this module for debugging only
-
-        /**
-        * Compile a tree structure to JSON output
-        * @param {array} tree The parsed tree to process
-        * @param {Object} [options] Optional options to use when compiling
-        * @return {string} The compiled output
-        */
-        compile: function compile(tree, options) {
-          return tree;
-        } // }}}
-        // MongoDB {{{
-        // mongodb: {
-        // 	id: 'mongodb',
-        // 	title: 'MongoDB Query Format',
-        // 	aliases: ['mongo'],
-        // 	debugging: true, // Mark this module for debugging only
-        // 	/**
-        // 	* Compile a tree structure to a MongoDB query
-        // 	* @param {array} tree The parsed tree to process
-        // 	* @param {Object} [options] Optional options to use when compiling
-        // 	* @return {Object} The compiled MongoDB query output
-        // 	*/
-        // 	compile: (tree, options) => {
-        // 		var settings = _.defaults(options, {
-        // 			replaceWildcards: true,
-        // 			translatePhraseField: t => ({'title': t}),
-        // 			meshField: 'mesh',
-        // 			translateTitleAbstract: t => ({$or: [{title: t}, {abstract: t}]}),
-        // 		});
-        // 		// Apply wildcard replacements
-        // 		if (settings.replaceWildcards) polyglot.tools.replaceContent(tree, ['phrase'], [
-        // 			{subject: /[\?\$]/g, value: '*'},
-        // 		]);
-        // 		var compileWalker = tree =>
-        // 			_(tree)
-        // 				.map((branch, branchIndex) => {
-        // 					var buffer = {};
-        // 					switch (branch.type) {
-        // 						case 'line':
-        // 							buffer += compileWalker(branch.nodes);
-        // 							break;
-        // 						case 'group':
-        // 							if (branch.field && branch.field == 'title+abstract') {
-        // 								// FIXME: Not yet properly supported
-        // 								buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
-        // 							} else if (branch.field) {
-        // 								buffer[branch.field] = compileWalker(branch.nodes);
-        // 							} else {
-        // 								buffer = settings.translatePhraseField(compileWalker(branch.nodes));
-        // 							}
-        // 							break;
-        // 						case 'ref':
-        // 							var node;
-        // 							for (node in branch.nodes) {
-        // 								if (node == 0) {
-        // 									buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-        // 								} else {
-        // 									buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-        // 								}	
-        // 							}
-        // 							break;
-        // 						case 'phrase':
-        // 							if (branch.field && branch.field == 'title+abstract') {
-        // 								buffer = settings.translateTitleAbstract(branch.content);
-        // 							} else if (branch.field) {
-        // 								buffer[branch.field] = branch.content;
-        // 							} else {
-        // 								buffer = settings.translatePhraseField(branch.content);
-        // 							}
-        // 							break;
-        // 						case 'joinNear':
-        // 						case 'joinAnd':
-        // 							buffer = {$and: []};
-        // 							break;
-        // 						case 'joinOr':
-        // 							buffer = {$or: []};
-        // 							break;
-        // 						case 'joinNot':
-        // 							buffer = {$not: {}};
-        // 							break;
-        // 						case 'mesh':
-        // 							// FIXME: No ability to recurse
-        // 							buffer[settings.meshField] = {$in: [branch.content]};
-        // 							break;
-        // 						case 'raw':
-        // 							// Do nothing
-        // 							break;
-        // 						case 'template':
-        // 							buffer = polyglot.tools.resolveTemplate(branch.content, 'mongodb');
-        // 							break;
-        // 						case 'comment':
-        // 							// Do nothing
-        // 							break;
-        // 						default:
-        // 							throw new Error('Unsupported object tree type: ' + branch.type);
-        // 					}
-        // 					return buffer;
-        // 				})
-        // 				// Renest + combine $or/$and conditions {{{
-        // 				// NOTE: Highly experimental - causes bugs under some circumstances
-        // 				// .thru(tree => polyglot.tools.renestConditions(tree))
-        // 				// .thru(tree => polyglot.tools.combineConditions(tree))
-        // 				// }}}
-        // 				// Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-        // 				.thru(tree => {
-        // 					if (_.isArray(tree) && tree.length == 1) tree = tree[0];
-        // 					return tree;
-        // 				})
-        // 				// }}}
-        // 				.value();
-        // 		return compileWalker(tree);
-        // 	},
-        // },
-        // }}}
-
-      }
-    },
-
-    /**
-    * Collection of utility functions to apply common behaviour to a compiled tree
-    * @var {Object}
-    */
-    tools: {
-      /**
-      * Apply a series of text replacements to every matching node object within a tree
-      * This function mutates tree
-      * @param {array} tree The tree sturcture to operate on
-      * @param {null|array} types Type filter to apply. If falsy all are used
-      * @param {array} replacements Array of replacements to apply. Each must be of the form `{subject: STRING|REGEXP, value: STRING|FUNCTION}`
-      * @return {array} The input tree element with the replacements applied
-      */
-      replaceContent: function replaceContent(tree, types, replacements) {
-        polyglot.tools.visit(tree, types, function (branch) {
-          if (!branch.content) return;
-          replacements.forEach(function (replacement) {
-            branch.content = branch.content.replace(replacement.subject, replacement.value);
-          });
-        });
-        return tree;
-      },
-
-      /**
-      * Visit the given node types within a deeply nested tree and run a function
-      * This function may mutate the input tree depending on the actions of the callbacks
-      * NOTE: If the return value of the callback is `"DEL"` the node is deleted
-      * @param {array} tree The tree sturcture to operate on
-      * @param {null|array} types Node filter to apply to (if falsy all are used)
-      * @param {function} callback The callback to call with each node. Called as (node, path)
-      * @return {array} The input tree
-      */
-      visit: function visit(tree, types, callback) {
-        var removals = []; // Stack of removal paths we are performing when done
-
-        var treeWalker = function treeWalker(tree, path) {
-          tree.forEach(function (branch, branchKey) {
-            var nodePath = path.concat(branchKey); // Fire callback if it matches
-
-            if (!types || _.includes(types, branch.type)) {
-              var result = callback(branch, nodePath);
-              if (result === 'DEL') removals.push(nodePath);
-            } // Walk down nodes if its a group
-
-
-            if (branch.type == 'group' || branch.type == 'line') treeWalker(branch.nodes, nodePath.concat(['nodes']));
-          });
-        };
-
-        treeWalker(tree, []); // Crop all items marked as removals
-
-        removals.reverse() // Walk in reverse order so we don't screw up arrays
-        .forEach(function (path) {
-          var nodeName = path.pop();
-          var parent = path.length ? _.get(tree, path) : tree;
-          delete parent[nodeName];
-        });
-        return tree;
-      },
-
-      /**
-      * Retrieve the contents of a template by its ID
-      * NOTE: If the specific engine definition is not found 'default' is used (and it will be pre-parsed via .translate())
-      * @param {string} template The template to resolve
-      * @param {string} engine The current engine (used to get the correct sub-templating string)
-      * @return {string} The resolved template
-      */
-      resolveTemplate: function resolveTemplate(template, engine) {
-        if (!polyglot.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
-        if (polyglot.templates[template].engines[engine]) return polyglot.templates[template].engines[engine];
-        if (polyglot.templates[template].engines.default) return polyglot.translate(polyglot.templates[template].engines.default, engine);
-        return '';
-      },
-
-      /**
-      * Determine if a phrase needs to be enclosed within speachmarks and return the result
-      * @param {Object} branch Phrase branch to examine
-      * @param {string} engine Optional engine ID to examine for other enclose methods
-      * @param {boolean} highlighting Optional bool to determine if html color styling is added
-      * @return {string} The phrase enclosed as needed
-      */
-      quotePhrase: function quotePhrase(branch, engine) {
-        var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        var text = _.trimEnd(branch.content);
-
-        return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
-      },
-
-      /**
-      * Convert the '$or' / '$and' nodes within a tree into a nested structure
-      * This function will also flatten identical branches (i.e. run-on multiple $and / $or into one array)
-      * @param {Object} tree The object tree to recombine
-      * @returns {Object} The recombined tree
-      */
-      renestConditions: function renestConditions(tree) {
-        if (!_.isArray(tree)) return tree; // Not an array - skip
-        // Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
-
-        return tree.reduce(function (res, branch, index, arr) {
-          var firstKey = _(branch).keys().first();
-
-          if (firstKey == '$or' || firstKey == '$and') {
-            // Is a combinator
-            var expression = {};
-            expression[firstKey] = [res.pop(), // Right side is the last thing we added to the buffer
-            arr.splice(index + 1, 1)[0]];
-            res.push(expression);
-          } else {
-            // Unknown - just push to array and carry on processing
-            res.push(branch);
-          }
-
-          return res;
-        }, []);
-      },
-
-      /**
-      * Combine multiple run-on $and / $or conditional branches into one branch
-      * This function is a companion function to renestConditions and should be called directly afterwards if needed
-      * @param {Object} tree The tree to traverse
-      * @param {Object} [options] Additional options to accept
-      * @param {number} [options.depth=10] The maximum depth to traverse before giving up, set to 0 to infinitely recurse
-      * @return {Object} The collapsed tree
-      * @example
-      * {left, joinAnd, right} => {joinAnd: [left, right]}
-      * @example
-      * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
-      */
-      combineConditions: function combineConditions(tree, options) {
-        var settings = _.defaults(options, {
-          depth: 10
-        });
-
-        var collapses = [];
-
-        var traverseTree = function traverseTree(branch) {
-          var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : []; // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
-
-          _.forEach(branch, function (v, k) {
-            // Use _.map if its an array and _.mapValues if we're examining an object
-            if (_.isObject(v)) {
-              var firstKey = _(branch).keys().first();
-
-              if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
-                // Mark for cleanup later (when we can do a bottom-up traversal)
-                var lastKey = _.findLast(collapses, function (i) {
-                  return i.key == '$and' || i.key == '$or';
-                }); // Collapse only identical keys
-
-
-                if (!lastKey || lastKey.key == firstKey) {
-                  collapses.push({
-                    key: firstKey,
-                    path: path
-                  });
-                }
-              }
-
-              if (settings.depth && path.length > settings.depth) return; // Stop recursing after depth has been reached
-
-              traverseTree(v, path.concat([k]));
-            }
-          });
-        };
-
-        traverseTree(tree);
-        collapses.forEach(function (collapse) {
-          var parent = _.get(tree, collapse.path.slice(0, -1));
-
-          var child = _.get(tree, collapse.path.concat([collapse.key]));
-
-          if (!child || !parent || !parent.length) return;
-          var child2 = parent[1];
-          if (child2) child.push(child2); // Wrap $or conditions (that have an '$and' parent) in an object {{{
-
-          var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
-
-          if (lastParent && lastParent == '$and' && collapse.key == '$or') child = {
-            $or: child
-          }; // }}}
-
-          _.set(tree, collapse.path.slice(0, -1), child);
-        });
-        return tree;
-      },
-
-      /**
-      * Create a tooltip with a specified message
-      * @param {string} content Content to append tooltip to
-      * @param {string} message Message to contain inside tooltip
-      */
-      createTooltip: function createTooltip(content, message) {
-        return "<span class=\"black-underline\" v-tooltip=\"'" + message + "'\">" + content + '</span>';
-      },
-
-      /**
-      * Create a popover with options to replace empty field tags with specified field tag
-      * @param {string} content Content to append popover to
-      */
-      createPopover: function createPopover(content, offset) {
-        return '<v-popover offset="8" placement="right">' + '<span class="blue-underline">' + content + '</span>' + '<template slot="popover">' + '<h3 class="popover-header">Add Field Tag</h3>' + '<input class="tooltip-content" v-model="customField" placeholder="Field tag" />' + '<div class="replace-all">' + '<input type="checkbox" id="checkbox" v-model="replaceAll">' + '<label for="checkbox">Replace All</label>' + '</div>' + '<div class="replace-buttons">' + '<button v-on:click="replaceFields(customField, replaceAll, ' + offset + ')" type="button" class="btn btn-primary">Replace</button>' + '<button v-close-popover type="button" class="btn btn-dark">Close</button>' + '</div>' + '</template>' + '</v-popover>';
-      }
     }
   };
 });
+var polyglot$1 = unwrapExports(polyglot_1);
 var polyglot_2 = polyglot_1.polyglot;
-var polyglot_3 = polyglot_1.examples;
-var polyglot_4 = polyglot_1.messages;
-var polyglot_5 = polyglot_1.variables;
-var polyglot_6 = polyglot_1.templates;
-var polyglot_7 = polyglot_1.translate;
-var polyglot_8 = polyglot_1.translateAll;
-var polyglot_9 = polyglot_1.preProcess;
-var polyglot_10 = polyglot_1.postProcess;
-var polyglot_11 = polyglot_1.parse;
-var polyglot_12 = polyglot_1.engines;
-var polyglot_13 = polyglot_1.tools;
+var polyglot_3 = polyglot_1.translate;
+var polyglot_4 = polyglot_1.translateAll;
+var polyglot_5 = polyglot_1.preProcess;
+var polyglot_6 = polyglot_1.postProcess;
 
 //
 //
@@ -63219,7 +63435,7 @@ var polyglot_13 = polyglot_1.tools;
 //
 //
 
-function parse$1 (data, depth = 0, last = true, key = undefined) {
+function parse$3 (data, depth = 0, last = true, key = undefined) {
   let kv = { depth, last, primitive: true, key: JSON.stringify(key) };
   if (typeof data !== 'object') {
     return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })
@@ -63227,13 +63443,13 @@ function parse$1 (data, depth = 0, last = true, key = undefined) {
     return Object.assign(kv, { type: 'null', value: 'null' })
   } else if (Array.isArray(data)) {
     let value = data.map((item, index) => {
-      return parse$1(item, depth + 1, index === data.length - 1)
+      return parse$3(item, depth + 1, index === data.length - 1)
     });
     return Object.assign(kv, { primitive: false, type: 'array', value })
   } else {
     let keys = Object.keys(data);
     let value = keys.map((key, index) => {
-      return parse$1(data[key], depth + 1, index === keys.length - 1, key)
+      return parse$3(data[key], depth + 1, index === keys.length - 1, key)
     });
     return Object.assign(kv, { primitive: false, type: 'object', value })
   }
@@ -63282,7 +63498,7 @@ var script = {
         result = '[Vue JSON Tree] Invalid raw JSON.';
         console.warn(result);
       } finally {
-        return parse$1(result)
+        return parse$3(result)
       }
     }
   },
@@ -63714,7 +63930,7 @@ var script$1 = {
         showPrintMargin: false,
         wrap: true
       },
-      engines: polyglot_1.engines,
+      engines: enginesImport,
       enginesExpanded: {},
       enginesQuery: {},
       polyglotOptions: {
@@ -63761,7 +63977,7 @@ var script$1 = {
       // Create new element
       var el = document.createElement('textarea'); // Set value (string to be copied)
 
-      el.value = polyglot_1.translate(this.query, id, {
+      el.value = polyglot$1.translate(this.query, id, {
         html: false
       }); // Set non-editable to avoid focus and move outside of view
 
@@ -63782,7 +63998,7 @@ var script$1 = {
       var chosenExample;
 
       do {
-        chosenExample = lodash.sample(polyglot_1.examples);
+        chosenExample = lodash.sample(global$2.examples);
       } while (this.exampleLast == chosenExample.title);
 
       this.exampleLast = chosenExample;
@@ -63793,7 +64009,6 @@ var script$1 = {
     },
     editorInit: function editorInit() {
       // Ace editor settings
-      Promise.resolve().then(function () { return chrome; });
       window.ace.config.set('modePath', 'syntax/ace');
     },
     loadTextFromFile: function loadTextFromFile(ev) {
@@ -63812,7 +64027,7 @@ var script$1 = {
     },
     replaceFields: function replaceFields(field, replace_all, offset) {
       if (replace_all) {
-        var itemsToReplace = polyglot_1.no_field_tag.slice(0).reverse(); // Work backwards through items
+        var itemsToReplace = global$2.variables.no_field_tag.slice(0).reverse(); // Work backwards through items
 
         for (var x in itemsToReplace) {
           // If original query is surrounded by quotation marks, 2 must be added to offset
@@ -63836,7 +64051,7 @@ var script$1 = {
     query: function query() {
       var _this2 = this;
 
-      lodash(polyglot_1.translateAll(this.query, this.polyglotOptions)).forEach(function (query, key) {
+      lodash(polyglot$1.translateAll(this.query, this.polyglotOptions)).forEach(function (query, key) {
         return _this2.$set(_this2.enginesQuery, key, query);
       });
     }
@@ -64083,11 +64298,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-f5586456_0", { source: "\n.text-reader[data-v-f5586456] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-f5586456] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-f5586456]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-f5586456] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA+LA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: polyglot.engines,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(polyglot.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\timport('brace/theme/chrome');\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = polyglot.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-283ebae1_0", { source: "\n.text-reader[data-v-283ebae1] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-283ebae1] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-283ebae1]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-283ebae1] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAgMA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport enginesImport from '../modules/engines.js'\r\nimport global from '../modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-f5586456";
+  const __vue_scope_id__$1 = "data-v-283ebae1";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -64115,138 +64330,5 @@ jquery(function () {
     },
     template: '<editor/>'
   });
-});
-
-ace.define("ace/theme/chrome",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
-
-exports.isDark = false;
-exports.cssClass = "ace-chrome";
-exports.cssText = ".ace-chrome .ace_gutter {\
-background: #ebebeb;\
-color: #333;\
-overflow : hidden;\
-}\
-.ace-chrome .ace_print-margin {\
-width: 1px;\
-background: #e8e8e8;\
-}\
-.ace-chrome {\
-background-color: #FFFFFF;\
-color: black;\
-}\
-.ace-chrome .ace_cursor {\
-color: black;\
-}\
-.ace-chrome .ace_invisible {\
-color: rgb(191, 191, 191);\
-}\
-.ace-chrome .ace_constant.ace_buildin {\
-color: rgb(88, 72, 246);\
-}\
-.ace-chrome .ace_constant.ace_language {\
-color: rgb(88, 92, 246);\
-}\
-.ace-chrome .ace_constant.ace_library {\
-color: rgb(6, 150, 14);\
-}\
-.ace-chrome .ace_invalid {\
-background-color: rgb(153, 0, 0);\
-color: white;\
-}\
-.ace-chrome .ace_fold {\
-}\
-.ace-chrome .ace_support.ace_function {\
-color: rgb(60, 76, 114);\
-}\
-.ace-chrome .ace_support.ace_constant {\
-color: rgb(6, 150, 14);\
-}\
-.ace-chrome .ace_support.ace_type,\
-.ace-chrome .ace_support.ace_class\
-.ace-chrome .ace_support.ace_other {\
-color: rgb(109, 121, 222);\
-}\
-.ace-chrome .ace_variable.ace_parameter {\
-font-style:italic;\
-color:#FD971F;\
-}\
-.ace-chrome .ace_keyword.ace_operator {\
-color: rgb(104, 118, 135);\
-}\
-.ace-chrome .ace_comment {\
-color: #236e24;\
-}\
-.ace-chrome .ace_comment.ace_doc {\
-color: #236e24;\
-}\
-.ace-chrome .ace_comment.ace_doc.ace_tag {\
-color: #236e24;\
-}\
-.ace-chrome .ace_constant.ace_numeric {\
-color: rgb(0, 0, 205);\
-}\
-.ace-chrome .ace_variable {\
-color: rgb(49, 132, 149);\
-}\
-.ace-chrome .ace_xml-pe {\
-color: rgb(104, 104, 91);\
-}\
-.ace-chrome .ace_entity.ace_name.ace_function {\
-color: #0000A2;\
-}\
-.ace-chrome .ace_heading {\
-color: rgb(12, 7, 255);\
-}\
-.ace-chrome .ace_list {\
-color:rgb(185, 6, 144);\
-}\
-.ace-chrome .ace_marker-layer .ace_selection {\
-background: rgb(181, 213, 255);\
-}\
-.ace-chrome .ace_marker-layer .ace_step {\
-background: rgb(252, 255, 0);\
-}\
-.ace-chrome .ace_marker-layer .ace_stack {\
-background: rgb(164, 229, 101);\
-}\
-.ace-chrome .ace_marker-layer .ace_bracket {\
-margin: -1px 0 0 -1px;\
-border: 1px solid rgb(192, 192, 192);\
-}\
-.ace-chrome .ace_marker-layer .ace_active-line {\
-background: rgba(0, 0, 0, 0.07);\
-}\
-.ace-chrome .ace_gutter-active-line {\
-background-color : #dcdcdc;\
-}\
-.ace-chrome .ace_marker-layer .ace_selected-word {\
-background: rgb(250, 250, 255);\
-border: 1px solid rgb(200, 200, 250);\
-}\
-.ace-chrome .ace_storage,\
-.ace-chrome .ace_keyword,\
-.ace-chrome .ace_meta.ace_tag {\
-color: rgb(147, 15, 128);\
-}\
-.ace-chrome .ace_string.ace_regex {\
-color: rgb(255, 0, 0)\
-}\
-.ace-chrome .ace_string {\
-color: #1A1AA6;\
-}\
-.ace-chrome .ace_entity.ace_other.ace_attribute-name {\
-color: #994409;\
-}\
-.ace-chrome .ace_indent-guide {\
-background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==\") right repeat-y;\
-}\
-";
-
-var dom = acequire("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
-});
-
-var chrome = /*#__PURE__*/Object.freeze({
-
 });
 //# sourceMappingURL=demoApp.js.map

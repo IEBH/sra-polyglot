@@ -26,6 +26,11 @@ ace.define("ace/mode/polyglot_highlight_rules", ["require", "exports", "module",
 					caseInsensitive: true,
 				},
 				{
+					token: 'constant.language',
+					regex: /\[mesh:noexp\]/,
+					caseInsensitive: true,
+				},
+				{
 					token: 'variable',
 					regex: /\[[a-z]{2,4}\]/,
 				},
