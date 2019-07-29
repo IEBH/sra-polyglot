@@ -37,6 +37,42 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 
 });
 
+describe('Translate title searches (PubMed -> *)', ()=> {
+
+	it('translate `term[Title]` -> PM `term[ti]`', ()=> {
+		expect(polyglot.translate('term[Title]', 'pubmed')).to.equal('term[ti]');
+	});
+
+	it('translate `term[Title]` -> OV `term.ti`', ()=> {
+		expect(polyglot.translate('term[Title]', 'ovid')).to.equal('term.ti.');
+	});
+
+	it('translate `term[Title]` -> CO `term:ti`', ()=> {
+		expect(polyglot.translate('term[Title]', 'cochrane')).to.equal('term:ti');
+	});
+
+	it('translate `term[Title]` -> EM `term:ti`', ()=> {
+		expect(polyglot.translate('term[Title]', 'embase')).to.equal('term:ti');
+	});
+
+	it('translate `term[Title]` -> CI `TI term`', ()=> {
+		expect(polyglot.translate('term[Title]', 'cinahl')).to.equal('TI term');
+	});
+
+	it('translate `term[Title]` -> PY `AB term`', ()=> {
+		expect(polyglot.translate('term[Title]', 'psycinfo')).to.equal('term.ti');
+	});
+
+	it('translate `term[Title]` -> SC `AB term`', ()=> {
+		expect(polyglot.translate('term[Title]', 'scopus')).to.equal('TITLE("term")');
+	});
+
+	it('translate `term[Title]` -> WS `term`', ()=> {
+		expect(polyglot.translate('term[Title]', 'wos')).to.equal('term');
+	});
+
+});
+
 describe('Translate title searches (Ovid -> *)', ()=> {
 
 	it('translate `term.ti` -> PM `term[ti]`', ()=> {
