@@ -60972,6 +60972,7 @@ var vue2AceEditor = {
     }
 };
 
+// File contains global variables
 var global$2 = {
   /**
   * List of example search queries
@@ -61078,7 +61079,7 @@ var tools = {
       tree.forEach(function (branch, branchKey) {
         var nodePath = path.concat(branchKey); // Fire callback if it matches
 
-        if (!types || _.includes(types, branch.type)) {
+        if (!types || lodash.includes(types, branch.type)) {
           var result = callback(branch, nodePath);
           if (result === 'DEL') removals.push(nodePath);
         } // Walk down nodes if its a group
@@ -61093,7 +61094,7 @@ var tools = {
     removals.reverse() // Walk in reverse order so we don't screw up arrays
     .forEach(function (path) {
       var nodeName = path.pop();
-      var parent = path.length ? _.get(tree, path) : tree;
+      var parent = path.length ? lodash.get(tree, path) : tree;
       delete parent[nodeName];
     });
     return tree;
@@ -61141,7 +61142,7 @@ var tools = {
   quotePhrase: function quotePhrase(branch, engine) {
     var highlighting = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-    var text = _.trimEnd(branch.content);
+    var text = lodash.trimEnd(branch.content);
 
     return /\s/.test(text) ? highlighting ? '<font color="DarkBlue">"' + text + '"</font>' : '"' + text + '"' : text;
   },
@@ -61153,11 +61154,11 @@ var tools = {
   * @returns {Object} The recombined tree
   */
   renestConditions: function renestConditions(tree) {
-    if (!_.isArray(tree)) return tree; // Not an array - skip
+    if (!lodash.isArray(tree)) return tree; // Not an array - skip
     // Transform arrays of the form: [X1, $or/$and, X2] => {$or/$and: [X1, X2]}
 
     return tree.reduce(function (res, branch, index, arr) {
-      var firstKey = _(branch).keys().first();
+      var firstKey = lodash(branch).keys().first();
 
       if (firstKey == '$or' || firstKey == '$and') {
         // Is a combinator
@@ -61187,7 +61188,7 @@ var tools = {
   * {foo, joinOr, bar, joinOr, baz} => {joinOr: [foo, bar, baz]}
   */
   combineConditions: function combineConditions(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       depth: 10
     });
 
@@ -61197,14 +61198,14 @@ var tools = {
       var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
       // Recurse into each tree node and make a bottom-up list of nodes we need to collapse
-      _.forEach(branch, function (v, k) {
+      lodash.forEach(branch, function (v, k) {
         // Use _.map if its an array and _.mapValues if we're examining an object
-        if (_.isObject(v)) {
-          var firstKey = _(branch).keys().first();
+        if (lodash.isObject(v)) {
+          var firstKey = lodash(branch).keys().first();
 
           if (path.length > 1 && (firstKey == '$or' || firstKey == '$and')) {
             // Mark for cleanup later (when we can do a bottom-up traversal)
-            var lastKey = _.findLast(collapses, function (i) {
+            var lastKey = lodash.findLast(collapses, function (i) {
               return i.key == '$and' || i.key == '$or';
             }); // Collapse only identical keys
 
@@ -61226,21 +61227,21 @@ var tools = {
 
     traverseTree(tree);
     collapses.forEach(function (collapse) {
-      var parent = _.get(tree, collapse.path.slice(0, -1));
+      var parent = lodash.get(tree, collapse.path.slice(0, -1));
 
-      var child = _.get(tree, collapse.path.concat([collapse.key]));
+      var child = lodash.get(tree, collapse.path.concat([collapse.key]));
 
       if (!child || !parent || !parent.length) return;
       var child2 = parent[1];
       if (child2) child.push(child2); // Wrap $or conditions (that have an '$and' parent) in an object {{{
 
-      var lastParent = _(collapse.path).slice(0, -1).findLast(_.isString);
+      var lastParent = lodash(collapse.path).slice(0, -1).findLast(lodash.isString);
 
       if (lastParent && lastParent == '$and' && collapse.key == '$or') child = {
         $or: child
       }; // }}}
 
-      _.set(tree, collapse.path.slice(0, -1), child);
+      lodash.set(tree, collapse.path.slice(0, -1), child);
     });
     return tree;
   },
@@ -61277,7 +61278,7 @@ var tools = {
 */
 
 var parse$1 = function parse(query, options) {
-  var settings = _.defaults(options, {
+  var settings = lodash.defaults(options, {
     groupLines: false,
     groupLinesAlways: false,
     removeNumbering: false,
@@ -61323,7 +61324,7 @@ var parse$1 = function parse(query, options) {
     if (settings.groupLines && (settings.groupLinesAlways || lines.length > 1)) {
       // Wrap lines provided they are not blank and are not just 'and', 'or', 'not' by themselves or a comment
       lines = lines.map(function (line) {
-        return _.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
+        return lodash.trim(line) && !/^\s*(and|or|not)\s*$/i.test(line) && !/^\s*#/.test(line) ? '(' + line + ')' : line;
       });
     } // }}}
 
@@ -61339,7 +61340,7 @@ var parse$1 = function parse(query, options) {
 
 
   function trimLastLeaf() {
-    if (leaf && _.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
+    if (leaf && lodash.includes(['phrase', 'raw'], leaf.type) && / $/.test(leaf.content)) {
       leaf.content = leaf.content.substr(0, leaf.content.length - 1);
       if (!leaf.content) branch.nodes.pop();
     }
@@ -61404,7 +61405,7 @@ var parse$1 = function parse(query, options) {
       // 1-7/OR
       branch.nodes.push({
         type: 'ref',
-        ref: _.range(match[1], (match[2] + 1) / 10),
+        ref: lodash.range(match[1], (match[2] + 1) / 10),
         cond: match[3].toUpperCase(),
         nodes: []
       });
@@ -61415,7 +61416,7 @@ var parse$1 = function parse(query, options) {
       // OR/1-7
       branch.nodes.push({
         type: 'ref',
-        ref: _.range(match[2], (match[3] + 1) / 10),
+        ref: lodash.range(match[2], (match[3] + 1) / 10),
         cond: match[1].toUpperCase(),
         nodes: []
       });
@@ -61507,7 +61508,7 @@ var parse$1 = function parse(query, options) {
       trimLastLeaf();
       branch.nodes.push({
         type: 'joinNear',
-        proximity: _.toNumber(match[2])
+        proximity: lodash.toNumber(match[2])
       });
       leaf = undefined;
       offset += match[0].length;
@@ -61574,9 +61575,9 @@ var parse$1 = function parse(query, options) {
         // Figure out the leaf to use (usually the last one) or the previously used group {{{
         var useLeaf = {};
 
-        if (_.isObject(leaf) && leaf.type == 'phrase') {
+        if (lodash.isObject(leaf) && leaf.type == 'phrase') {
           useLeaf = leaf;
-        } else if (_.isArray(leaf) && lastGroup) {
+        } else if (lodash.isArray(leaf) && lastGroup) {
           useLeaf = lastGroup;
         } // }}}
 
@@ -61633,20 +61634,21 @@ var parse$1 = function parse(query, options) {
         offset += match[0].length;
         q = q.substr(match[0].length);
         cropString = false;
-      } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) {
+      } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) {
       // Field specifier - PubMed syntax
       // Figure out the leaf to use (usually the last one) or the previously used group {{{
       var useLeaf;
 
-      if (_.isObject(leaf) && leaf.type == 'phrase') {
+      if (lodash.isObject(leaf) && leaf.type == 'phrase') {
         useLeaf = leaf;
-      } else if (_.isArray(leaf) && lastGroup) {
+      } else if (lodash.isArray(leaf) && lastGroup) {
         useLeaf = lastGroup;
       } // }}}
 
 
       switch (match[1].toLowerCase()) {
         case 'tiab':
+        case 'title/abstract':
           useLeaf.field = 'title+abstract';
           break;
 
@@ -61655,6 +61657,7 @@ var parse$1 = function parse(query, options) {
           break;
 
         case 'ti':
+        case 'title':
           useLeaf.field = 'title';
           break;
 
@@ -61691,7 +61694,7 @@ var parse$1 = function parse(query, options) {
     } else {
       var nextChar = q.substr(0, 1);
 
-      if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') {
+      if ((lodash.isUndefined(leaf) || lodash.isArray(leaf)) && nextChar != ' ') {
         // Leaf pointing to array entity - probably not created fallback leaf to append to
         if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
           // First character is a speachmark - slurp until we see the next one
@@ -61724,7 +61727,7 @@ var parse$1 = function parse(query, options) {
           };
           branch.nodes.push(leaf);
         }
-      } else if (_.isObject(leaf) && leaf.type == 'phrase') {
+      } else if (lodash.isObject(leaf) && leaf.type == 'phrase') {
         leaf.content += nextChar;
       }
 
@@ -61777,135 +61780,6 @@ var parse$2 = /*#__PURE__*/Object.freeze({
 	parse: parse$1
 });
 
-ace.define("ace/theme/chrome",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
-
-exports.isDark = false;
-exports.cssClass = "ace-chrome";
-exports.cssText = ".ace-chrome .ace_gutter {\
-background: #ebebeb;\
-color: #333;\
-overflow : hidden;\
-}\
-.ace-chrome .ace_print-margin {\
-width: 1px;\
-background: #e8e8e8;\
-}\
-.ace-chrome {\
-background-color: #FFFFFF;\
-color: black;\
-}\
-.ace-chrome .ace_cursor {\
-color: black;\
-}\
-.ace-chrome .ace_invisible {\
-color: rgb(191, 191, 191);\
-}\
-.ace-chrome .ace_constant.ace_buildin {\
-color: rgb(88, 72, 246);\
-}\
-.ace-chrome .ace_constant.ace_language {\
-color: rgb(88, 92, 246);\
-}\
-.ace-chrome .ace_constant.ace_library {\
-color: rgb(6, 150, 14);\
-}\
-.ace-chrome .ace_invalid {\
-background-color: rgb(153, 0, 0);\
-color: white;\
-}\
-.ace-chrome .ace_fold {\
-}\
-.ace-chrome .ace_support.ace_function {\
-color: rgb(60, 76, 114);\
-}\
-.ace-chrome .ace_support.ace_constant {\
-color: rgb(6, 150, 14);\
-}\
-.ace-chrome .ace_support.ace_type,\
-.ace-chrome .ace_support.ace_class\
-.ace-chrome .ace_support.ace_other {\
-color: rgb(109, 121, 222);\
-}\
-.ace-chrome .ace_variable.ace_parameter {\
-font-style:italic;\
-color:#FD971F;\
-}\
-.ace-chrome .ace_keyword.ace_operator {\
-color: rgb(104, 118, 135);\
-}\
-.ace-chrome .ace_comment {\
-color: #236e24;\
-}\
-.ace-chrome .ace_comment.ace_doc {\
-color: #236e24;\
-}\
-.ace-chrome .ace_comment.ace_doc.ace_tag {\
-color: #236e24;\
-}\
-.ace-chrome .ace_constant.ace_numeric {\
-color: rgb(0, 0, 205);\
-}\
-.ace-chrome .ace_variable {\
-color: rgb(49, 132, 149);\
-}\
-.ace-chrome .ace_xml-pe {\
-color: rgb(104, 104, 91);\
-}\
-.ace-chrome .ace_entity.ace_name.ace_function {\
-color: #0000A2;\
-}\
-.ace-chrome .ace_heading {\
-color: rgb(12, 7, 255);\
-}\
-.ace-chrome .ace_list {\
-color:rgb(185, 6, 144);\
-}\
-.ace-chrome .ace_marker-layer .ace_selection {\
-background: rgb(181, 213, 255);\
-}\
-.ace-chrome .ace_marker-layer .ace_step {\
-background: rgb(252, 255, 0);\
-}\
-.ace-chrome .ace_marker-layer .ace_stack {\
-background: rgb(164, 229, 101);\
-}\
-.ace-chrome .ace_marker-layer .ace_bracket {\
-margin: -1px 0 0 -1px;\
-border: 1px solid rgb(192, 192, 192);\
-}\
-.ace-chrome .ace_marker-layer .ace_active-line {\
-background: rgba(0, 0, 0, 0.07);\
-}\
-.ace-chrome .ace_gutter-active-line {\
-background-color : #dcdcdc;\
-}\
-.ace-chrome .ace_marker-layer .ace_selected-word {\
-background: rgb(250, 250, 255);\
-border: 1px solid rgb(200, 200, 250);\
-}\
-.ace-chrome .ace_storage,\
-.ace-chrome .ace_keyword,\
-.ace-chrome .ace_meta.ace_tag {\
-color: rgb(147, 15, 128);\
-}\
-.ace-chrome .ace_string.ace_regex {\
-color: rgb(255, 0, 0)\
-}\
-.ace-chrome .ace_string {\
-color: #1A1AA6;\
-}\
-.ace-chrome .ace_entity.ace_other.ace_attribute-name {\
-color: #994409;\
-}\
-.ace-chrome .ace_indent-guide {\
-background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==\") right repeat-y;\
-}\
-";
-
-var dom = acequire("../lib/dom");
-dom.importCssString(exports.cssText, exports.cssClass);
-});
-
 var pubmedImport = {
   id: 'pubmed',
   title: 'PubMed',
@@ -61919,7 +61793,7 @@ var pubmedImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62064,7 +61938,7 @@ var ovidImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62203,7 +62077,7 @@ var cochraneImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62382,7 +62256,7 @@ var embaseImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62528,7 +62402,7 @@ var wosImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62681,7 +62555,7 @@ var cinahlImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62727,7 +62601,7 @@ var cinahlImport = {
             if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
               buffer += 'TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ' OR ' + 'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting);
             } else if (branch.field) {
-              buffer += _.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting));
+              buffer += lodash.trimStart((branch.field == 'title' ? 'TI' : branch.field == 'abstract' ? 'AB' : branch.field == 'floatingSubheading' ? 'MW' : branch.field == 'publicationType' ? 'PT' : branch.field == 'substance' ? 'MW' : '') + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting));
             } else {
               if (settings.highlighting) {
                 buffer += tools.createPopover(tools.quotePhrase(branch, 'cinahl', settings.highlighting), branch.offset + branch.content.length);
@@ -62814,7 +62688,7 @@ var psycinfoImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -62942,7 +62816,7 @@ var scopusImport = {
   * @return {string} The compiled output
   */
   compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
+    var settings = lodash.defaults(options, {
       replaceWildcards: true
     }); // Apply wildcard replacements
 
@@ -63060,150 +62934,6 @@ var scopusImport = {
   openTerms: 'use advanced search box'
 };
 
-var mongodbImport = {
-  id: 'mongodb',
-  title: 'MongoDB Query Format',
-  aliases: ['mongo'],
-  debugging: true,
-  // Mark this module for debugging only
-
-  /**
-  * Compile a tree structure to a MongoDB query
-  * @param {array} tree The parsed tree to process
-  * @param {Object} [options] Optional options to use when compiling
-  * @return {Object} The compiled MongoDB query output
-  */
-  compile: function compile(tree, options) {
-    var settings = _.defaults(options, {
-      replaceWildcards: true,
-      translatePhraseField: function translatePhraseField(t) {
-        return {
-          'title': t
-        };
-      },
-      meshField: 'mesh',
-      translateTitleAbstract: function translateTitleAbstract(t) {
-        return {
-          $or: [{
-            title: t
-          }, {
-            abstract: t
-          }]
-        };
-      }
-    }); // Apply wildcard replacements
-
-
-    if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [{
-      subject: /[\?\$]/g,
-      value: '*'
-    }]);
-
-    var compileWalker = function compileWalker(tree) {
-      return _(tree).map(function (branch, branchIndex) {
-        var buffer = {};
-
-        switch (branch.type) {
-          case 'line':
-            buffer += compileWalker(branch.nodes);
-            break;
-
-          case 'group':
-            if (branch.field && branch.field == 'title+abstract') {
-              // FIXME: Not yet properly supported
-              buffer['TITLE+ABSTRACT'] = compileWalker(branch.nodes);
-            } else if (branch.field) {
-              buffer[branch.field] = compileWalker(branch.nodes);
-            } else {
-              buffer = settings.translatePhraseField(compileWalker(branch.nodes));
-            }
-
-            break;
-
-          case 'ref':
-            var node;
-
-            for (node in branch.nodes) {
-              if (node == 0) {
-                buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-              } else {
-                buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-              }
-            }
-
-            break;
-
-          case 'phrase':
-            if (branch.field && branch.field == 'title+abstract') {
-              buffer = settings.translateTitleAbstract(branch.content);
-            } else if (branch.field) {
-              buffer[branch.field] = branch.content;
-            } else {
-              buffer = settings.translatePhraseField(branch.content);
-            }
-
-            break;
-
-          case 'joinNear':
-          case 'joinAnd':
-            buffer = {
-              $and: []
-            };
-            break;
-
-          case 'joinOr':
-            buffer = {
-              $or: []
-            };
-            break;
-
-          case 'joinNot':
-            buffer = {
-              $not: {}
-            };
-            break;
-
-          case 'mesh':
-            // FIXME: No ability to recurse
-            buffer[settings.meshField] = {
-              $in: [branch.content]
-            };
-            break;
-
-          case 'raw':
-            // Do nothing
-            break;
-
-          case 'template':
-            buffer = tools.resolveTemplate(branch.content, 'mongodb');
-            break;
-
-          case 'comment':
-            // Do nothing
-            break;
-
-          default:
-            throw new Error('Unsupported object tree type: ' + branch.type);
-        }
-
-        return buffer;
-      }) // Renest + combine $or/$and conditions {{{
-      // NOTE: Highly experimental - causes bugs under some circumstances
-      // .thru(tree => tools.renestConditions(tree))
-      // .thru(tree => tools.combineConditions(tree))
-      // }}}
-      // Remove array structure if there is only one child (i.e. `[{foo: 'foo!'}]` => `{foo: 'foo!'}`) {{{
-      .thru(function (tree) {
-        if (_.isArray(tree) && tree.length == 1) tree = tree[0];
-        return tree;
-      }) // }}}
-      .value();
-    };
-
-    return compileWalker(tree);
-  }
-};
-
 /**
 * Collection of supported engines
 * Each engine should specify:
@@ -63258,10 +62988,10 @@ var enginesImport = {
     compile: function compile(tree, options) {
       return tree;
     }
-  },
-  // }}}
+  } // }}}
   // MongoDB {{{
-  mongodb: mongodbImport // }}}
+  // mongodb: mongodbImport,
+  // }}}
 
 };
 
@@ -63276,6 +63006,8 @@ var require$$0 = getCjsExportFromNamespace(engines);
 var polyglot_1 = createCommonjsModule(function (module) {
 
   var _engines = _interopRequireDefault(require$$0);
+
+  var _lodash = _interopRequireDefault(lodash);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -63318,7 +63050,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
       var tree = (0, _parse.parse)(query, options);
       tree = polyglot.preProcess(tree, options);
 
-      _.forEach(_engines.default, function (engine, id) {
+      _lodash.default.forEach(_engines.default, function (engine, id) {
         if (id == "lexicalTreeJSON") {
           // Dont run postprocess for lexicalTreeJSON
           output[id] = engine.compile(tree, options), options;
@@ -63338,7 +63070,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
     * @see parse()
     */
     preProcess: function preProcess(tree, options) {
-      var settings = _.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
+      var settings = _lodash.default.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
 
 
       return tree;
@@ -63358,7 +63090,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
     * @see parse()
     */
     postProcess: function postProcess(text, options) {
-      var settings = _.defaults(options, {
+      var settings = _lodash.default.defaults(options, {
         forceString: true,
         html: true,
         highlighting: false,
@@ -63366,7 +63098,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
         transposeLines: true
       });
 
-      if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
+      if (settings.forceString && !_lodash.default.isString(text)) text = JSON.stringify(text, null, '\t');
 
       if (settings.highlighting) {
         text = text.replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>').replace(/\bNOT\b/g, '<font color="purple">NOT</font>');
@@ -63374,7 +63106,7 @@ var polyglot_1 = createCommonjsModule(function (module) {
 
       if (settings.html) {
         text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
-      } else if (_.isString(text)) {
+      } else if (_lodash.default.isString(text)) {
         // Flatten HTML - Yes this is a horrible method, but its quick
         for (var i = 0; i < 10; i++) {
           text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
@@ -63920,6 +63652,135 @@ __vue_render__._withStripped = true;
 
 var t=function(t,o,e){if(!o.hasOwnProperty(e)){var r=Object.getOwnPropertyDescriptor(t,e);Object.defineProperty(o,e,r);}};var VRuntimeTemplate = {props:{template:String,parent:Object,templateProps:{type:Object,default:function(){return {}}}},render:function(o){if(this.template){var e=this.parent||this.$parent,r=e.$data;void 0===r&&(r={});var n=e.$props;void 0===n&&(n={});var a=e.$options;void 0===a&&(a={});var p=a.components;void 0===p&&(p={});var c=a.computed;void 0===c&&(c={});var i=a.methods;void 0===i&&(i={});var s=this.$data;void 0===s&&(s={});var d=this.$props;void 0===d&&(d={});var v=this.$options;void 0===v&&(v={});var f=v.methods;void 0===f&&(f={});var m=v.computed;void 0===m&&(m={});var u=v.components;void 0===u&&(u={});var h={$data:{},$props:{},$options:{},components:{},computed:{},methods:{}};Object.keys(r).forEach(function(t){void 0===s[t]&&(h.$data[t]=r[t]);}),Object.keys(n).forEach(function(t){void 0===d[t]&&(h.$props[t]=n[t]);}),Object.keys(i).forEach(function(t){void 0===f[t]&&(h.methods[t]=i[t]);}),Object.keys(c).forEach(function(t){void 0===m[t]&&(h.computed[t]=c[t]);}),Object.keys(p).forEach(function(t){void 0===u[t]&&(h.components[t]=p[t]);});var O=Object.keys(h.methods||{}),$=Object.keys(h.$data||{}),b=Object.keys(h.$props||{}),j=Object.keys(this.templateProps),y=$.concat(b).concat(O).concat(j),k=(E=e,P={},O.forEach(function(o){return t(E,P,o)}),P),l=function(o){var e={};return o.forEach(function(o){o&&Object.getOwnPropertyNames(o).forEach(function(r){return t(o,e,r)});}),e}([h.$data,h.$props,k,this.templateProps]);return o({template:this.template||"<div></div>",props:y,computed:h.computed,components:h.components,provide:this.$parent._provided},{props:l})}var E,P;}};
 
+ace.define("ace/theme/chrome",["require","exports","module","ace/lib/dom"], function(acequire, exports, module) {
+
+exports.isDark = false;
+exports.cssClass = "ace-chrome";
+exports.cssText = ".ace-chrome .ace_gutter {\
+background: #ebebeb;\
+color: #333;\
+overflow : hidden;\
+}\
+.ace-chrome .ace_print-margin {\
+width: 1px;\
+background: #e8e8e8;\
+}\
+.ace-chrome {\
+background-color: #FFFFFF;\
+color: black;\
+}\
+.ace-chrome .ace_cursor {\
+color: black;\
+}\
+.ace-chrome .ace_invisible {\
+color: rgb(191, 191, 191);\
+}\
+.ace-chrome .ace_constant.ace_buildin {\
+color: rgb(88, 72, 246);\
+}\
+.ace-chrome .ace_constant.ace_language {\
+color: rgb(88, 92, 246);\
+}\
+.ace-chrome .ace_constant.ace_library {\
+color: rgb(6, 150, 14);\
+}\
+.ace-chrome .ace_invalid {\
+background-color: rgb(153, 0, 0);\
+color: white;\
+}\
+.ace-chrome .ace_fold {\
+}\
+.ace-chrome .ace_support.ace_function {\
+color: rgb(60, 76, 114);\
+}\
+.ace-chrome .ace_support.ace_constant {\
+color: rgb(6, 150, 14);\
+}\
+.ace-chrome .ace_support.ace_type,\
+.ace-chrome .ace_support.ace_class\
+.ace-chrome .ace_support.ace_other {\
+color: rgb(109, 121, 222);\
+}\
+.ace-chrome .ace_variable.ace_parameter {\
+font-style:italic;\
+color:#FD971F;\
+}\
+.ace-chrome .ace_keyword.ace_operator {\
+color: rgb(104, 118, 135);\
+}\
+.ace-chrome .ace_comment {\
+color: #236e24;\
+}\
+.ace-chrome .ace_comment.ace_doc {\
+color: #236e24;\
+}\
+.ace-chrome .ace_comment.ace_doc.ace_tag {\
+color: #236e24;\
+}\
+.ace-chrome .ace_constant.ace_numeric {\
+color: rgb(0, 0, 205);\
+}\
+.ace-chrome .ace_variable {\
+color: rgb(49, 132, 149);\
+}\
+.ace-chrome .ace_xml-pe {\
+color: rgb(104, 104, 91);\
+}\
+.ace-chrome .ace_entity.ace_name.ace_function {\
+color: #0000A2;\
+}\
+.ace-chrome .ace_heading {\
+color: rgb(12, 7, 255);\
+}\
+.ace-chrome .ace_list {\
+color:rgb(185, 6, 144);\
+}\
+.ace-chrome .ace_marker-layer .ace_selection {\
+background: rgb(181, 213, 255);\
+}\
+.ace-chrome .ace_marker-layer .ace_step {\
+background: rgb(252, 255, 0);\
+}\
+.ace-chrome .ace_marker-layer .ace_stack {\
+background: rgb(164, 229, 101);\
+}\
+.ace-chrome .ace_marker-layer .ace_bracket {\
+margin: -1px 0 0 -1px;\
+border: 1px solid rgb(192, 192, 192);\
+}\
+.ace-chrome .ace_marker-layer .ace_active-line {\
+background: rgba(0, 0, 0, 0.07);\
+}\
+.ace-chrome .ace_gutter-active-line {\
+background-color : #dcdcdc;\
+}\
+.ace-chrome .ace_marker-layer .ace_selected-word {\
+background: rgb(250, 250, 255);\
+border: 1px solid rgb(200, 200, 250);\
+}\
+.ace-chrome .ace_storage,\
+.ace-chrome .ace_keyword,\
+.ace-chrome .ace_meta.ace_tag {\
+color: rgb(147, 15, 128);\
+}\
+.ace-chrome .ace_string.ace_regex {\
+color: rgb(255, 0, 0)\
+}\
+.ace-chrome .ace_string {\
+color: #1A1AA6;\
+}\
+.ace-chrome .ace_entity.ace_other.ace_attribute-name {\
+color: #994409;\
+}\
+.ace-chrome .ace_indent-guide {\
+background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==\") right repeat-y;\
+}\
+";
+
+var dom = acequire("../lib/dom");
+dom.importCssString(exports.cssText, exports.cssClass);
+});
+
 var script$1 = {
   data: function data() {
     return {
@@ -64298,11 +64159,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-283ebae1_0", { source: "\n.text-reader[data-v-283ebae1] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-283ebae1] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-283ebae1]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-283ebae1] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAgMA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport enginesImport from '../modules/engines.js'\r\nimport global from '../modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-68ba2a0c_0", { source: "\n.text-reader[data-v-68ba2a0c] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-68ba2a0c] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-68ba2a0c]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-68ba2a0c] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAiMA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from 'polyglot';\r\nimport enginesImport from '../modules/engines.js'\r\nimport global from '../modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle\"></i>\r\n\t\t\t</div>\r\n\t\t\tType a PubMed or Ovid MEDLINE query in the box below to see its translations.\r\n\t\t\t<div class=\"text-muted\">(or click here to see an example)</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-283ebae1";
+  const __vue_scope_id__$1 = "data-v-68ba2a0c";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */

@@ -4,6 +4,8 @@ var _parse = require("../modules/parse.js");
 
 var _engines = _interopRequireDefault(require("../modules/engines.js"));
 
+var _lodash = _interopRequireDefault(require("lodash"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var polyglot = module.exports = {
@@ -41,7 +43,7 @@ var polyglot = module.exports = {
     var tree = (0, _parse.parse)(query, options);
     tree = polyglot.preProcess(tree, options);
 
-    _.forEach(_engines.default, function (engine, id) {
+    _lodash.default.forEach(_engines.default, function (engine, id) {
       if (id == "lexicalTreeJSON") {
         // Dont run postprocess for lexicalTreeJSON
         output[id] = engine.compile(tree, options), options;
@@ -61,7 +63,7 @@ var polyglot = module.exports = {
   * @see parse()
   */
   preProcess: function preProcess(tree, options) {
-    var settings = _.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
+    var settings = _lodash.default.defaults(options, {}); // NOTE: THIS FUNCTION IS CURRENTLY ONLY A STUB
 
 
     return tree;
@@ -81,7 +83,7 @@ var polyglot = module.exports = {
   * @see parse()
   */
   postProcess: function postProcess(text, options) {
-    var settings = _.defaults(options, {
+    var settings = _lodash.default.defaults(options, {
       forceString: true,
       html: true,
       highlighting: false,
@@ -89,7 +91,7 @@ var polyglot = module.exports = {
       transposeLines: true
     });
 
-    if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
+    if (settings.forceString && !_lodash.default.isString(text)) text = JSON.stringify(text, null, '\t');
 
     if (settings.highlighting) {
       text = text.replace(/\bOR\b/g, '<font color="purple">OR</font>').replace(/\bAND\b/g, '<font color="purple">AND</font>').replace(/\bNOT\b/g, '<font color="purple">NOT</font>');
@@ -97,7 +99,7 @@ var polyglot = module.exports = {
 
     if (settings.html) {
       text = text.replace(/\n/g, '<br/>').replace(/\t/g, '<span class="tab"></span>');
-    } else if (_.isString(text)) {
+    } else if (_lodash.default.isString(text)) {
       // Flatten HTML - Yes this is a horrible method, but its quick
       for (var i = 0; i < 10; i++) {
         text = text.replace(/<(.+)(\s.*)>(.*)<\/\1>/g, '$3');
