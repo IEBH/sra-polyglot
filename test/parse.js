@@ -1,10 +1,12 @@
+import { parse } from '../modules/parse.js';
+
 var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
 describe('Parse', ()=> {
 	it('should parse the most basic phrase', ()=> {
-		expect(polyglot.parse('foo bar baz')).to.deep.equal([
+		expect(parse('foo bar baz')).to.deep.equal([
 			{
 				type: "line",
 				number: 1,
@@ -21,7 +23,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should parse a compound phrase (and)', ()=> {
-		expect(polyglot.parse('(foo and bar and baz)')).to.deep.equal([
+		expect(parse('(foo and bar and baz)')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -55,7 +57,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should parse a compound phrase (and) + (and)', ()=> {
-		expect(polyglot.parse('(foo or bar) and (baz or quz or quuz)')).to.deep.equal([
+		expect(parse('(foo or bar) and (baz or quz or quuz)')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -106,7 +108,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should parse Mesh terms (PubMed syntax)', ()=> {
-		expect(polyglot.parse('foo[mesh] and "bar baz"[mesh:noexp] and quz quuz[mesh]')).to.deep.equal([
+		expect(parse('foo[mesh] and "bar baz"[mesh:noexp] and quz quuz[mesh]')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -138,7 +140,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should parse Mesh terms (Ovid syntax)', ()=> {
-		expect(polyglot.parse('exp foo/ and exp bar baz/ and quz/ and quz quuz/')).to.deep.equal([
+		expect(parse('exp foo/ and exp bar baz/ and quz/ and quz quuz/')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -175,7 +177,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should identify field specific phrase objects (PubMed syntax)', ()=> {
-		expect(polyglot.parse('foo[tiab] and bar baz[ti] and quz[ab] and (thud and waldo)[tiab]')).to.deep.equal([
+		expect(parse('foo[tiab] and bar baz[ti] and quz[ab] and (thud and waldo)[tiab]')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -225,7 +227,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should identify field specific phrase objects (Ovid syntax)', ()=> {
-		expect(polyglot.parse('foo.tw. and bar baz.pt. and quz.ab. and (thud and waldo).fs.')).to.deep.equal([
+		expect(parse('foo.tw. and bar baz.pt. and quz.ab. and (thud and waldo).fs.')).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
@@ -275,7 +277,7 @@ describe('Parse', ()=> {
 	});
 
 	it('should wrap lines as groups and preserve linefeeds', ()=> {
-		expect(polyglot.parse('foo near3 bar\n\nand\n\nbaz not quz', {groupLines: false})).to.deep.equal([
+		expect(parse('foo near3 bar\n\nand\n\nbaz not quz', {groupLines: false})).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,

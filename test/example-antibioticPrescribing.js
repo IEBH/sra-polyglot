@@ -1,4 +1,5 @@
 import global from '../modules/global.js'
+import { parse } from '../modules/parse.js'
 
 var _ = require('lodash');
 var expect = require('chai').expect;
@@ -195,7 +196,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 			},
 		];
 		// }}}
-		expect(polyglot.parse(example.query, {groupLines: false})).to.deep.equal(tree);
+		expect(parse(example.query, {groupLines: false})).to.deep.equal(tree);
 	});
 
 	it('should translate the example into PubMed format', ()=> {

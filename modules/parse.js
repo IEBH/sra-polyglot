@@ -299,7 +299,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|ti|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -311,12 +311,14 @@ export const parse = (query, options) => {
 
             switch (match[1].toLowerCase()) {
                 case 'tiab':
+                case 'title/abstract':
                     useLeaf.field = 'title+abstract';
                     break;
                 case 'tw':
                     useLeaf.field = 'title+abstract+other';
                     break;
                 case 'ti':
+                case 'title':
                     useLeaf.field = 'title';
                     break;
                 case 'ab':

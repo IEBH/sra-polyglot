@@ -1,10 +1,11 @@
+import { parse } from '../modules/parse.js';
+
 var expect = require('chai').expect;
-var polyglot = require('..');
 
 describe('Check that comments are ignored', ()=> {
 
 	it('should parse comments as a logical node', ()=> {
-		expect(polyglot.parse('term1 OR term2\n#Comment1\n\n#Comment2\n\nAND\n\nterm3 or term4 #Comment3', {groupLines: false})).to.deep.equal([
+		expect(parse('term1 OR term2\n#Comment1\n\n#Comment2\n\nAND\n\nterm3 or term4 #Comment3', {groupLines: false})).to.deep.equal([
 			{
 				type: 'line',
 				number: 1,
