@@ -1,4 +1,5 @@
 import global from './global.js'
+import _ from 'lodash';
 
 /**
 * Collection of utility functions to apply common behaviour to a compiled tree

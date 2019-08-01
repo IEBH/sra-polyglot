@@ -8,14 +8,14 @@
   },
   "scripts": {
     "serve": "gulp serve",
-    "test": "mocha"
+    "test": "mocha -r esm"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CREBP/sra-polyglot.git"
+    "url": "git+https://github.com/IEBH/sra-polyglot.git"
   },
   "keywords": [
-    "crebp",
+    "iebh",
     "sra",
     "search",
     "translation",
@@ -28,9 +28,9 @@
   "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/CREBP/sra-polyglot/issues"
+    "url": "https://github.com/IEBH/sra-polyglot/issues"
   },
-  "homepage": "https://github.com/CREBP/sra-polyglot#readme",
+  "homepage": "https://github.com/IEBH/sra-polyglot#readme",
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
@@ -74,12 +74,13 @@
     "vue2-ace-editor": "0.0.13"
   },
   "dependencies": {
+    "esm": "^3.2.25",
     "lodash": "^4.17.11",
     "v-runtime-template": "^1.10.0",
     "v-tooltip": "^2.0.2",
     "vue-json-tree": "^0.3.3"
   },
   "engines": {
-    "node": "4.0.0"
+    "node": "10.0.0"
   }
 }

@@ -6,7 +6,7 @@ import wosImport from './engines/wos.js'
 import cinahlImport from './engines/cinahl.js'
 import psycinfoImport from './engines/psycinfo.js'
 import scopusImport from './engines/scopus.js'
-import mongodbImport from './engines/mongodb.js'
+// import mongodbImport from './engines/mongodb.js'
 
 /**
 * Collection of supported engines
@@ -70,6 +70,6 @@ export default {
     // }}}
 
     // MongoDB {{{
-    mongodb: mongodbImport,
+    // mongodb: mongodbImport,
     // }}}
 }

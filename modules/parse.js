@@ -1,5 +1,6 @@
-import global from './global.js'
-import tools from './tools.js'
+import global from './global.js';
+import tools from './tools.js';
+import _ from 'lodash';
 
 /**
 * Parse a given string into a lexical object tree

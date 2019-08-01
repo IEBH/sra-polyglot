@@ -1,9 +1,11 @@
+import global from '../modules/global.js'
+
 var _ = require('lodash');
 var expect = require('chai').expect;
 var polyglot = require('..');
 
 describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', ()=> {
-	var example = _.find(polyglot.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
+	var example = _.find(global.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
 	expect(example).to.be.an.instanceOf(Object);
 	expect(example).to.have.property('query');
 

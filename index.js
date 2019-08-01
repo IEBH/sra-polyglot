@@ -1,5 +1,6 @@
-import { parse } from '../modules/parse.js'
-import engines from '../modules/engines.js'
+import { parse } from '../modules/parse.js';
+import engines from '../modules/engines.js';
+import _ from 'lodash';
 
 var polyglot = module.exports = {
 

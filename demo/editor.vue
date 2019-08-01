@@ -6,6 +6,7 @@ import enginesImport from '../modules/engines.js'
 import global from '../modules/global.js'
 import JsonTree from 'vue-json-tree'
 import VRuntimeTemplate from "v-runtime-template";
+import 'brace/theme/chrome';
 
 export default {
 	data: ()=> ({

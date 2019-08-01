@@ -1,3 +1,4 @@
+// File contains global variables
 export default {
     /**
 	* List of example search queries

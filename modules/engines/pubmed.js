@@ -1,6 +1,6 @@
 import tools from '../tools.js'
 import global from '../global.js'
-import 'brace/theme/chrome';
+import _ from 'lodash';
 
 export default {
     id: 'pubmed',
