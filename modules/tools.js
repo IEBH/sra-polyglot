@@ -1,11 +1,11 @@
-global = require('./global.js');
-_ = require('lodash');
+import global from './global.js'
+import _ from 'lodash';
 
 /**
 * Collection of utility functions to apply common behaviour to a compiled tree
 * @var {Object}
 */
-module.exports = {
+export default {
     /**
     * Visit the given node types within a deeply nested tree and run a function
     * This function may mutate the input tree depending on the actions of the callbacks

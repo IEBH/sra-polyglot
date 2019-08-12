@@ -29,7 +29,6 @@ function jsLib() {
 			},
 		}))
 		.pipe(rename('polyglot.js'))
-		.pipe(replace(/\.\/modules\/(\w+)/g, '../modules/$1')) // Replace import path one directory back (because file is moved to dist)
 		.pipe(babel({
 			presets: ['@babel/env'],
 		}))

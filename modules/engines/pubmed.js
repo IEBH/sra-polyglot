@@ -1,8 +1,8 @@
-tools = require('../tools.js');
-global = require('../global.js')
-_ = require('lodash');
+import tools from '../tools.js'
+import global from '../global.js'
+import _ from 'lodash';
 
-module.exports = {
+export default {
     id: 'pubmed',
     title: 'PubMed',
     aliases: ['pubmed', 'p', 'pm', 'pubm'],

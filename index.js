@@ -1,6 +1,6 @@
-parse = require('./modules/parse.js');
-engines = require('./modules/engines.js');
-_ = require('lodash');
+import { parse } from './modules/parse.js';
+import engines from './modules/engines.js';
+import _ from 'lodash';
 
 var polyglot = module.exports = {
 

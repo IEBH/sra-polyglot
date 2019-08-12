@@ -1,6 +1,6 @@
-global = require('./global.js');
-tools =  require('./tools.js');
-_ = require('lodash');
+import global from './global.js';
+import tools from './tools.js';
+import _ from 'lodash';
 
 /**
 * Parse a given string into a lexical object tree
@@ -14,7 +14,7 @@ _ = require('lodash');
 * @param {boolean} [options.preserveNewlines=true] Preserve newlines in the output as 'raw' tree nodes
 * @return {array} Array representing the parsed tree nodes
 */
-exports.parse = (query, options) => {
+export const parse = (query, options) => {
     var settings = _.defaults(options, {
         groupLines: false,
         groupLinesAlways: false,

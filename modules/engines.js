@@ -1,10 +1,11 @@
-pubmedImport = require('./engines/pubmed.js');
-ovidImport = require('./engines/ovid.js');
-cochraneImport = require('./engines/cochrane.js');
-wosImport = require('./engines/wos.js');
-cinahlImport = require('./engines/cinahl.js');
-psycinfoImport = require('./engines/psycinfo.js');
-scopusImport = require('./engines/scopus.js');
+import pubmedImport from './engines/pubmed.js'
+import ovidImport from './engines/ovid.js'
+import cochraneImport from './engines/cochrane.js'
+import embaseImport from './engines/embase.js'
+import wosImport from './engines/wos.js'
+import cinahlImport from './engines/cinahl.js'
+import psycinfoImport from './engines/psycinfo.js'
+import scopusImport from './engines/scopus.js'
 // import mongodbImport from './engines/mongodb.js'
 
 /**
@@ -18,7 +19,7 @@ scopusImport = require('./engines/scopus.js');
 *
 * @var {array}
 */
-var engines = {
+export default {
     // PubMed {{{
     pubmed: pubmedImport,
     // }}}
@@ -72,6 +73,3 @@ var engines = {
     // mongodb: mongodbImport,
     // }}}
 }
-
-module.exports = engines;
-exports = engines;

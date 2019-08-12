@@ -1,5 +1,5 @@
 // File contains global variables
-module.exports = {
+export default {
     /**
 	* List of example search queries
 	* See tests/examples.js for the outputs in each case

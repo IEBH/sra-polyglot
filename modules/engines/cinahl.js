@@ -1,7 +1,7 @@
-tools = require('../tools.js');
-_ = require('lodash');
+import tools from '../tools.js'
+import _ from 'lodash';
 
-module.exports = {
+export default {
     id: 'cinahl',
     title: 'CINAHL',
     aliases: ['cinahl', 'ci', 'cnal'],
