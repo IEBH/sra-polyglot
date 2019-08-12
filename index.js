@@ -1,4 +1,4 @@
-parse = require('./modules/parse.js').parse;
+parse = require('./modules/parse.js');
 engines = require('./modules/engines.js');
 _ = require('lodash');
 
