@@ -1,7 +1,6 @@
 pubmedImport = require('./engines/pubmed.js');
 ovidImport = require('./engines/ovid.js');
 cochraneImport = require('./engines/cochrane.js');
-embaseImport = require('./engines/embase.js')
 wosImport = require('./engines/wos.js');
 cinahlImport = require('./engines/cinahl.js');
 psycinfoImport = require('./engines/psycinfo.js');
