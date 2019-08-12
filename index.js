@@ -2,8 +2,7 @@ import { parse } from './modules/parse.js';
 import engines from './modules/engines.js';
 import _ from 'lodash';
 
-let polyglot;
-export default polyglot = {
+var polyglot = module.exports = {
 
 	/**
 	* Translate the given query using the given engine ID

@@ -63003,12 +63003,7 @@ var _parse = getCjsExportFromNamespace(parse$2);
 
 var require$$0 = getCjsExportFromNamespace(engines);
 
-var polyglot_1 = createCommonjsModule(function (module, exports) {
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = void 0;
+var polyglot_1 = createCommonjsModule(function (module) {
 
   var _engines = _interopRequireDefault(require$$0);
 
@@ -63020,9 +63015,7 @@ var polyglot_1 = createCommonjsModule(function (module, exports) {
     };
   }
 
-  var polyglot;
-
-  var _default = polyglot = {
+  var polyglot = module.exports = {
     /**
     * Translate the given query using the given engine ID
     * This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
@@ -63127,11 +63120,13 @@ var polyglot_1 = createCommonjsModule(function (module, exports) {
       return text;
     }
   };
-
-  exports.default = _default;
 });
 var polyglot$1 = unwrapExports(polyglot_1);
 var polyglot_2 = polyglot_1.polyglot;
+var polyglot_3 = polyglot_1.translate;
+var polyglot_4 = polyglot_1.translateAll;
+var polyglot_5 = polyglot_1.preProcess;
+var polyglot_6 = polyglot_1.postProcess;
 
 //
 //

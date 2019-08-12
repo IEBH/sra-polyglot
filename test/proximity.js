@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '..';
+var polyglot = require('..');
 
 describe('Translate adjacency searches (ADJ format)', ()=> {
 

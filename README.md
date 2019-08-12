@@ -141,7 +141,7 @@ To use comments simply add a hash character (`#`) anywhere on a line. Any text *
 
 ## Input Output API
 ```javascript
-import polyglot from 'sra-polyglot';
+var polyglot = require('sra-polyglot');
 
 var queries = polyglot.translateAll('"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice\n\nAND\n\n"Treatment Failure"[Mesh] OR Treatment failure OR Treatment failures\n\nAND\n\n"Bacterial Infections"[Mesh] OR Bacteria OR Bacterial\n\nAND\n\n"Anti-Bacterial Agents"[Mesh] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic');
 

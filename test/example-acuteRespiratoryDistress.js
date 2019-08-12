@@ -3,7 +3,7 @@ import { parse } from '../modules/parse.js'
 
 var _ = require('lodash');
 var expect = require('chai').expect;
-import polyglot from '..';
+var polyglot = require('..');
 
 describe('Example test "Positioning for acute respiratory distress in hospitalised infants and children"', ()=> {
 	var example = _.find(global.examples, {title: 'Positioning for acute respiratory distress in hospitalised infants and children'});
