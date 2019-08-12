@@ -1,5 +1,10 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 var _parse = require("../modules/parse.js");
 
 var _engines = _interopRequireDefault(require("../modules/engines.js"));
@@ -8,7 +13,9 @@ var _lodash = _interopRequireDefault(require("lodash"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var polyglot = module.exports = {
+var polyglot;
+
+var _default = polyglot = {
   /**
   * Translate the given query using the given engine ID
   * This is really just a wrapper for the parse() + engine[ENGINE].compile() pipeline
@@ -113,3 +120,5 @@ var polyglot = module.exports = {
     return text;
   }
 };
+
+exports.default = _default;

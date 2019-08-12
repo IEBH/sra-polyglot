@@ -3,7 +3,7 @@
 */
 
 var expect = require('chai').expect;
-var polyglot = require('..');
+import polyglot from '..';
 
 describe('User edge cases', ()=> {
 
