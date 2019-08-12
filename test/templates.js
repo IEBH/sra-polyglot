@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var expect = require('chai').expect;
-var polyglot = require('..');
+import polyglot from '..';
 
 describe('Translate the meta template `<engine>`', ()=> {
 

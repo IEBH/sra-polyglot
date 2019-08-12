@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var polyglot = require('..');
+import polyglot from '..';
 
 describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 

@@ -3,7 +3,7 @@ import { parse } from '../modules/parse.js'
 
 var _ = require('lodash');
 var expect = require('chai').expect;
-var polyglot = require('..');
+import polyglot from '..';
 
 describe('Example test "Failure of antibiotic prescribing for bacterial infections"', ()=> {
 	var example = _.find(global.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
