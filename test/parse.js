@@ -1,8 +1,8 @@
-import { parse } from '../modules/parse.js';
+import { parse } from '../src/modules/parse.js';
+import polyglot from '../src'
 
 var _ = require('lodash');
 var expect = require('chai').expect;
-var polyglot = require('..');
 
 describe('Parse', ()=> {
 	it('should parse the most basic phrase', ()=> {

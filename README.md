@@ -1,4 +1,4 @@
-# Polyglot Search Syntax Translator
+# Polyglot Search Translator
 This module is part of the [Bond University Centre for Research in Evidence-Based Practice](https://github.com/IEBH) Systematic Review Assistant suite of tools.
 
 When given a complex search query in either PubMed or Ovid MEDLINE format it will attempt to translate it to any of the supported search engine formats.

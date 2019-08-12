@@ -20,7 +20,7 @@ exports.default = gulp.series(build, serve)
 exports.gh_pages = gulp.series(build, gh_page)
 
 function jsLib() {
-	return gulp.src('./index.js')
+	return gulp.src('./src/index.js')
 		.pipe(plumber({
 			errorHandler: function(err) {
 				gutil.log(gutil.colors.red('ERROR DURING JS BUILD'));
@@ -30,9 +30,6 @@ function jsLib() {
 		}))
 		.pipe(rename('polyglot.js'))
 		.pipe(replace(/\.\/modules\/(\w+)/g, '../modules/$1')) // Replace import path one directory back (because file is moved to dist)
-		.pipe(babel({
-			presets: ['@babel/env'],
-		}))
 		.pipe(gulp.dest('./dist'))
 		// .pipe(uglify())
 		.pipe(rename('polyglot.min.js'))
@@ -80,11 +77,6 @@ async function jsDemo() {
 				jQuery: 'jquery',
 				$: 'jquery',
 			}),
-			require('rollup-plugin-babel')({
-				presets: ['@babel/env'],
-				plugins: ['@babel/plugin-syntax-dynamic-import'],
-				exclude: 'node_modules/**',
-			}),
 			production && require('rollup-plugin-uglify').uglify(),
 			require('rollup-plugin-sizes')(),
 		],
@@ -116,7 +108,7 @@ function serve() {
 			console.log('Server restarted');
 		});
 
-	return watch(['./index.js', 'demo/**/*.js', 'demo/**/*.vue', 'src/**/*.js', 'src/**/*.vue'], function() {
+	return watch(['src/**/*.js', 'demo/**/*.js', 'demo/**/*.vue'], function() {
 		console.log('Rebuild client-side JS files...');
 		jsBuild();
 	});

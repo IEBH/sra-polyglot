@@ -1,4 +1,4 @@
-import { parse } from '../modules/parse.js';
+import { parse } from '../src/modules/parse.js';
 
 var expect = require('chai').expect;
 

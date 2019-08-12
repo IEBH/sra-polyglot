@@ -1,9 +1,9 @@
 <script>
 import _ from 'lodash';
 import ace from 'vue2-ace-editor';
-import polyglot from 'polyglot';
-import enginesImport from '../modules/engines.js'
-import global from '../modules/global.js'
+import polyglot from '../src';
+import enginesImport from '../src/modules/engines.js'
+import global from '../src/modules/global.js'
 import JsonTree from 'vue-json-tree'
 import VRuntimeTemplate from "v-runtime-template";
 import 'brace/theme/chrome';

@@ -1,6 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '..';
-
+import polyglot from '../src';
 describe('Translate searches and ignore numbering', ()=> {
 
 	it('translate multi-line with numbering (Number + Dot + Space)', ()=> {

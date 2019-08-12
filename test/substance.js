@@ -1,6 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '..';
-
+import polyglot from '../src';
 describe('Translate substance searches (PubMed -> *)', ()=> {
 
 	it('translate `term[nm]` -> PM `term[nm]`', ()=> {

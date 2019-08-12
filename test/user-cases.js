@@ -3,8 +3,7 @@
 */
 
 var expect = require('chai').expect;
-import polyglot from '..';
-
+import polyglot from '../src';
 describe('User edge cases', ()=> {
 
 	// Issue - a running series of 'whitespace' doesn't get closed off properly. So a mesh term + closing brackets cancels the next whitespace character
