@@ -1,7 +1,7 @@
-import tools from '../tools.js'
-import _ from 'lodash';
+tools = require('../tools.js');
+_ = require('lodash');
 
-export default {
+module.exports = {
     id: 'wos',
     title: 'Web of Science',
     aliases: ['webofscience', 'w', 'wos', 'websci'],
