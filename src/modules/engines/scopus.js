@@ -87,6 +87,14 @@ export default {
                                 buffer += 'INDEXTERMS("' + branch.content + '")';
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += 'INDEXTERMS("' + branch.content + '")';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;

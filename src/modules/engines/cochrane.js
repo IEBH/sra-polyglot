@@ -117,6 +117,14 @@ export default {
                                 buffer += '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']';
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;

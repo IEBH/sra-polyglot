@@ -72,6 +72,9 @@ export default {
 			// Remove temporary element
 			document.body.removeChild(el);
 		},
+		openGuide() {
+			window.open('https://github.com/IEBH/sra-polyglot/blob/master/README.md', '_blank')
+		},
 		showExample() {
 			var chosenExample;
 			do {
@@ -128,12 +131,11 @@ export default {
 
 <template>
 	<div class="container">
-		<div v-if="!query" v-on:click="showExample()" class="alert alert-info text-center">
+		<div v-on:click="openGuide()" class="alert alert-info text-center">
 			<div class="pull-left font-xl h1">
-				<i class="fa fa-question-circle"></i>
+				<i class="fa fa-question-circle push-up"></i>
 			</div>
-			Type a PubMed or Ovid MEDLINE query in the box below to see its translations.
-			<div class="text-muted">(or click here to see an example)</div>
+			Click here to open user reference guide for Polyglot
 		</div>
 
 		<div class="row-fluid">
@@ -158,6 +160,14 @@ export default {
 					></editor>
 				</div>
 			</div>
+		</div>
+
+		<div v-if="!query" v-on:click="showExample()" class="alert alert-info text-center show-example">
+			<div class="pull-left font-xl h1">
+				<i class="fa fa-question-circle"></i>
+			</div>
+			Type a PubMed or Ovid MEDLINE query in the box above to see its translations.
+			<div class="text-muted">(or click here to see an example)</div>
 		</div>
 
 		<label class="text-reader">

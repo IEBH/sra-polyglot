@@ -31,6 +31,16 @@ ace.define("ace/mode/polyglot_highlight_rules", ["require", "exports", "module",
 					caseInsensitive: true,
 				},
 				{
+					token: 'constant.language',
+					regex: /\[majr\]/,
+					caseInsensitive: true,
+				},
+				{
+					token: 'constant.language',
+					regex: /\[mesh major topic\]/,
+					caseInsensitive: true,
+				},
+				{
 					token: 'variable',
 					regex: /\[[a-z]{2,4}\]/,
 				},
