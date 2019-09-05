@@ -19,7 +19,7 @@ It forms the [Polyglot Search Syntax Translator](http://sr-accelerator.com/#/pol
   * [Tooltips](#tooltips)
   * [Templates](#templates)
   * [Comments](#comments)
-- [How Polyglot Works](#how-polyglot-works)
+- [For Developers](#how-polyglot-works)
   * [Input/Output API](#input-output-api)
   * [Parsed Tree Object](#parsed-tree-object)
 
@@ -51,7 +51,9 @@ To search for a supported Mesh term use any of the following:
 
 * `Term[Mesh]` (exploded Mesh heading, PubMed format)
 * `Term[Mesh:NoExp]` (non-exploded Mesh heading, PubMed format)
+* `Term[Majr]` or `Term[MeSH Major Topic]` (Major Mesh heading, PubMed format)
 * `exp Term/` (exploded Mesh heading, Ovid MEDLINE format #1)
+* `exp *Term/` (Major Mesh heading, Ovid MEDLINE format #1)
 * `Term/` (non-exploded Mesh heading, Ovid MEDLINE format #1)
 * `Term.xm.` (exploded Mesh heading, Ovid MEDLINE format #2)
 * `Term.sh.` (non-exploded Mesh heading, Ovid MEDLINE format #2)
@@ -137,7 +139,7 @@ These allow you to write your query in a human-readable way without effecting th
 To use comments simply add a hash character (`#`) anywhere on a line. Any text *after* that character will be ignored until the next line.
 
 
-# How Polyglot Works
+# For Developers
 
 ## Input Output API
 ```javascript
