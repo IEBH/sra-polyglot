@@ -69,6 +69,14 @@ export default {
                                 buffer += tools.quotePhrase(branch, 'wos');
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),
+                                                                        "Web of Science does not support MeSH terms")
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'wos');
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;

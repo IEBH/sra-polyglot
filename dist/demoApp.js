@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60940,6 +60944,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61533,6 +61543,13 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
+        } else if (match = /^\[(majr)(:NoExp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
+            leaf.type = 'meshMajor';
+            leaf.recurse = ! match[2];
+            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
         } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
             branch.nodes.push({type: 'mesh', recurse: true, content: match[2]});
             offset += match[1].length;
@@ -61828,6 +61845,14 @@ var pubmedImport = {
                                 buffer += tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr]' + '</font>', 
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr]';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;
@@ -61968,6 +61993,14 @@ var ovidImport = {
                                                                         "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
                             } else {
                                 buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + 'exp *' + branch.content + '/</font>',
+                                                                        "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+                            } else {
+                                buffer += 'exp *' + branch.content + '/';
                             }
                             break;
                         case 'raw':
@@ -62115,6 +62148,14 @@ var cochraneImport = {
                             if (settings.highlighting) buffer += '</font>';
                             break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']';
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
@@ -62292,6 +62333,14 @@ var embaseImport = {
                                 buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/exp/" + 'mj' + '</font>',
+                                                                        "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually");
+                            } else {
+                                buffer += "'" + branch.content + "'/exp/" + 'mj';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;
@@ -62390,6 +62439,14 @@ var wosImport = {
                             buffer += 'NEAR/' + branch.proximity;
                             break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),
+                                                                        "Web of Science does not support MeSH terms");
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'wos');
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),
                                                                         "Web of Science does not support MeSH terms");
@@ -62556,6 +62613,14 @@ var cinahlImport = {
                                 buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;
@@ -62679,6 +62744,14 @@ var psycinfoImport = {
                                 buffer +=  tools.quotePhrase(branch, 'psycinfo');
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting),
+                                                                        "PsycInfo does not support MeSH terms");
+                            } else {
+                                buffer +=  tools.quotePhrase(branch, 'psycinfo');
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;
@@ -62794,6 +62867,14 @@ var scopusImport = {
                             buffer += 'W/' + branch.proximity;
                             break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += 'INDEXTERMS("' + branch.content + '")';
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");

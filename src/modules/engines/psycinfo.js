@@ -88,6 +88,14 @@ export default {
                                 buffer +=  tools.quotePhrase(branch, 'psycinfo');
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting),
+                                                                        "PsycInfo does not support MeSH terms")
+                            } else {
+                                buffer +=  tools.quotePhrase(branch, 'psycinfo');
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;

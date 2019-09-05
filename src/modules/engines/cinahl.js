@@ -93,6 +93,14 @@ export default {
                                 buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
                             }
                             break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")';
+                            }
+                            break;
                         case 'raw':
                             buffer += branch.content;
                             break;
