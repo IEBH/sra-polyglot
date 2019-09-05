@@ -220,8 +220,14 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
+        } else if ((match = /^(exp "([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp ([^*]*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
             branch.nodes.push({type: 'mesh', recurse: true, content: match[2]});
+            offset += match[1].length;
+            q = q.substr(match[1].length);
+            cropString = false;
+            afterWhitespace = true;
+        } else if ((match = /^(exp \*"([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp \*([^*]*?)\/)\s*/i.exec(q))) { // Major Mesh term - Ovid syntax (exploded)
+            branch.nodes.push({type: 'meshMajor', recurse: true, content: match[2]});
             offset += match[1].length;
             q = q.substr(match[1].length);
             cropString = false;
