@@ -67,6 +67,15 @@ a:hover {
 	margin-right: 5px;
 }
 
+.show-example {
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.push-up {
+	margin-top: -10px;
+}
+
 .tooltip {
 	display: block !important;
 	z-index: 10000;
