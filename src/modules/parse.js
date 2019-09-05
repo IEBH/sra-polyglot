@@ -213,7 +213,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(majr)(:NoExp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
+        } else if (match = /^\[(majr|mesh major topic)(:NoExp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
             leaf.type = 'meshMajor';
             leaf.recurse = ! match[2];
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
