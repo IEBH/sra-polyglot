@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60945,6 +60949,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61557,7 +61567,7 @@ const parse$1 = (query, options) => {
             q = q.substr(match[1].length);
             cropString = false;
             afterWhitespace = true;
-        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) { // Mesh term - Ovid syntax (non-exploded)
+        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
             leaf.type = 'mesh';
             leaf.recurse = false;
         } else if (match = /^<(.*?)>/.exec(q)) {

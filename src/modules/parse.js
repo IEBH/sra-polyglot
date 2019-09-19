@@ -232,7 +232,7 @@ export const parse = (query, options) => {
             q = q.substr(match[1].length);
             cropString = false;
             afterWhitespace = true;
-        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) { // Mesh term - Ovid syntax (non-exploded)
+        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
             leaf.type = 'mesh';
             leaf.recurse = false;
         } else if (match = /^<(.*?)>/.exec(q)) {
