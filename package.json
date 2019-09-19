@@ -12,7 +12,9 @@
     "prepare": "babel src --out-dir lib"
   },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   },
   "repository": {
     "type": "git",
@@ -82,7 +84,7 @@
   },
   "dependencies": {
     "esm": "^3.2.25",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "v-runtime-template": "^1.10.0",
     "v-tooltip": "^2.0.2",
     "vue-json-tree": "^0.3.3"
