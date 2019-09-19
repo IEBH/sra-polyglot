@@ -100,10 +100,10 @@ export default {
                             break;
                         case 'meshMajor':
                             if (settings.highlighting) {
-                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr]' + '</font>', 
+                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
                             } else {
-                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr]';
+                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']';
                             }
                             break;
                         case 'raw':

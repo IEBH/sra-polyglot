@@ -109,10 +109,10 @@ export default {
                             break;
                         case 'meshMajor':
                             if (settings.highlighting) {
-                                buffer += tools.createTooltip('<font color="blue">' + 'exp *' + branch.content + '/</font>',
+                                buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + '*' + branch.content + '/</font>',
                                                                         "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
                             } else {
-                                buffer += 'exp *' + branch.content + '/';
+                                buffer += (branch.recurse ? 'exp ' : '') + '*' + branch.content + '/';
                             }
                             break;
                         case 'raw':

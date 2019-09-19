@@ -233,7 +233,12 @@ export const parse = (query, options) => {
             cropString = false;
             afterWhitespace = true;
         } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
-            leaf.type = 'mesh';
+            // Major Mesh
+            if(leaf.content[0] == "*") {
+                leaf.content = leaf.content.substr(1)
+                leaf.type = 'meshMajor'
+            }
+            else leaf.type = 'mesh';
             leaf.recurse = false;
         } else if (match = /^<(.*?)>/.exec(q)) {
             branch.nodes.push({type: 'template', content: match[1].toLowerCase()});

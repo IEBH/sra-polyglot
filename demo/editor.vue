@@ -159,15 +159,11 @@ export default {
 						v-bind:options="editorOptions"
 					></editor>
 				</div>
+					<div v-if="!query" v-on:click="showExample()" class="card-footer text-center">
+					Type a PubMed or Ovid MEDLINE query in the box above to see its translations
+					<span class="text-muted">(or click here to see an example)</span>
+				</div>
 			</div>
-		</div>
-
-		<div v-if="!query" v-on:click="showExample()" class="alert alert-info text-center show-example">
-			<div class="pull-left font-xl h1">
-				<i class="fa fa-question-circle"></i>
-			</div>
-			Type a PubMed or Ovid MEDLINE query in the box above to see its translations.
-			<div class="text-muted">(or click here to see an example)</div>
 		</div>
 
 		<label class="text-reader">
