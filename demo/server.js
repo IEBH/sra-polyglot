@@ -24,6 +24,7 @@ app.use('/syntax', express.static(`${root}/syntax`));
 app.get('/', (req, res) => res.sendFile('index.html', {root: __dirname}));
 app.get('/dist/demoApp.js', (req, res) => res.sendFile('demoApp.js', {root: root + '/dist'}));
 app.get('/dist/demoApp.css', (req, res) => res.sendFile('demoApp.css', {root: root + '/dist'}));
+app.get('/dist/minton.min.css', (req, res) => res.sendFile('minton.min.css', {root: root + '/dist'}));
 
 app.get('/dist/ngPolyglot.js', (req, res) => res.sendFile('ngPolyglot.js', {root: root + '/dist'}));
 

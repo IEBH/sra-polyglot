@@ -14,7 +14,7 @@ var watch = require('gulp-watch');
 
 var production = process.env.NODE_ENV == 'production';
 const jsBuild = gulp.series(jsLib, jsDemo);
-const build = gulp.parallel(cssDemo, jsBuild)
+const build = gulp.parallel(cssDemo, cssBootstrap, jsBuild)
 
 exports.default = gulp.series(build, serve)
 exports.gh_pages = gulp.series(build, gh_page)
@@ -95,6 +95,11 @@ function cssDemo() {
 		.pipe(gulp.dest('./dist'))
 }
 
+function cssBootstrap() {
+	return gulp.src('./demo/minton.min.css')
+		.pipe(gulp.dest('./dist'))
+}
+
 function serve() {
 	var monitor = nodemon({
 		script: './demo/server.js',
@@ -126,7 +131,8 @@ function gh_page() {
 		'./dist/**/*',
 		'./syntax/ace/mode-polyglot.js',
 		'./node_modules/vue/dist/vue.js',
-		'./node_modules/bootstrap/dist/css/bootstrap.css',
+		// './node_modules/bootstrap/dist/css/bootstrap.css',
+		'./demo/minton.min.css',
 		'./node_modules/bootstrap/dist/js/bootstrap.js',
 		'./node_modules/lodash/lodash.js',
 		'./node_modules/jquery/dist/jquery.js',
