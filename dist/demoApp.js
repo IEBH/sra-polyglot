@@ -61439,7 +61439,9 @@ const parse$1 = (query, options) => {
             leaf = branch.nodes;
         } else if (/^\)/.test(q)) {
             lastGroup = branch;
-            branch = branchStack.pop();
+            if(branchStack.length > 0) {
+                branch = branchStack.pop();
+            }
             leaf = branch.nodes;
         } else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
             branch.nodes.push({
