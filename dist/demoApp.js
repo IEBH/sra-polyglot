@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60945,6 +60949,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61439,7 +61449,9 @@ const parse$1 = (query, options) => {
             leaf = branch.nodes;
         } else if (/^\)/.test(q)) {
             lastGroup = branch;
-            branch = branchStack.pop();
+            if(branchStack.length > 0) {
+                branch = branchStack.pop();
+            }
             leaf = branch.nodes;
         } else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
             branch.nodes.push({
