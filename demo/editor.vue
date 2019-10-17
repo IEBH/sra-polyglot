@@ -138,15 +138,6 @@ export default {
 			Click here to open user reference guide for Polyglot
 		</div>
 
-		<a href="http://sr-accelerator.com/#/polyglot">
-			<div class="alert alert-info text-center">
-				<div class="pull-left font-xl h1">
-					<i class="fa fa-question-circle push-up"></i>
-				</div>
-				Click here to open legacy version of polyglot
-			</div>
-		</a>
-
 		<div class="row-fluid">
 			<div class="card">
 				<div class="card-header">
