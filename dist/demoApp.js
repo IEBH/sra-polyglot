@@ -63032,8 +63032,8 @@ var polyglot$2 = polyglot$1 = {
 		lodash.forEach(engines, (engine, id) => {
 			if (id == "lexicalTreeJSON") { // Dont run postprocess for lexicalTreeJSON
 				output[id] = engine.compile(tree, options), options;
-			} else {
-				output[id] = polyglot$1.postProcess(engine.compile(JSON.parse(JSON.stringify(tree)), options), options);
+			} else { 
+				output[id] = polyglot$1.postProcess(engine.compile(lodash.cloneDeep(tree), options), options);
 			}
 		});
 		return output;
