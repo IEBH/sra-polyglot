@@ -41,7 +41,7 @@ export default polyglot = {
 			if (id == "lexicalTreeJSON") { // Dont run postprocess for lexicalTreeJSON
 				output[id] = engine.compile(tree, options), options
 			} else {
-				output[id] = polyglot.postProcess(engine.compile(tree, options), options)
+				output[id] = polyglot.postProcess(engine.compile(JSON.parse(JSON.stringify(tree)), options), options)
 			}
 		});
 		return output;

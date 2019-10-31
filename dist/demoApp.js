@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60945,6 +60949,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -63033,7 +63043,7 @@ var polyglot$2 = polyglot$1 = {
 			if (id == "lexicalTreeJSON") { // Dont run postprocess for lexicalTreeJSON
 				output[id] = engine.compile(tree, options), options;
 			} else {
-				output[id] = polyglot$1.postProcess(engine.compile(tree, options), options);
+				output[id] = polyglot$1.postProcess(engine.compile(JSON.parse(JSON.stringify(tree)), options), options);
 			}
 		});
 		return output;
