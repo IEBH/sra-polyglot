@@ -20,9 +20,9 @@ export default {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane")},
+            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane")},
         ]);
 
         var compileWalker = (tree, expand = true) =>
