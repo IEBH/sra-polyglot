@@ -61778,7 +61778,7 @@ var pubmedImport = {
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
             {subject: /\?/g, value: '?'},
             {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed")},
         ]);
 
         var compileWalker = tree =>
@@ -62066,9 +62066,9 @@ var cochraneImport = {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane")},
+            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane")},
         ]);
 
         var compileWalker = (tree, expand = true) =>
@@ -62252,9 +62252,9 @@ var embaseImport = {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase")},
+            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase")},
         ]);
 
         var compileWalker = (tree, expand = true) =>
@@ -62407,7 +62407,7 @@ var wosImport = {
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
             {subject: /\?/g, value: '$'},
             {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS")},
         ]);
 
         var compileWalker = tree =>
@@ -62548,7 +62548,7 @@ var cinahlImport = {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl")},
             {subject: /\?/g, value: '#'},
             {subject: /\$/g, value: '*'},
         ]);
@@ -62815,9 +62815,9 @@ var scopusImport = {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>'},
+            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus")},
+            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus")},
+            {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus")},
         ]);
 
         var compileWalker = tree =>
@@ -62933,7 +62933,7 @@ var scopusImport = {
 * Each engine should specify:
 *	title - Human readable name of the engine
 *	aliases - Alternative names for each engine
-*	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span msg=""></span> where @msg corresponds to an entry in messages
+*	compile() - function that takes a parsed tree array and returns a string (string can contain HTML markup of the form <span class="black-underline" v-tooltip="message"> content </span>)
 *	open() - optional function that takes a query and provides the direct searching method
 *	debugging - optional boolean specifying that the engine is for debugging purposes only
 *
@@ -63033,7 +63033,7 @@ var polyglot$2 = polyglot$1 = {
 			if (id == "lexicalTreeJSON") { // Dont run postprocess for lexicalTreeJSON
 				output[id] = engine.compile(tree, options), options;
 			} else {
-				output[id] = polyglot$1.postProcess(engine.compile(tree, options), options);
+				output[id] = polyglot$1.postProcess(engine.compile(JSON.parse(JSON.stringify(tree)), options), options);
 			}
 		});
 		return output;
