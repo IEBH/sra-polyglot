@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60945,6 +60949,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61300,9 +61310,11 @@ var tools = {
     * Create a tooltip with a specified message
     * @param {string} content Content to append tooltip to
     * @param {string} message Message to contain inside tooltip
+    * @param {string} css CSS class to use
     */
-    createTooltip(content, message) {
-        return `<span class="black-underline" v-tooltip="'` + message + `'">`
+    createTooltip(content, message, css) {
+        css = typeof css !== 'undefined' ? css : "black-underline";
+        return `<span class="`+ css + `" v-tooltip="'` + message + `'">`
                 + content 
                 + '</span>'
     },
@@ -61733,7 +61745,6 @@ const parse$1 = (query, options) => {
                     if (userLineNumber) {
                         if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
@@ -61742,7 +61753,6 @@ const parse$1 = (query, options) => {
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
@@ -61778,7 +61788,7 @@ var pubmedImport = {
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
             {subject: /\?/g, value: '?'},
             {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
         ]);
 
         var compileWalker = tree =>
@@ -62548,7 +62558,7 @@ var cinahlImport = {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
             {subject: /\?/g, value: '#'},
             {subject: /\$/g, value: '*'},
         ]);

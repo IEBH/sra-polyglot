@@ -22,7 +22,7 @@ export default {
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
             {subject: /\?/g, value: '$'},
             {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
         ]);
 
         var compileWalker = tree =>

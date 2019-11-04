@@ -55,6 +55,10 @@ a:hover {
 	border-bottom: 1px blue dashed;
 }
 
+.highlight {
+	background-color: #FFFF00;
+}
+
 .tooltip-content {
 	margin-bottom: 10px;
 }

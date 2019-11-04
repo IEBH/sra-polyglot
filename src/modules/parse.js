@@ -411,7 +411,6 @@ export const parse = (query, options) => {
                     if (userLineNumber) {
                         if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
@@ -420,7 +419,6 @@ export const parse = (query, options) => {
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();

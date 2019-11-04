@@ -20,7 +20,7 @@ export default {
 
         // Apply wildcard replacements
         if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl")},
+            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
             {subject: /\?/g, value: '#'},
             {subject: /\$/g, value: '*'},
         ]);

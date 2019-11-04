@@ -185,9 +185,11 @@ export default {
     * Create a tooltip with a specified message
     * @param {string} content Content to append tooltip to
     * @param {string} message Message to contain inside tooltip
+    * @param {string} css CSS class to use
     */
-    createTooltip(content, message) {
-        return `<span class="black-underline" v-tooltip="'` + message + `'">`
+    createTooltip(content, message, css) {
+        css = typeof css !== 'undefined' ? css : "black-underline";
+        return `<span class="`+ css + `" v-tooltip="'` + message + `'">`
                 + content 
                 + '</span>'
     },
