@@ -18,13 +18,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase", "highlight")},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase", "highlight")},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {

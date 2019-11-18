@@ -1,4 +1,5 @@
 import global from './global.js'
+import tools from './tools.js'
 import _ from 'lodash';
 
 /**
@@ -65,6 +66,13 @@ export default {
         return tree;
     },
 
+    multiReplace: (text, replacements) => {
+        replacements.forEach(replacement => {
+            text = text.replace(replacement.subject, replacement.value)
+        })
+        return text;
+    },
+
 
     /**
     * Retrieve the contents of a template by its ID
@@ -90,9 +98,72 @@ export default {
     */
     quotePhrase: (branch, engine, highlighting = false) => {
         var text = _.trimEnd(branch.content);
+        var space = /\s/.test(text)
+
+        // if(settings.replaceWildcards)
+        switch(engine) {
+            case "cinahl":
+                text = tools.multiReplace(text, [
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
+                    {subject: /\?/g, value: '#'},
+                    {subject: /\$/g, value: '*'},
+                ])
+                break;
+            case "cochrane":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane", "highlight")},
+                ])
+                break;
+            case "embase":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase", "highlight")},
+                ])
+                break;
+            case "mongodb":
+                text = tools.multiReplace(text,[
+                    
+                ])
+                break;
+            case "ovid":
+                text = tools.multiReplace(text,[
+                    
+                ])
+                break;
+            case "psycinfo":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                ])
+                break;
+            case "pubmed":
+                text = tools.multiReplace(text, [
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+                ])
+                break;
+            case "scopus":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus", "highlight")},
+                ])
+                break;
+            case "wos":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '$'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
+                ])
+                break;
+        }
 
         return (
-            /\s/.test(text)
+            space
             ? highlighting? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
             : text
         );

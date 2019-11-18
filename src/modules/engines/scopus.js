@@ -18,13 +18,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
-            {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus", "highlight")},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {

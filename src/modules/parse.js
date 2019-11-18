@@ -377,7 +377,7 @@ export const parse = (query, options) => {
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
-                } else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
+                } else if (match = /^[^\s:/[.)]+/.exec(q)) { // Slurp the phrase until the space or any character which indicates the end of a phrase
                     leaf = {type: 'phrase', content: match[0], offset: offset};
                     branch.nodes.push(leaf);
                     offset += match[0].length;

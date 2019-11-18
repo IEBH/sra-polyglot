@@ -20,11 +20,11 @@ export default {
         });
 
         // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
-        ]);
+        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
+        //     {subject: /\?/g, value: '?'},
+        //     {subject: /\$/g, value: '*'},
+        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+        // ]);
 
         var compileWalker = tree =>
             tree

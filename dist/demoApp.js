@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60949,12 +60945,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61190,6 +61180,13 @@ var tools = {
         return tree;
     },
 
+    multiReplace: (text, replacements) => {
+        replacements.forEach(replacement => {
+            text = text.replace(replacement.subject, replacement.value);
+        });
+        return text;
+    },
+
 
     /**
     * Retrieve the contents of a template by its ID
@@ -61215,9 +61212,72 @@ var tools = {
     */
     quotePhrase: (branch, engine, highlighting = false) => {
         var text = lodash.trimEnd(branch.content);
+        var space = /\s/.test(text);
+
+        // if(settings.replaceWildcards)
+        switch(engine) {
+            case "cinahl":
+                text = tools.multiReplace(text, [
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
+                    {subject: /\?/g, value: '#'},
+                    {subject: /\$/g, value: '*'},
+                ]);
+                break;
+            case "cochrane":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane", "highlight")},
+                ]);
+                break;
+            case "embase":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase", "highlight")},
+                ]);
+                break;
+            case "mongodb":
+                text = tools.multiReplace(text,[
+                    
+                ]);
+                break;
+            case "ovid":
+                text = tools.multiReplace(text,[
+                    
+                ]);
+                break;
+            case "psycinfo":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                ]);
+                break;
+            case "pubmed":
+                text = tools.multiReplace(text, [
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+                ]);
+                break;
+            case "scopus":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus", "highlight")},
+                ]);
+                break;
+            case "wos":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '$'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
+                ]);
+                break;
+        }
 
         return (
-            /\s/.test(text)
+            space
             ? highlighting? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
             : text
         );
@@ -61711,7 +61771,7 @@ const parse$1 = (query, options) => {
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
-                } else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
+                } else if (match = /^[^\s:/[.)]+/.exec(q)) { // Slurp the phrase until the space or any character which indicates the end of a phrase
                     leaf = {type: 'phrase', content: match[0], offset: offset};
                     branch.nodes.push(leaf);
                     offset += match[0].length;
@@ -61785,11 +61845,11 @@ var pubmedImport = {
         });
 
         // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
-        ]);
+        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
+        //     {subject: /\?/g, value: '?'},
+        //     {subject: /\$/g, value: '*'},
+        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+        // ]);
 
         var compileWalker = tree =>
             tree
@@ -62074,13 +62134,6 @@ var cochraneImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane")},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane")},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -62260,13 +62313,6 @@ var embaseImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase")},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase")},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -62412,14 +62458,7 @@ var wosImport = {
         var settings = lodash.defaults(options, {
             replaceWildcards: true,
         });
-
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '$'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS")},
-        ]);
-
+        
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62556,13 +62595,6 @@ var cinahlImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
-            {subject: /\?/g, value: '#'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62692,12 +62724,6 @@ var psycinfoImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62822,13 +62848,6 @@ var scopusImport = {
         var settings = lodash.defaults(options, {
             replaceWildcards: true,
         });
-
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus")},
-            {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus")},
-        ]);
 
         var compileWalker = tree =>
             tree

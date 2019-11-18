@@ -17,14 +17,7 @@ export default {
         var settings = _.defaults(options, {
             replaceWildcards: true,
         });
-
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '$'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
-        ]);
-
+        
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
