@@ -150,7 +150,7 @@ export default {
                 text = tools.multiReplace(text,[
                     {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
                     {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
-                    {subject: /#/g, value: tools.createTooltip("?", "Single Wildcard for Scopus is '?'", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("?", "Single Wildcard for Scopus is ?", "highlight")},
                 ])
                 space = true; //Always include quotes with scopus to make phrase a "loose phrase"
                 break;

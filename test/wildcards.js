@@ -63,7 +63,7 @@ describe('Translate wildcards searches (single character "#" style)', ()=> {
 	});
 
 	it('translate `term#` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term#', 'scopus')).to.equal(`"term<span class="highlight" v-tooltip="\'Single Wildcard for Scopus is '?'\'">?</span>"`);
+		expect(polyglot.translate('term#', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'Single Wildcard for Scopus is ?\'">?</span>"');
 	});
 
 	it('translate `term#` -> WS `term*`', ()=> {
