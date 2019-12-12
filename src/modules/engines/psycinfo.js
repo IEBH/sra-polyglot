@@ -42,7 +42,7 @@ export default {
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=
-                                    branch.content +
+                                    tools.quotePhrase(branch, 'psycinfo', settings.highlighting) +
                                     (
                                         branch.field == 'title' ? '.ti' :
                                         branch.field == 'abstract' ? '.ab' :
@@ -56,9 +56,9 @@ export default {
                                     )
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'psycinfo', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += branch.content;
+                                    buffer += tools.quotePhrase(branch, 'psycinfo', settings.highlighting);
                                 }
                             }
                             break;
