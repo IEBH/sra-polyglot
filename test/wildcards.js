@@ -63,7 +63,7 @@ describe('Translate wildcards searches (single character "#" style)', ()=> {
 	});
 
 	it('translate `term#` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term#', 'scopus')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for Scopus\'">?</span>');
+		expect(polyglot.translate('term#', 'scopus')).to.equal(`"term<span class="highlight" v-tooltip="\'Single Wildcard for Scopus is '?'\'">?</span>"`);
 	});
 
 	it('translate `term#` -> WS `term*`', ()=> {
@@ -99,7 +99,7 @@ describe('Translate wildcards searches (single character PubMed "?" style)', ()=
 	});
 
 	it('translate `term?` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term?', 'scopus')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">?</span>');
+		expect(polyglot.translate('term?', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">?</span>"');
 	});
 
 	it('translate `term?` -> WS `term*`', ()=> {
@@ -135,7 +135,7 @@ describe('Translate wildcards searches (single character Ovid "$" style)', ()=> 
 	});
 
 	it('translate `term$` -> SC `term*`', ()=> {
-		expect(polyglot.translate('term$', 'scopus')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">*</span>');
+		expect(polyglot.translate('term$', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">*</span>"');
 	});
 
 	it('translate `term$` -> WS `term*`', ()=> {

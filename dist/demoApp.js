@@ -61274,8 +61274,9 @@ var tools = {
                 text = tools.multiReplace(text,[
                     {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
                     {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
-                    {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("?", "Single Wildcard for Scopus is '?'", "highlight")},
                 ]);
+                space = true; //Always include quotes with scopus to make phrase a "loose phrase"
                 break;
             case "wos":
                 text = tools.multiReplace(text,[
@@ -62883,21 +62884,21 @@ var scopusImport = {
                         case 'phrase':
                             if (branch.field) {
                                 buffer += (
-                                    branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
-                                    branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
-                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
-                                    branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
-                                    branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
-                                    '"' + branch.content + '"'
+                                    branch.field == 'title' ? 'TITLE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'abstract' ? 'ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'scopus', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += '"' + branch.content + '"';										
+                                    buffer += tools.quotePhrase(branch, 'scopus', settings.highlighting);										
                                 }
                             }
                             break;
