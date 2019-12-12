@@ -163,8 +163,8 @@ export default {
         }
 
         return (
-            space
-            ? highlighting? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
+            space?
+                highlighting ? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
             : text
         );
     },
