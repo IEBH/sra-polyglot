@@ -61180,6 +61180,13 @@ var tools = {
         return tree;
     },
 
+    multiReplace: (text, replacements) => {
+        replacements.forEach(replacement => {
+            text = text.replace(replacement.subject, replacement.value);
+        });
+        return text;
+    },
+
 
     /**
     * Retrieve the contents of a template by its ID
@@ -61205,10 +61212,74 @@ var tools = {
     */
     quotePhrase: (branch, engine, highlighting = false) => {
         var text = lodash.trimEnd(branch.content);
+        var space = /\s/.test(text);
+
+        // if(settings.replaceWildcards)
+        switch(engine) {
+            case "cinahl":
+                text = tools.multiReplace(text, [
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
+                    {subject: /\?/g, value: '#'},
+                    {subject: /\$/g, value: '*'},
+                ]);
+                break;
+            case "cochrane":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane", "highlight")},
+                ]);
+                break;
+            case "embase":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase", "highlight")},
+                ]);
+                break;
+            case "mongodb":
+                text = tools.multiReplace(text,[
+                    
+                ]);
+                break;
+            case "ovid":
+                text = tools.multiReplace(text,[
+                    
+                ]);
+                break;
+            case "psycinfo":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                ]);
+                break;
+            case "pubmed":
+                text = tools.multiReplace(text, [
+                    {subject: /\?/g, value: '?'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+                ]);
+                break;
+            case "scopus":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
+                    {subject: /#/g, value: tools.createTooltip("?", "Single Wildcard for Scopus is '?'", "highlight")},
+                ]);
+                space = true; //Always include quotes with scopus to make phrase a "loose phrase"
+                break;
+            case "wos":
+                text = tools.multiReplace(text,[
+                    {subject: /\?/g, value: '$'},
+                    {subject: /\$/g, value: '*'},
+                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
+                ]);
+                break;
+        }
 
         return (
-            /\s/.test(text)
-            ? highlighting? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
+            space?
+                highlighting ? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
             : text
         );
     },
@@ -61300,9 +61371,11 @@ var tools = {
     * Create a tooltip with a specified message
     * @param {string} content Content to append tooltip to
     * @param {string} message Message to contain inside tooltip
+    * @param {string} css CSS class to use
     */
-    createTooltip(content, message) {
-        return `<span class="black-underline" v-tooltip="'` + message + `'">`
+    createTooltip(content, message, css) {
+        css = typeof css !== 'undefined' ? css : "black-underline";
+        return `<span class="`+ css + `" v-tooltip="'` + message + `'">`
                 + content 
                 + '</span>'
     },
@@ -61699,7 +61772,7 @@ const parse$1 = (query, options) => {
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
-                } else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
+                } else if (match = /^[^\s:/[.)]+/.exec(q)) { // Slurp the phrase until the space or any character which indicates the end of a phrase
                     leaf = {type: 'phrase', content: match[0], offset: offset};
                     branch.nodes.push(leaf);
                     offset += match[0].length;
@@ -61733,7 +61806,6 @@ const parse$1 = (query, options) => {
                     if (userLineNumber) {
                         if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
@@ -61742,7 +61814,6 @@ const parse$1 = (query, options) => {
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
@@ -61775,11 +61846,11 @@ var pubmedImport = {
         });
 
         // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed")},
-        ]);
+        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
+        //     {subject: /\?/g, value: '?'},
+        //     {subject: /\$/g, value: '*'},
+        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+        // ]);
 
         var compileWalker = tree =>
             tree
@@ -62064,13 +62135,6 @@ var cochraneImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane")},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane")},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -62250,13 +62314,6 @@ var embaseImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase")},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase")},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -62402,14 +62459,7 @@ var wosImport = {
         var settings = lodash.defaults(options, {
             replaceWildcards: true,
         });
-
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '$'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS")},
-        ]);
-
+        
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62546,13 +62596,6 @@ var cinahlImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl")},
-            {subject: /\?/g, value: '#'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62682,12 +62725,6 @@ var psycinfoImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62712,7 +62749,7 @@ var psycinfoImport = {
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=
-                                    branch.content +
+                                    tools.quotePhrase(branch, 'psycinfo', settings.highlighting) +
                                     (
                                         branch.field == 'title' ? '.ti' :
                                         branch.field == 'abstract' ? '.ab' :
@@ -62726,9 +62763,9 @@ var psycinfoImport = {
                                     );
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'psycinfo', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += branch.content;
+                                    buffer += tools.quotePhrase(branch, 'psycinfo', settings.highlighting);
                                 }
                             }
                             break;
@@ -62813,13 +62850,6 @@ var scopusImport = {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus")},
-            {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus")},
-            {subject: /#/g, value: tools.createTooltip("?", "No Signle Wildcard for Scopus")},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -62844,21 +62874,21 @@ var scopusImport = {
                         case 'phrase':
                             if (branch.field) {
                                 buffer += (
-                                    branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
-                                    branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
-                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
-                                    branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
-                                    branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
-                                    '"' + branch.content + '"'
+                                    branch.field == 'title' ? 'TITLE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'abstract' ? 'ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'scopus', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += '"' + branch.content + '"';										
+                                    buffer += tools.quotePhrase(branch, 'scopus', settings.highlighting);										
                                 }
                             }
                             break;
