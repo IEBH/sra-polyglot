@@ -121,7 +121,11 @@ export default {
 		},
 	},
 	watch: {
-		query() {
+		query: function() {
+			_(polyglot.translateAll(this.query, this.polyglotOptions))
+				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
+		},
+		'polyglotOptions.transposeLines': function() {
 			_(polyglot.translateAll(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
 		},
@@ -143,6 +147,8 @@ export default {
 				<div class="card-header">
 					Your query
 					<div class="pull-right">
+						<input type="checkbox" id="checkbox" v-model="polyglotOptions.transposeLines">
+						<label for="checkbox">Replace Line References</label>
 						<a v-on:click="clear()" class="btn btn-sm btn-default"><i class="fa fa-eraser" title="Clear search"></i></a>
 						<a v-on:click="copyQuery()" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
 						<a v-on:click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" title="Show a random example"></i></a>
