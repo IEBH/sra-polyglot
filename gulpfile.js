@@ -13,7 +13,7 @@ var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
 var production = process.env.NODE_ENV == 'production';
-const jsBuild = gulp.series(jsLib, jsDemo);
+const jsBuild = gulp.series(jsLib, jsDemo, jsVtooltip);
 const build = gulp.parallel(cssDemo, cssBootstrap, jsBuild)
 
 exports.default = gulp.series(build, serve)
@@ -88,6 +88,11 @@ async function jsDemo() {
 		sourcemap: true,
 	});
 };
+
+function jsVtooltip() {
+	return gulp.src('./demo/v-tooltip.min.js')
+		.pipe(gulp.dest('./dist'))
+}
 
 function cssDemo() {
 	return gulp.src('./demo/app.css')
