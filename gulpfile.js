@@ -13,28 +13,11 @@ var uglify = require('gulp-uglify');
 var watch = require('gulp-watch');
 
 var production = process.env.NODE_ENV == 'production';
-const jsBuild = gulp.series(jsLib, jsDemo, jsVtooltip);
+const jsBuild = gulp.series(jsDemo, jsVtooltip);
 const build = gulp.parallel(cssDemo, cssBootstrap, jsBuild)
 
 exports.default = gulp.series(build, serve)
 exports.gh_pages = gulp.series(build, gh_page)
-
-function jsLib() {
-	return gulp.src('./src/index.js')
-		.pipe(plumber({
-			errorHandler: function(err) {
-				gutil.log(gutil.colors.red('ERROR DURING JS BUILD'));
-				process.stdout.write(err.stack);
-				this.emit('end');
-			},
-		}))
-		.pipe(rename('polyglot.js'))
-		.pipe(replace(/\.\/modules\/(\w+)/g, '../modules/$1')) // Replace import path one directory back (because file is moved to dist)
-		.pipe(gulp.dest('./dist'))
-		// .pipe(uglify())
-		.pipe(rename('polyglot.min.js'))
-		.pipe(gulp.dest('./dist'))
-};
 
 async function jsDemo() {
 	const bundle = await rollup.rollup({
