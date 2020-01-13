@@ -120,12 +120,22 @@ export default {
 			}
 		},
 	},
+	mounted() {
+		if (localStorage.query) {
+			this.query = localStorage.query;
+		}
+		if (localStorage.transposeLines) {
+			this.polyglotOptions.transposeLines = localStorage.transposeLines;
+		}
+	},
 	watch: {
 		query: function() {
+			localStorage.query = this.query;
 			_(polyglot.translateAll(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
 		},
 		'polyglotOptions.transposeLines': function() {
+			localStorage.transposeLines = this.polyglotOptions.transposeLines;
 			_(polyglot.translateAll(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
 		},
