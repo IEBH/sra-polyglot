@@ -61516,7 +61516,7 @@ const parse$1 = (query, options) => {
                 branch = branchStack.pop();
             }
             leaf = branch.nodes;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
+        } else if (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
                 type: 'ref', 
                 ref: lodash.range(match[1], (match[2]+1)/10), 
@@ -61526,7 +61526,7 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) { // OR/1-7
+        } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
                 type: 'ref', 
                 ref: lodash.range(match[2], (match[3]+1)/10), 
@@ -61536,7 +61536,7 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) { // 1 AND ...
+        } else if (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             branch.nodes.push({
                 type: 'ref', 
                 ref: [match[1]],
@@ -61546,7 +61546,7 @@ const parse$1 = (query, options) => {
             offset += match[1].length;
             q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) { // AND 2...
+        } else if (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
             switch(match[1].toLowerCase()) {
                 case "and":
@@ -61570,7 +61570,7 @@ const parse$1 = (query, options) => {
             }); 
             offset += match[0].length; 
             q = q.substr(match[0].length); 
-        } else if ((settings.transposeLines) && (match = /^([0-9]+\.?)\s+/i.exec(q))) { // 1 or 1. (Line number)
+        } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
             lineNumber = parseInt(match[1], 10);
             branch.number = lineNumber;
             branch.isNumbered = true;
@@ -61870,15 +61870,19 @@ var pubmedImport = {
                             buffer += '(' + compileWalker(branch.nodes) + ')';					
                             break;
                             case 'ref':
-                                var node;
-                                for (node in branch.nodes) {
-                                    if (node == 0) {
-                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                    } else {
-                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                    }	
+                                if (settings.transposeLines) {
+                                    var node;
+                                    for (node in branch.nodes) {
+                                        if (node == 0) {
+                                            buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                        }	
+                                    }
+                                } else {
+                                    buffer += branch.ref;
                                 }
-                            break;
+                                break;
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=
@@ -62020,13 +62024,17 @@ var ovidImport = {
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62169,13 +62177,17 @@ var cochraneImport = {
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }   
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62344,13 +62356,17 @@ var embaseImport = {
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62472,13 +62488,17 @@ var wosImport = {
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62608,13 +62628,17 @@ var cinahlImport = {
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if(settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62737,13 +62761,17 @@ var psycinfoImport = {
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -62862,13 +62890,17 @@ var scopusImport = {
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref;
                             }
                             break;
                         case 'phrase':
@@ -63809,7 +63841,7 @@ var script$1 = {
 			removeNumbering: false,
 			preserveNewLines: true,
 			replaceWildcards: true,
-			transposeLines: true,
+			transposeLines: false,
 			highlighting: true,
 		},
 		exampleLast: '',
@@ -63903,12 +63935,22 @@ var script$1 = {
 			}
 		},
 	},
+	mounted() {
+		if (localStorage.query) {
+			this.query = localStorage.query;
+		}
+		if (localStorage.transposeLines) {
+			this.polyglotOptions.transposeLines = localStorage.transposeLines;
+		}
+	},
 	watch: {
 		query: function() {
+			localStorage.query = this.query;
 			lodash(polyglot$2.translateAll(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query));
 		},
 		'polyglotOptions.transposeLines': function() {
+			localStorage.transposeLines = this.polyglotOptions.transposeLines;
 			lodash(polyglot$2.translateAll(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query));
 		},
@@ -64221,11 +64263,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-479dece4_0", { source: "\n.text-reader[data-v-479dece4] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-479dece4] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-479dece4]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-479dece4] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AA6MA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from '../src';\r\nimport enginesImport from '../src/modules/engines.js'\r\nimport global from '../src/modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: true,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\topenGuide() {\r\n\t\t\twindow.open('https://github.com/IEBH/sra-polyglot/blob/master/README.md', '_blank')\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\twatch: {\r\n\t\tquery: function() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t\t'polyglotOptions.transposeLines': function() {\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-on:click=\"openGuide()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to open user reference guide for Polyglot\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\r\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\r\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\r\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-73a85a8c_0", { source: "\n.text-reader[data-v-73a85a8c] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-73a85a8c] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-73a85a8c]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-73a85a8c] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAuNA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from '../src';\r\nimport enginesImport from '../src/modules/engines.js'\r\nimport global from '../src/modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: false,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\topenGuide() {\r\n\t\t\twindow.open('https://github.com/IEBH/sra-polyglot/blob/master/README.md', '_blank')\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\tmounted() {\r\n\t\tif (localStorage.query) {\r\n\t\t\tthis.query = localStorage.query;\r\n\t\t}\r\n\t\tif (localStorage.transposeLines) {\r\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\tquery: function() {\r\n\t\t\tlocalStorage.query = this.query;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t\t'polyglotOptions.transposeLines': function() {\r\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-on:click=\"openGuide()\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to open user reference guide for Polyglot\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\r\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\r\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\r\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-479dece4";
+  const __vue_scope_id__$1 = "data-v-73a85a8c";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
