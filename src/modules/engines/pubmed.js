@@ -44,15 +44,19 @@ export default {
                             buffer += '(' + compileWalker(branch.nodes) + ')';					
                             break;
                             case 'ref':
-                                var node;
-                                for (node in branch.nodes) {
-                                    if (node == 0) {
-                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                    } else {
-                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                    }	
+                                if (settings.transposeLines) {
+                                    var node;
+                                    for (node in branch.nodes) {
+                                        if (node == 0) {
+                                            buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                        }	
+                                    }
+                                } else {
+                                    buffer += branch.ref
                                 }
-                            break;
+                                break;
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=

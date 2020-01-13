@@ -121,7 +121,7 @@ export const parse = (query, options) => {
                 // branch.msg = "Extra closing bracket removed after term"
             }
             leaf = branch.nodes;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
+        } else if (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[1], (match[2]+1)/10), 
@@ -131,7 +131,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) { // OR/1-7
+        } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[2], (match[3]+1)/10), 
@@ -141,7 +141,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) { // 1 AND ...
+        } else if (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             branch.nodes.push({
                 type: 'ref', 
                 ref: [match[1]],
@@ -151,7 +151,7 @@ export const parse = (query, options) => {
             offset += match[1].length;
             q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) { // AND 2...
+        } else if (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
             switch(match[1].toLowerCase()) {
                 case "and":
@@ -175,7 +175,7 @@ export const parse = (query, options) => {
             }); 
             offset += match[0].length; 
             q = q.substr(match[0].length); 
-        } else if ((settings.transposeLines) && (match = /^([0-9]+\.?)\s+/i.exec(q))) { // 1 or 1. (Line number)
+        } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
             lineNumber = parseInt(match[1], 10)
             branch.number = lineNumber
             branch.isNumbered = true

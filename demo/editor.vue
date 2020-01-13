@@ -26,7 +26,7 @@ export default {
 			removeNumbering: false,
 			preserveNewLines: true,
 			replaceWildcards: true,
-			transposeLines: true,
+			transposeLines: false,
 			highlighting: true,
 		},
 		exampleLast: '',
