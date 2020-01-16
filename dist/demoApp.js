@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60949,12 +60945,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61674,8 +61664,8 @@ const parse$1 = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -61723,11 +61713,14 @@ const parse$1 = (query, options) => {
                     useLeaf.type = 'mesh';
                     useLeaf.recurse = true;
                     break;
+                case 'af':
+                    useLeaf.field = 'allFields';
+                    break;
             }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
@@ -61760,6 +61753,10 @@ const parse$1 = (query, options) => {
                     break;
                 case 'pt':
                     useLeaf.field = 'publicationType';
+                    break;
+                case 'all':
+                case 'all fields':
+                    useLeaf.field = 'allFields';
                     break;
             }
             offset += match[0].length;

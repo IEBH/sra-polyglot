@@ -269,8 +269,8 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -318,11 +318,14 @@ export const parse = (query, options) => {
                     useLeaf.type = 'mesh';
                     useLeaf.recurse = true;
                     break;
+                case 'af':
+                    useLeaf.field = 'allFields';
+                    break;
             }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -355,6 +358,10 @@ export const parse = (query, options) => {
                     break;
                 case 'pt':
                     useLeaf.field = 'publicationType';
+                    break;
+                case 'all':
+                case 'all fields':
+                    useLeaf.field = 'allFields'
                     break;
             }
             offset += match[0].length;
