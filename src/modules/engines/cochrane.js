@@ -70,6 +70,8 @@ export default {
                                 if (settings.highlighting) buffer += '<font color="blue">';
                                 buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
                                 if (settings.highlighting) buffer += '</font>';
+                            } else if (branch.field && branch.field == 'language') {
+                                buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline")
                             } else if (branch.field && expand) {
                                 buffer +=
                                     tools.quotePhrase(branch, 'cochrane', settings.highlighting) +

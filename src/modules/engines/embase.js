@@ -40,6 +40,7 @@ export default {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                                 }
@@ -74,6 +75,7 @@ export default {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                             } else {

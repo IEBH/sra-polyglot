@@ -55,6 +55,10 @@ a:hover {
 	border-bottom: 1px blue dashed;
 }
 
+.red-underline {
+	border-bottom: 1px red dashed;
+}
+
 .highlight {
 	background-color: #FFFF00;
 }

@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60949,12 +60945,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -62222,6 +62212,8 @@ var cochraneImport = {
                                 if (settings.highlighting) buffer += '<font color="blue">';
                                 buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
                                 if (settings.highlighting) buffer += '</font>';
+                            } else if (branch.field && branch.field == 'language') {
+                                buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline");
                             } else if (branch.field && expand) {
                                 buffer +=
                                     tools.quotePhrase(branch, 'cochrane', settings.highlighting) +
@@ -62375,6 +62367,7 @@ var embaseImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                                 }
@@ -62409,6 +62402,7 @@ var embaseImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                             } else {
@@ -62682,6 +62676,7 @@ var cinahlImport = {
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
+                                        branch.field == 'language' ? 'LA' :
                                         ''
                                     )
                                     + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting)
@@ -62814,6 +62809,7 @@ var psycinfoImport = {
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
+                                        branch.field == 'language' ? '.la' :
                                         ''
                                     );
                             } else {
@@ -62941,6 +62937,7 @@ var scopusImport = {
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
                             } else {

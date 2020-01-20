@@ -56,6 +56,7 @@ export default {
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
+                                        branch.field == 'language' ? '.la' :
                                         ''
                                     )
                             } else {

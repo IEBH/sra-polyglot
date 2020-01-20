@@ -57,6 +57,7 @@ export default {
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
+                                        branch.field == 'language' ? 'LA' :
                                         ''
                                     )
                                     + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting)
