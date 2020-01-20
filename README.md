@@ -42,8 +42,8 @@ The following sub-headings break down each individual syntax.
 To search for basic phrases simply specify the words within the search term with or without being enclosed in speachmarks. Specific search fields can be specified by appending it to the term in any of the following supported formats:
 
 * `Term` (Generic search in all fields, polyglot will undeline the word in blue: [Replacing Empty Field Tags](#replacing-empty-field-tags))
-* `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `tw`, `ab`, `nm`, `sh`, `pt`)
-* `Term.ti.` or `Term:ti` (Ovid MEDLINE field specification, fields also supported: `tw`, `ti,ab`, `ab,ti`, `ti`, `ab`, `mp`, `nm`, `pt`, `fs`, `sh`, `xm`)
+* `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `tw`, `ab`, `nm`, `sh`, `pt`, `la`)
+* `Term.ti.` or `Term:ti` (Ovid MEDLINE field specification, fields also supported: `tw`, `ti,ab`, `ab,ti`, `ti`, `ab`, `mp`, `nm`, `pt`, `fs`, `sh`, `xm`, `lg`)
 
 
 ## Mesh Headings
@@ -81,6 +81,7 @@ Similar to [Logical Syntax](#logical-syntax), proximity searching allows the sea
 
 ## Line Referencing
 There are two main methods to number lines, either leave the beggining of the line blank and use the numbers provided in the left hand side of the editor, or specify a custom number at the begining of each line.
+Automatic line expansion can be used by enabling the checkbox.
 **If you specify a line number at the beginning of a line, all lines must be numbered.**
 
 ![blank line number](https://user-images.githubusercontent.com/25999161/61197739-d3be5d00-a719-11e9-94ab-60f3bd00175a.png)
