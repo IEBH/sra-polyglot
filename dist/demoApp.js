@@ -61664,8 +61664,8 @@ const parse$1 = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -61713,11 +61713,17 @@ const parse$1 = (query, options) => {
                     useLeaf.type = 'mesh';
                     useLeaf.recurse = true;
                     break;
+                case 'af':
+                    useLeaf.field = 'allFields';
+                    break;
+                case 'lg':
+                    useLeaf.field = 'language';
+                    break;
             }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
@@ -61750,6 +61756,14 @@ const parse$1 = (query, options) => {
                     break;
                 case 'pt':
                     useLeaf.field = 'publicationType';
+                    break;
+                case 'all':
+                case 'all fields':
+                    useLeaf.field = 'allFields';
+                    break;
+                case 'la':
+                case 'language':
+                    useLeaf.field = 'language';
                     break;
             }
             offset += match[0].length;
@@ -61896,6 +61910,7 @@ var pubmedImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">[la]</font>' : '[la]' :
                                         '' // Unsupported field suffix for PubMed
                                     );
                             } else {
@@ -62016,6 +62031,7 @@ var ovidImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
                                         '' // Unsupported field suffix for Ovid
                                     );
                                 }
@@ -62050,6 +62066,7 @@ var ovidImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
                                         '' // Unsupported field suffix for Ovid
                                     );
                             } else {
@@ -62195,6 +62212,8 @@ var cochraneImport = {
                                 if (settings.highlighting) buffer += '<font color="blue">';
                                 buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
                                 if (settings.highlighting) buffer += '</font>';
+                            } else if (branch.field && branch.field == 'language') {
+                                buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline");
                             } else if (branch.field && expand) {
                                 buffer +=
                                     tools.quotePhrase(branch, 'cochrane', settings.highlighting) +
@@ -62348,6 +62367,7 @@ var embaseImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                                 }
@@ -62382,6 +62402,7 @@ var embaseImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
                             } else {
@@ -62655,6 +62676,7 @@ var cinahlImport = {
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
+                                        branch.field == 'language' ? 'LA' :
                                         ''
                                     )
                                     + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting)
@@ -62787,6 +62809,7 @@ var psycinfoImport = {
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
+                                        branch.field == 'language' ? '.la' :
                                         ''
                                     );
                             } else {
@@ -62914,6 +62937,7 @@ var scopusImport = {
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
                             } else {
