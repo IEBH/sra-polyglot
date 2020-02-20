@@ -40,7 +40,19 @@ export default {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "S" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' S' + branch.ref[node]
+                                        }
+                                    }
+                                } else {
+                                    buffer += "S" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
