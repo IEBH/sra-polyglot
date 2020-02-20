@@ -62242,7 +62242,19 @@ var cochraneImport = {
                                     }	
                                 }   
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62424,7 +62436,19 @@ var embaseImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
