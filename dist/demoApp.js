@@ -61885,16 +61885,32 @@ var pubmedImport = {
                             break;
                             case 'ref':
                                 if (settings.transposeLines) {
+                                    // Expand each line to show full query
                                     var node;
+                                    
                                     for (node in branch.nodes) {
                                         if (node == 0) {
+                                            // First line is printed as is wrapped in brackets
                                             buffer += '(' + compileWalker(branch.nodes[node]) + ')';
                                         } else {
+                                            // Remaining lines are appended with the condition
                                             buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
                                         }	
                                     }
                                 } else {
-                                    buffer += branch.ref;
+                                    // Only print each line number in format defined by engine 
+                                    // If branch.ref is array then user specified OR/1-4
+                                    if(Array.isArray(branch.ref)) {
+                                        for (node in branch.ref) {
+                                            if (node == 0) {
+                                                buffer += "#" + branch.ref[node];
+                                            } else {
+                                                buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                            }
+                                        }
+                                    } else {
+                                        buffer += "#" + branch.ref;
+                                    }
                                 }
                                 break;
                         case 'phrase':
@@ -62050,7 +62066,19 @@ var ovidImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' ' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62204,7 +62232,19 @@ var cochraneImport = {
                                     }	
                                 }   
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62386,7 +62426,19 @@ var embaseImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62506,6 +62558,12 @@ var wosImport = {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
@@ -62519,7 +62577,19 @@ var wosImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62646,6 +62716,12 @@ var cinahlImport = {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
@@ -62659,7 +62735,19 @@ var cinahlImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "S" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' S' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "S" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62780,6 +62868,12 @@ var psycinfoImport = {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
@@ -62793,7 +62887,19 @@ var psycinfoImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
@@ -62910,6 +63016,12 @@ var scopusImport = {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
@@ -62923,7 +63035,19 @@ var scopusImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += "#" + branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
