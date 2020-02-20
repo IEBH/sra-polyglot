@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.4.1
@@ -60945,6 +60949,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61885,16 +61895,32 @@ var pubmedImport = {
                             break;
                             case 'ref':
                                 if (settings.transposeLines) {
+                                    // Expand each line to show full query
                                     var node;
+                                    
                                     for (node in branch.nodes) {
                                         if (node == 0) {
+                                            // First line is printed as is wrapped in brackets
                                             buffer += '(' + compileWalker(branch.nodes[node]) + ')';
                                         } else {
+                                            // Remaining lines are appended with the condition
                                             buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
                                         }	
                                     }
                                 } else {
-                                    buffer += branch.ref;
+                                    // Only print each line number in format defined by engine 
+                                    // If branch.ref is array then user specified OR/1-4
+                                    if(Array.isArray(branch.ref)) {
+                                        for (node in branch.ref) {
+                                            if (node == 0) {
+                                                buffer += "#" + branch.ref[node];
+                                            } else {
+                                                buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                            }
+                                        }
+                                    } else {
+                                        buffer += "#" + branch.ref;
+                                    }
                                 }
                                 break;
                         case 'phrase':
@@ -62050,7 +62076,19 @@ var ovidImport = {
                                     }	
                                 }
                             } else {
-                                buffer += branch.ref;
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += branch.ref[node];
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' ' + branch.ref[node];
+                                        }
+                                    }
+                                } else {
+                                    buffer += branch.ref;
+                                }
                             }
                             break;
                         case 'phrase':
