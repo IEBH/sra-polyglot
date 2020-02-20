@@ -62593,7 +62593,11 @@ var wosImport = {
                             }
                             break;
                         case 'phrase':
-                            buffer += tools.quotePhrase(branch, 'wos', settings.highlighting);
+                            if (branch.field && branch.field == 'language') {
+                                buffer += "LA=" + branch.content;
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'wos', settings.highlighting);
+                            }
                             break;
                         case 'joinAnd':
                             buffer += 'AND';
