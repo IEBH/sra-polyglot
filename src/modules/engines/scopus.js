@@ -27,6 +27,12 @@ export default {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':

@@ -36,81 +36,81 @@ describe('Line expression expansion', ()=> {
 
 	it('translate line expansion format -> PM', ()=> {
 		expect(polyglot.translate(input, 'pubmed')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
 	it('translate line expansion format -> OV', ()=> {
 		expect(polyglot.translate(input, 'ovid')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 1 OR 2 OR 3 OR 4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'1 OR 2 OR 3 OR 4'
 		);
 	});
 
 	it('translate line expansion format -> CO', ()=> {
 		expect(polyglot.translate(input, 'cochrane')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
 	it('translate line expansion format -> EM', ()=> {
 		expect(polyglot.translate(input, 'embase')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
 	it('translate line expansion format -> CI', ()=> {
 		expect(polyglot.translate(input, 'cinahl')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 S1 OR S2 OR S3 OR S4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'S1 OR S2 OR S3 OR S4'
 		);
 	});
 
 	it('translate line expansion format -> PY', ()=> {
 		expect(polyglot.translate(input, 'psycinfo')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
 	it('translate line expansion format -> SC', ()=> {
 		expect(polyglot.translate(input, 'scopus')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'"Foo" AND<br/>' +
+			'"Bar" AND<br/>' +
+			'"Baz" OR<br/>' +
+			'"Quz"<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
 	it('translate line expansion format -> WS', ()=> {
 		expect(polyglot.translate(input, 'wos')).to.equal(
-			'1 Foo AND\n' +
-			'2 Bar AND\n' +
-			'3 Baz OR\n' +
-			'4 Quz\n' +
-			'5 #1 OR #2 OR #3 OR #4'
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'#1 OR #2 OR #3 OR #4'
 		);
 	});
 
