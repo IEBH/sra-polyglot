@@ -121,7 +121,7 @@ export const parse = (query, options) => {
                 // branch.msg = "Extra closing bracket removed after term"
             }
             leaf = branch.nodes;
-        } else if (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
+        } else if (match = /^([0-9]+)\s*[‐\-]\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[1], (match[2]+1)/10), 
@@ -131,7 +131,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q)) { // OR/1-7
+        } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*[‐\-]\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[2], (match[3]+1)/10), 
