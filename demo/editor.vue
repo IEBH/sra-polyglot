@@ -72,8 +72,8 @@ export default {
 			// Remove temporary element
 			document.body.removeChild(el);
 		},
-		openGuide() {
-			window.open('https://github.com/IEBH/sra-polyglot/blob/master/README.md', '_blank')
+		openLink(link) {
+			window.open(link, '_blank')
 		},
 		showExample() {
 			var chosenExample;
@@ -145,11 +145,17 @@ export default {
 
 <template>
 	<div class="container">
-		<div v-on:click="openGuide()" class="alert alert-info text-center">
+		<div v-on:click="openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')" class="alert alert-info text-center">
 			<div class="pull-left font-xl h1">
 				<i class="fa fa-question-circle push-up"></i>
 			</div>
-			Click here to open user reference guide for Polyglot
+			Click here to cite the Polyglot tool
+		</div>
+		<div v-on:click="openLink('http://sr-accelerator.com/#/help/polyglot')" class="alert alert-info text-center">
+			<div class="pull-left font-xl h1">
+				<i class="fa fa-question-circle push-up"></i>
+			</div>
+			Click here to access the Polyglot help guide 
 		</div>
 
 		<div class="row-fluid">
@@ -208,6 +214,12 @@ export default {
 					<!-- MongoDB not included at this stage -->
 				</div>
 			</div>
+		</div>
+		<div v-on:click="openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')" class="alert alert-info text-center">
+			<div class="pull-left font-xl h1">
+				<i class="fa fa-question-circle push-up"></i>
+			</div>
+			Click here to open user reference guide for Polyglot
 		</div>
 	</div>
 </template>
