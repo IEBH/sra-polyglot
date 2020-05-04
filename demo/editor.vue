@@ -10,6 +10,7 @@ import 'brace/theme/chrome';
 
 export default {
 	data: ()=> ({
+		global: global,
 		query: '',
 		customField: '',
 		replaceAll: false,
@@ -83,11 +84,14 @@ export default {
 			this.exampleLast = chosenExample;
 			this.query = chosenExample.query;
 		},
+		insertTemplate(key) {
+			let editor = this.$refs.queryEditor.editor;
+			editor.insert("<" + key + ">");
+		},
 		toggleExpandEngine(engine) {
 			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
 		},
 		editorInit() { // Ace editor settings
-			
 			window.ace.config.set('modePath', 'syntax/ace');
 		},
 		loadTextFromFile(ev) {
@@ -168,10 +172,19 @@ export default {
 						<a v-on:click="clear()" class="btn btn-sm btn-default"><i class="fa fa-eraser" title="Clear search"></i></a>
 						<a v-on:click="copyQuery()" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
 						<a v-on:click="showExample()" class="btn btn-sm btn-default"><i class="fa fa-random" title="Show a random example"></i></a>
+						<span class="dropdown">
+							<a class="btn btn-sm btn-default" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<i class="fa fa-caret-down" title="Insert Template"></i>
+							</a>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a v-for="(template, key) in global.templates" :key="key" class="dropdown-item" href="#" v-on:click="insertTemplate(key)">{{template.name}}</a>
+							</div>
+						</span>
 					</div>
 				</div>
 				<div class="card-body p-0">
 					<editor
+						ref='queryEditor'
 						v-model="query"
 						v-on:init="editorInit"
 						lang="polyglot"
