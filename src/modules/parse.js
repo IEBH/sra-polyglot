@@ -428,7 +428,7 @@ export const parse = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            return;
                         }
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
@@ -436,10 +436,20 @@ export const parse = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            return;
                         }
                     }	
                 }
+                // Line not found, push error message
+                node.nodes.push(
+                [{
+                    type: "phrase", 
+                    content: tools.createTooltip(
+                        "Line " + node.ref[reference] + " not found", 
+                        "Polyglot could not find specified line in the search query", 
+                        "red-underline"
+                    )
+                }]);
             }
         });
     }
