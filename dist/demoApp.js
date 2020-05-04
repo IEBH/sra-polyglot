@@ -22519,7 +22519,7 @@ var lodash = createCommonjsModule(function (module, exports) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -25178,16 +25178,10 @@ var lodash = createCommonjsModule(function (module, exports) {
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -26111,8 +26105,8 @@ var lodash = createCommonjsModule(function (module, exports) {
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -27929,7 +27923,7 @@ var lodash = createCommonjsModule(function (module, exports) {
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -29112,7 +29106,7 @@ var lodash = createCommonjsModule(function (module, exports) {
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -29120,6 +29114,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -32920,6 +32918,7 @@ var lodash = createCommonjsModule(function (module, exports) {
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -37306,9 +37305,12 @@ var lodash = createCommonjsModule(function (module, exports) {
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
+      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -37341,7 +37343,9 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      // Like with sourceURL, we take care to not check the option's prototype,
+      // as this configuration is a code injection vector.
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -39546,10 +39550,11 @@ var lodash = createCommonjsModule(function (module, exports) {
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -61818,7 +61823,7 @@ const parse$1 = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            return;
                         }
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
@@ -61826,10 +61831,20 @@ const parse$1 = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            return;
                         }
                     }	
                 }
+                // Line not found, push error message
+                node.nodes.push(
+                [{
+                    type: "phrase", 
+                    content: tools.createTooltip(
+                        "Line " + node.ref[reference] + " not found", 
+                        "Polyglot could not find specified line in the search query", 
+                        "red-underline"
+                    )
+                }]);
             }
         });
     }
@@ -63815,7 +63830,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = function (inject) {
     if (!inject) return
-    inject("data-v-77f67d02_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["D:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
+    inject("data-v-3dacf241_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
@@ -63972,6 +63987,7 @@ dom.importCssString(exports.cssText, exports.cssClass);
 
 var script$1 = {
 	data: ()=> ({
+		global: global$2,
 		query: '',
 		customField: '',
 		replaceAll: false,
@@ -64045,11 +64061,14 @@ var script$1 = {
 			this.exampleLast = chosenExample;
 			this.query = chosenExample.query;
 		},
+		insertTemplate(key) {
+			let editor = this.$refs.queryEditor.editor;
+			editor.insert("<" + key + ">");
+		},
 		toggleExpandEngine(engine) {
 			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
 		},
 		editorInit() { // Ace editor settings
-			
 			window.ace.config.set('modePath', 'syntax/ace');
 		},
 		loadTextFromFile(ev) {
@@ -64113,47 +64132,34 @@ var __vue_render__$1 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("div", { staticClass: "container" }, [
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col" }, [
-        _c(
-          "div",
-          {
-            staticClass: "alert alert-info text-center",
-            on: {
-              click: function($event) {
-                return _vm.openLink(
-                  "https://www.ncbi.nlm.nih.gov/pubmed/32256231"
-                )
-              }
-            }
-          },
-          [
-            _vm._m(0),
-            _vm._v("\n\t\t\t\t\tClick here to cite the Polyglot tool\n\t\t\t\t")
-          ]
-        )
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col" }, [
-        _c(
-          "div",
-          {
-            staticClass: "alert alert-info text-center",
-            on: {
-              click: function($event) {
-                return _vm.openLink("http://sr-accelerator.com/#/help/polyglot")
-              }
-            }
-          },
-          [
-            _vm._m(1),
-            _vm._v(
-              "\n\t\t\t\t\tClick here to access the Polyglot help guide \n\t\t\t\t"
-            )
-          ]
-        )
-      ])
-    ]),
+    _c(
+      "div",
+      {
+        staticClass: "alert alert-info text-center",
+        on: {
+          click: function($event) {
+            return _vm.openLink("https://www.ncbi.nlm.nih.gov/pubmed/32256231")
+          }
+        }
+      },
+      [_vm._m(0), _vm._v("\n\t\t\tClick here to cite the Polyglot tool\n\t\t")]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "alert alert-info text-center",
+        on: {
+          click: function($event) {
+            return _vm.openLink("http://sr-accelerator.com/#/help/polyglot")
+          }
+        }
+      },
+      [
+        _vm._m(1),
+        _vm._v("\n\t\t\tClick here to access the Polyglot help guide \n\t\t")
+      ]
+    ),
     _vm._v(" "),
     _c("div", { staticClass: "row-fluid" }, [
       _c("div", { staticClass: "card" }, [
@@ -64261,7 +64267,36 @@ var __vue_render__$1 = function() {
                   attrs: { title: "Show a random example" }
                 })
               ]
-            )
+            ),
+            _vm._v(" "),
+            _c("span", { staticClass: "dropdown" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "dropdown-menu",
+                  attrs: { "aria-labelledby": "dropdownMenuButton" }
+                },
+                _vm._l(_vm.global.templates, function(template, key) {
+                  return _c(
+                    "a",
+                    {
+                      key: key,
+                      staticClass: "dropdown-item",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          return _vm.insertTemplate(key)
+                        }
+                      }
+                    },
+                    [_vm._v(_vm._s(template.name))]
+                  )
+                }),
+                0
+              )
+            ])
           ])
         ]),
         _vm._v(" "),
@@ -64270,6 +64305,7 @@ var __vue_render__$1 = function() {
           { staticClass: "card-body p-0" },
           [
             _c("editor", {
+              ref: "queryEditor",
               attrs: {
                 lang: "polyglot",
                 theme: "chrome",
@@ -64431,7 +64467,7 @@ var __vue_render__$1 = function() {
         }
       },
       [
-        _vm._m(2),
+        _vm._m(3),
         _vm._v(
           "\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t"
         )
@@ -64460,6 +64496,29 @@ var __vue_staticRenderFns__$1 = [
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
+    return _c(
+      "a",
+      {
+        staticClass: "btn btn-sm btn-default",
+        attrs: {
+          id: "dropdownMenuButton",
+          "data-toggle": "dropdown",
+          "aria-haspopup": "true",
+          "aria-expanded": "false"
+        }
+      },
+      [
+        _c("i", {
+          staticClass: "fa fa-caret-down",
+          attrs: { title: "Insert Template" }
+        })
+      ]
+    )
+  },
+  function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
     return _c("div", { staticClass: "pull-left font-xl h1" }, [
       _c("i", { staticClass: "fa fa-question-circle push-up" })
     ])
@@ -64470,11 +64529,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-56ebcac6_0", { source: "\n.text-reader[data-v-56ebcac6] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-56ebcac6] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-56ebcac6]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-56ebcac6] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["D:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAyOA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from '../src';\r\nimport enginesImport from '../src/modules/engines.js'\r\nimport global from '../src/modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: false,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\topenLink(link) {\r\n\t\t\twindow.open(link, '_blank')\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\t\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\tmounted() {\r\n\t\tif (localStorage.query) {\r\n\t\t\tthis.query = localStorage.query;\r\n\t\t}\r\n\t\tif (localStorage.transposeLines) {\r\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\tquery: function() {\r\n\t\t\tlocalStorage.query = this.query;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t\t'polyglotOptions.transposeLines': function() {\r\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div class=\"row\">\r\n\t\t\t<div class=\"col\">\r\n\t\t\t\t<div v-on:click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\" class=\"alert alert-info text-center\">\r\n\t\t\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\tClick here to cite the Polyglot tool\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<div class=\"col\">\r\n\t\t\t\t<div v-on:click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\" class=\"alert alert-info text-center\">\r\n\t\t\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\tClick here to access the Polyglot help guide \r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\r\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\r\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\r\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to open user reference guide for Polyglot\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
+    inject("data-v-3b450cca_0", { source: "\n.text-reader[data-v-3b450cca] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-3b450cca] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-3b450cca]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-3b450cca] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["C:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAgPA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from '../src';\r\nimport enginesImport from '../src/modules/engines.js'\r\nimport global from '../src/modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tglobal: global,\r\n\t\tquery: '',\r\n\t\tcustomField: '',\r\n\t\treplaceAll: false,\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: enginesImport,\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: false,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\topenLink(link) {\r\n\t\t\twindow.open(link, '_blank')\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\tinsertTemplate(key) {\r\n\t\t\tlet editor = this.$refs.queryEditor.editor;\r\n\t\t\teditor.insert(\"<\" + key + \">\");\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\treplaceFields(field, replace_all, offset) {\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\r\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n\tmounted() {\r\n\t\tif (localStorage.query) {\r\n\t\t\tthis.query = localStorage.query;\r\n\t\t}\r\n\t\tif (localStorage.transposeLines) {\r\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\tquery: function() {\r\n\t\t\tlocalStorage.query = this.query;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t\t'polyglotOptions.transposeLines': function() {\r\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\r\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<div v-on:click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to cite the Polyglot tool\r\n\t\t</div>\r\n\t\t<div v-on:click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to access the Polyglot help guide \r\n\t\t</div>\r\n\r\n\t\t<div class=\"row-fluid\">\r\n\t\t\t<div class=\"card\">\r\n\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\tYour query\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\r\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\r\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t\t<span class=\"dropdown\">\r\n\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\r\n\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\r\n\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t<editor\r\n\t\t\t\t\t\tref='queryEditor'\r\n\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t></editor>\r\n\t\t\t\t</div>\r\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\r\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\r\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<label class=\"text-reader\">\r\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n  \t\t</label>\r\n\t\t\r\n\t\t<hr/>\r\n\r\n\t\t<div class=\"accordion panel-group\">\r\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t{{engine.title}}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\r\n\t\t\t\t\t<v-runtime-template class=\"preview\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" :template=\"'<div>' + enginesQuery[engine.id] + '</div>'\" ></v-runtime-template>\r\n\t\t\t\t\t<!-- <pre class=\"preview\" v-html=\"enginesQuery[engine.id]\" v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\"></pre> -->\r\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\r\n      \t\t\t\t<hr>\r\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\r\n\t\t\t<div class=\"pull-left font-xl h1\">\r\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\r\n\t\t\t</div>\r\n\t\t\tClick here to open user reference guide for Polyglot\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-56ebcac6";
+  const __vue_scope_id__$1 = "data-v-3b450cca";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
