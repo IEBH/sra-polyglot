@@ -151,9 +151,9 @@ export const parse = (query, options) => {
             offset += match[1].length;
             q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
             cropString = false;
-        } else if (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q)) { // AND 2...
+        } else if (match = /^((AND|OR|NOT) +([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
-            switch(match[1].toLowerCase()) {
+            switch(match[2].toLowerCase()) {
                 case "and":
                     branch.nodes.push({type: 'joinAnd'});
                     break;
@@ -169,12 +169,12 @@ export const parse = (query, options) => {
 
             branch.nodes.push({
                 type: 'ref', 
-                ref: [match[2]],
+                ref: [match[3]],
                 cond: '',
                 nodes: []
             }); 
-            offset += match[0].length; 
-            q = q.substr(match[0].length); 
+            offset += match[1].length; 
+            q = q.substr(match[1].length); 
         } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
             lineNumber = parseInt(match[1], 10)
             branch.number = lineNumber
@@ -420,6 +420,7 @@ export const parse = (query, options) => {
             var line;
             // Find the matching line
             for (reference in node.ref) {
+                var found = false;
                 for (line in tree.nodes) {
                     // If custom numbering is used only use nodes that are numbered by the user
                     if (userLineNumber) {
@@ -428,7 +429,7 @@ export const parse = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            return;
+                            found = true;
                         }
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
@@ -436,20 +437,22 @@ export const parse = (query, options) => {
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            return;
+                            found = true;
                         }
                     }	
                 }
                 // Line not found, push error message
-                node.nodes.push(
-                [{
-                    type: "phrase", 
-                    content: tools.createTooltip(
-                        "Line " + node.ref[reference] + " not found", 
-                        "Polyglot could not find specified line in the search query", 
-                        "red-underline"
-                    )
-                }]);
+                if (!found) {
+                    node.nodes.push(
+                    [{
+                        type: "phrase", 
+                        content: tools.createTooltip(
+                            "Line " + node.ref[reference] + " not found", 
+                            "Polyglot could not find specified line in the search query", 
+                            "red-underline"
+                        )
+                    }]);
+                }
             }
         });
     }
