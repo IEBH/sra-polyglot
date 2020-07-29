@@ -7,6 +7,7 @@ import global from '../src/modules/global.js'
 import JsonTree from 'vue-json-tree'
 import VRuntimeTemplate from "v-runtime-template";
 import 'brace/theme/chrome';
+import { createToken, getQuery } from "./api.js";
 
 export default {
 	data: ()=> ({
@@ -76,6 +77,16 @@ export default {
 		openLink(link) {
 			window.open(link, '_blank')
 		},
+		async openSearchRefiner() {
+			var link = "https://ielab-sysrev2.uqcloud.net?token="
+			try {
+				var token = await createToken(this.query);
+				link = link.concat(token);
+			} catch(e) {
+				console.error(e);
+			}
+			window.open(link, '_blank')
+		},
 		showExample() {
 			var chosenExample;
 			do {
@@ -124,8 +135,18 @@ export default {
 			}
 		},
 	},
-	mounted() {
-		if (localStorage.query) {
+	async mounted() {
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const token = urlParams.get('token')
+		if(token) {
+			try {
+				this.query = await getQuery(token)
+			} catch(e) {
+				console.error(e);
+			}
+		}
+		else if (localStorage.query) {
 			this.query = localStorage.query;
 		}
 		if (localStorage.transposeLines) {
@@ -201,6 +222,9 @@ export default {
 			</div>
 		</div>
 
+		<label class="text-reader">
+			<span class="select-button" @click="openSearchRefiner">Open Query in SearchRefiner</span>
+  		</label>
 		<label class="text-reader">
 			<span class="select-button">Import Search From .txt File</span>
 			<input type="file" @change="loadTextFromFile">
