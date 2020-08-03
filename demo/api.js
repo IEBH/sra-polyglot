@@ -1,12 +1,14 @@
 export const createToken = (query) => {
     return new Promise((resolve, reject) => {
         var body = {
-            Data: {
-                query: query
+            data: {
+                query: query,
+                seeds: "[]"
             },
-            Referrer: "polyglot"
+            referrer: "polyglot"
         }
-        fetch("http://localhost:4040/exchange", {
+        console.log(JSON.stringify(body));
+        fetch("https://ielab-sysrev3.uqcloud.net/exchange", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -22,7 +24,7 @@ export const createToken = (query) => {
 
 export const getQuery = (token) => {
     return new Promise((resolve, reject) => {
-        fetch("http://localhost:4040/exchange?token=".concat(token), {
+        fetch("https://ielab-sysrev3.uqcloud.net/exchange?token=".concat(token), {
             method: 'GET'
         }).then(function (response) {
             return response.json();

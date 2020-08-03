@@ -78,9 +78,9 @@ export default {
 			window.open(link, '_blank')
 		},
 		async openSearchRefiner() {
-			var link = "https://ielab-sysrev2.uqcloud.net?token="
+			var link = "https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token="
 			try {
-				var token = await createToken(this.query);
+				var token = await createToken(this.query); // TODO use pubmed translation maybe
 				link = link.concat(token);
 			} catch(e) {
 				console.error(e);
