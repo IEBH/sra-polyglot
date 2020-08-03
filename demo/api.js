@@ -2,8 +2,8 @@ export const createToken = (query) => {
     return new Promise((resolve, reject) => {
         var body = {
             data: {
-                query: query,
-                seeds: "[]"
+                query: query, 
+                seeds: "[]" // TODO Add array of pubmed id strings
             },
             referrer: "polyglot"
         }
