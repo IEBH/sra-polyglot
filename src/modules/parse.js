@@ -257,7 +257,9 @@ export const parse = (query, options) => {
                 leaf = undefined;
             }
             lineNumber += match[0].length;
-            newLine(lineNumber);
+            if (branchStack.length > 0 && branchStack[branchStack.length-1].nodes.every(node => node.type !== "group")) { // If we are currently inside a group don't add a newline group
+                newLine(lineNumber);
+            }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
