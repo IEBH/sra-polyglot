@@ -1,9 +1,9 @@
-export const createToken = (query) => {
+export const createToken = (query, seeds) => {
     return new Promise((resolve, reject) => {
         var body = {
             data: {
-                query: query, 
-                seeds: "[]" // TODO Add array of pubmed id strings
+                query, 
+                seeds
             },
             referrer: "polyglot"
         }
@@ -29,7 +29,7 @@ export const getQuery = (token) => {
         }).then(function (response) {
             return response.json();
         }).then(function (res) {
-            resolve(res.data.query);
+            resolve([res.data.query, res.data.seeds]);
         }).catch(err => reject(err)); 
     })
 }

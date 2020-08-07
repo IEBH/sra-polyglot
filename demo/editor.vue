@@ -13,6 +13,7 @@ export default {
 	data: ()=> ({
 		global: global,
 		query: '',
+		seeds: '[]',
 		customField: '',
 		replaceAll: false,
 		editorOptions: {
@@ -80,7 +81,7 @@ export default {
 		async openSearchRefiner() {
 			var link = "https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token="
 			try {
-				var token = await createToken(this.query); // TODO use pubmed translation maybe
+				var token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe
 				link = link.concat(token);
 			} catch(e) {
 				console.error(e);
@@ -141,7 +142,7 @@ export default {
 		const token = urlParams.get('token')
 		if(token) {
 			try {
-				this.query = await getQuery(token)
+				[this.query, this.seeds] = await getQuery(token)
 			} catch(e) {
 				console.error(e);
 			}
