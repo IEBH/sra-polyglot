@@ -61884,9 +61884,10 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
+        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)?\b/i.exec(q))) {
             trimLastLeaf();
-            branch.nodes.push({type: 'joinNear', proximity: lodash.toNumber(match[2])});
+            if (match[2]) branch.nodes.push({type: 'joinNear', proximity: lodash.toNumber(match[2])});
+            else branch.nodes.push({type: 'joinNear', proximity: 1});
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
