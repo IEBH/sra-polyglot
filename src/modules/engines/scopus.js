@@ -72,6 +72,7 @@ export default {
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'keyword' ? 'KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );

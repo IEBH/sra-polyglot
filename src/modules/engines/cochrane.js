@@ -96,6 +96,7 @@ export default {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
                                         '' // Unsupported field suffix for PubMed
                                     );
                             } else {

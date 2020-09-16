@@ -61951,8 +61951,8 @@ const parse$1 = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -61994,7 +61994,10 @@ const parse$1 = (query, options) => {
                     useLeaf.field = 'publicationType';
                     break;
                 case 'kf':
-                    useLeaf.field = 'author';
+                    useLeaf.field = 'keyword';
+                    break;
+                case 'kw':
+                    useLeaf.field = 'keyword';
                     break;
                 case 'xm':
                     useLeaf.type = 'mesh';
@@ -62010,7 +62013,7 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|tw)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
@@ -62047,6 +62050,9 @@ const parse$1 = (query, options) => {
                 case 'all':
                 case 'all fields':
                     useLeaf.field = 'allFields';
+                    break;
+                case 'tw':
+                    useLeaf.field = 'keyword';
                     break;
                 case 'la':
                 case 'language':
@@ -62226,6 +62232,7 @@ var pubmedImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
                                         branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">[la]</font>' : '[la]' :
                                         '' // Unsupported field suffix for PubMed
                                     );
@@ -62394,6 +62401,7 @@ var ovidImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">.kf.</font>' : '.kf.' :
                                         branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
                                         '' // Unsupported field suffix for Ovid
                                     );
@@ -62566,6 +62574,7 @@ var cochraneImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
                                         '' // Unsupported field suffix for PubMed
                                     );
                             } else {
@@ -62754,6 +62763,7 @@ var embaseImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
                                         branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
                                         '' // Unsupported field suffix for EmBase
                                     );
@@ -63219,6 +63229,7 @@ var psycinfoImport = {
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
+                                        branch.field == 'keyword' ? '.tw' :
                                         branch.field == 'language' ? '.la' :
                                         ''
                                     );
@@ -63365,6 +63376,7 @@ var scopusImport = {
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'keyword' ? 'KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
