@@ -64,9 +64,9 @@ export default {
                         case 'phrase':
                             if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
                                 buffer +=
-                                    'TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
+                                    '(TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
                                     ' OR ' +
-                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ')';
                             } else if (branch.field) {
                                 buffer += _.trimStart(
                                     (

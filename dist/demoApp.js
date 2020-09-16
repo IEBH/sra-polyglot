@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -61220,6 +61224,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -63047,9 +63057,9 @@ var cinahlImport = {
                         case 'phrase':
                             if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
                                 buffer +=
-                                    'TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
+                                    '(TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
                                     ' OR ' +
-                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ')';
                             } else if (branch.field) {
                                 buffer += lodash.trimStart(
                                     (

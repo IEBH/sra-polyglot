@@ -19,7 +19,7 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[tiab]` -> CI `TI term OR AB term2`', ()=> {
-		expect(polyglot.translate('term[tiab]', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term[tiab]', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term[tiab]` -> PY `term.ti,ab`', ()=> {
@@ -55,7 +55,7 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Title/Abstract]` -> CI `TI term OR AB term2`', ()=> {
-		expect(polyglot.translate('term[Title/Abstract]', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term[Title/Abstract]', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term[Title/Abstract]` -> PY `term.ti,ab`', ()=> {
@@ -91,7 +91,7 @@ describe('Translate title + abstract searches (Ovid `term:ti,ab` format) -> *)',
 	});
 
 	it('translate `term:ti,ab` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translate('term:ti,ab', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term:ti,ab', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term:ti,ab` -> PY `term.ti,ab`', ()=> {
@@ -127,7 +127,7 @@ describe('Translate title + abstract searches (Ovid `term.ti,ab` format) -> *)',
 	});
 
 	it('translate `term.ti,ab` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translate('term.ti,ab', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term.ti,ab', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term.ti,ab` -> PY `term.ti,ab`', ()=> {
@@ -163,7 +163,7 @@ describe('Translate title + abstract searches (Ovid `term.tw` format) -> *)', ()
 	});
 
 	it('translate `term.tw.` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translate('term.tw.', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term.tw.', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term.tw.` -> PY `term.ti,ab`', ()=> {
@@ -199,7 +199,7 @@ describe('Translate abstract + title searches (Ovid `term.ab,ti` format) -> *)',
 	});
 
 	it('translate `term.ab,ti` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translate('term.ab,ti', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term.ab,ti', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term.ab,ti` -> PY `term.ti,ab`', ()=> {
@@ -235,7 +235,7 @@ describe('Translate abstract + title searches (Ovid `term.ab,ti.` format) -> *)'
 	});
 
 	it('translate `term.ab,ti.` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translate('term.ab,ti.', 'cinahl')).to.equal('TI term OR AB term');
+		expect(polyglot.translate('term.ab,ti.', 'cinahl')).to.equal('(TI term OR AB term)');
 	});
 
 	it('translate `term.ab,ti.` -> PY `term.ti,ab`', ()=> {
