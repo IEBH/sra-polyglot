@@ -80,6 +80,9 @@ export default {
                         case 'joinNear':
                             buffer += 'NEAR/' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'NEAR/' + (branch.proximity - 1);
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),

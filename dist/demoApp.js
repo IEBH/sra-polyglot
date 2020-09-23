@@ -61874,10 +61874,18 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)?\b/i.exec(q))) {
+        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
             trimLastLeaf();
             if (match[2]) branch.nodes.push({type: 'joinNear', proximity: lodash.toNumber(match[2])});
             else branch.nodes.push({type: 'joinNear', proximity: 1});
+            leaf = undefined;
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (afterWhitespace && (match = /^(next\/|next|adj|w|w\/|pre\/|p\/)(\d+)?\b/i.exec(q))) {
+            trimLastLeaf();
+            if (match[2]) branch.nodes.push({type: 'joinNext', proximity: lodash.toNumber(match[2])});
+            else branch.nodes.push({type: 'joinNext', proximity: 1});
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -62240,6 +62248,7 @@ var pubmedImport = {
                             }
                             break;
                         case 'joinNear':
+                        case 'joinNext':
                         case 'joinAnd':
                             buffer += 'AND';
                             break;
@@ -62418,6 +62427,11 @@ var ovidImport = {
                             buffer += 'ADJ' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>';
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'ADJ';
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>',
@@ -62588,6 +62602,11 @@ var cochraneImport = {
                         case 'joinNear':
                             if (settings.highlighting) buffer += '<font color="purple">';
                             buffer += 'NEAR/' + branch.proximity;
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'NEXT';
                             if (settings.highlighting) buffer += '</font>';
                             break;
                         case 'mesh':
@@ -62780,6 +62799,11 @@ var embaseImport = {
                             buffer += 'NEAR/' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>';
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'NEXT/' + branch.proximity;
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>',
@@ -62911,6 +62935,9 @@ var wosImport = {
                             break;
                         case 'joinNear':
                             buffer += 'NEAR/' + branch.proximity;
+                            break;
+                        case 'joinNext':
+                            buffer += 'NEAR/' + (branch.proximity - 1);
                             break;
                         case 'mesh':
                             if (settings.highlighting) {
@@ -63096,6 +63123,9 @@ var cinahlImport = {
                         case 'joinNear':
                             buffer += 'N' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'W' + branch.proximity;
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
@@ -63245,6 +63275,9 @@ var psycinfoImport = {
                         case 'joinNear':
                             buffer += 'ADJ' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'ADJ';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting),
@@ -63390,6 +63423,9 @@ var scopusImport = {
                             buffer += 'NOT';
                             break;
                         case 'joinNear':
+                            buffer += 'W/' + branch.proximity;
+                            break;
+                        case 'joinNext':
                             buffer += 'W/' + branch.proximity;
                             break;
                         case 'mesh':

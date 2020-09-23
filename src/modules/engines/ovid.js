@@ -118,6 +118,11 @@ export default {
                             buffer += 'ADJ' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>';
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'ADJ';
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>',

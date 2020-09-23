@@ -204,10 +204,18 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)?\b/i.exec(q))) {
+        } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
             trimLastLeaf();
             if (match[2]) branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
             else branch.nodes.push({type: 'joinNear', proximity: 1});
+            leaf = undefined;
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (afterWhitespace && (match = /^(next\/|next|adj|w|w\/|pre\/|p\/)(\d+)?\b/i.exec(q))) {
+            trimLastLeaf();
+            if (match[2]) branch.nodes.push({type: 'joinNext', proximity: _.toNumber(match[2])});
+            else branch.nodes.push({type: 'joinNext', proximity: 1});
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);

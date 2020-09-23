@@ -98,6 +98,9 @@ export default {
                         case 'joinNear':
                             buffer += 'ADJ' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'ADJ';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting),

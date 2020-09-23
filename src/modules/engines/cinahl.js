@@ -102,6 +102,9 @@ export default {
                         case 'joinNear':
                             buffer += 'N' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'W' + branch.proximity;
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',

@@ -68,6 +68,7 @@ export default {
                             }
                             break;
                         case 'joinNear':
+                        case 'joinNext':
                         case 'joinAnd':
                             buffer = {$and: []};
                             break;

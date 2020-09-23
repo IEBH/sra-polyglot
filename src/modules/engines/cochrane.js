@@ -121,6 +121,11 @@ export default {
                             buffer += 'NEAR/' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>'
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">'
+                            buffer += 'NEXT'
+                            if (settings.highlighting) buffer += '</font>'
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
