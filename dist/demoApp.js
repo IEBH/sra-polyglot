@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -61224,12 +61220,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -62233,7 +62223,7 @@ var pubmedImport = {
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[ot]</font>' : '[tw]' :
                                         branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">[la]</font>' : '[la]' :
                                         '' // Unsupported field suffix for PubMed
                                     );
@@ -63076,6 +63066,7 @@ var cinahlImport = {
                                     (
                                         branch.field == 'title' ? 'TI' :
                                         branch.field == 'abstract' ? 'AB' :
+                                        branch.field == 'keyword' ? 'AB' :
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
@@ -63230,7 +63221,7 @@ var psycinfoImport = {
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
-                                        branch.field == 'keyword' ? '.tw' :
+                                        branch.field == 'keyword' ? '.id.' :
                                         branch.field == 'language' ? '.la' :
                                         ''
                                     );
@@ -63377,7 +63368,7 @@ var scopusImport = {
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
-                                    branch.field == 'keyword' ? 'KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'keyword' ? 'AUTHKEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );

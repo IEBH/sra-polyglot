@@ -72,6 +72,7 @@ export default {
                                     (
                                         branch.field == 'title' ? 'TI' :
                                         branch.field == 'abstract' ? 'AB' :
+                                        branch.field == 'keyword' ? 'AB' :
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
