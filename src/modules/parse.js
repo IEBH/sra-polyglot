@@ -280,8 +280,8 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab,kf|ti,kf,ab|ab,ti,kf|ab,kf,ti|kf,ti,ab|kf,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab,kw|ti,kw,ab|ab,ti,kw|ab,kw,ti|kw,ti,ab|kw,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -295,6 +295,20 @@ export const parse = (query, options) => {
             switch (match[1].toLowerCase()) {
                 case 'ti':
                     useLeaf.field = 'title';
+                    break;
+                case 'ti,ab,kf':
+                case 'ti,kf,ab':
+                case 'ab,ti,kf':
+                case 'ab,kf,ti':
+                case 'kf,ti,ab':
+                case 'kf,ab,ti':
+                case 'ti,ab,kw':
+                case 'ti,kw,ab':
+                case 'ab,ti,kw':
+                case 'ab,kw,ti':
+                case 'kw,ti,ab':
+                case 'kw ,ab,ti':
+                    useLeaf.field = 'title+abstract+keyword';
                     break;
                 case 'ab,ti':
                 case 'ti,ab':
@@ -323,8 +337,6 @@ export const parse = (query, options) => {
                     useLeaf.field = 'publicationType';
                     break;
                 case 'kf':
-                    useLeaf.field = 'keyword';
-                    break;
                 case 'kw':
                     useLeaf.field = 'keyword';
                     break;
@@ -342,7 +354,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|tw)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|ot)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -380,7 +392,7 @@ export const parse = (query, options) => {
                 case 'all fields':
                     useLeaf.field = 'allFields'
                     break;
-                case 'tw':
+                case 'ot':
                     useLeaf.field = 'keyword'
                     break;
                 case 'la':

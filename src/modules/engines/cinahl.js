@@ -62,7 +62,7 @@ export default {
                             }
                             break;
                         case 'phrase':
-                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
+                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw'|| branch.field == 'title+abstract+keyword')) {
                                 buffer +=
                                     '(TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
                                     ' OR ' +

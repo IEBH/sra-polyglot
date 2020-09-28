@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -61220,6 +61224,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61950,8 +61960,8 @@ const parse$1 = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab,kf|ti,kf,ab|ab,ti,kf|ab,kf,ti|kf,ti,ab|kf,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab,kw|ti,kw,ab|ab,ti,kw|ab,kw,ti|kw,ti,ab|kw,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -61965,6 +61975,20 @@ const parse$1 = (query, options) => {
             switch (match[1].toLowerCase()) {
                 case 'ti':
                     useLeaf.field = 'title';
+                    break;
+                case 'ti,ab,kf':
+                case 'ti,kf,ab':
+                case 'ab,ti,kf':
+                case 'ab,kf,ti':
+                case 'kf,ti,ab':
+                case 'kf,ab,ti':
+                case 'ti,ab,kw':
+                case 'ti,kw,ab':
+                case 'ab,ti,kw':
+                case 'ab,kw,ti':
+                case 'kw,ti,ab':
+                case 'kw ,ab,ti':
+                    useLeaf.field = 'title+abstract+keyword';
                     break;
                 case 'ab,ti':
                 case 'ti,ab':
@@ -61993,8 +62017,6 @@ const parse$1 = (query, options) => {
                     useLeaf.field = 'publicationType';
                     break;
                 case 'kf':
-                    useLeaf.field = 'keyword';
-                    break;
                 case 'kw':
                     useLeaf.field = 'keyword';
                     break;
@@ -62012,7 +62034,7 @@ const parse$1 = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|tw)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|ot)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
@@ -62050,7 +62072,7 @@ const parse$1 = (query, options) => {
                 case 'all fields':
                     useLeaf.field = 'allFields';
                     break;
-                case 'tw':
+                case 'ot':
                     useLeaf.field = 'keyword';
                     break;
                 case 'la':
@@ -62228,6 +62250,7 @@ var pubmedImport = {
                                         branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
                                         branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
                                         branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
+                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' :
@@ -62398,6 +62421,7 @@ var ovidImport = {
                                         branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
                                         branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
                                         branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
+                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab,kf.</font>' : '.ti,ab,kf.' :
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
@@ -62576,6 +62600,7 @@ var cochraneImport = {
                                         branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
                                         branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
                                         branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
@@ -62770,6 +62795,7 @@ var embaseImport = {
                                         branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
                                         branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
                                         branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
+                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
@@ -63083,7 +63109,7 @@ var cinahlImport = {
                             }
                             break;
                         case 'phrase':
-                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
+                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw'|| branch.field == 'title+abstract+keyword')) {
                                 buffer +=
                                     '(TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
                                     ' OR ' +
@@ -63248,6 +63274,7 @@ var psycinfoImport = {
                                         branch.field == 'title+abstract' ? '.ti,ab' :
                                         branch.field == 'title+abstract+tw' ? '.ti,ab' :
                                         branch.field == 'title+abstract+other' ? '.mp.' :
+                                        branch.field == 'title+abstract+keyword' ? '.ti,ab,id.' :
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
@@ -63398,6 +63425,7 @@ var scopusImport = {
                                     branch.field == 'title+abstract' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'title+abstract+tw' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+keyword' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
                                     branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
