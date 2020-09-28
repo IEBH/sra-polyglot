@@ -1,6 +1,22 @@
 import tools from '../tools.js'
 import _ from 'lodash';
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        '' // Unsupported field suffix for PubMed
+    );
+};
+
 export default {
     id: 'cochrane',
     title: 'Cochrane Library',
@@ -34,18 +50,7 @@ export default {
                             } else if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')' 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -86,20 +91,7 @@ export default {
                                 buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline")
                             } else if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);

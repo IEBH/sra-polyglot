@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -61224,12 +61220,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -62333,6 +62323,23 @@ var pubmedImport = {
     openTerms: 'any search box',
 };
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">.ti,ab,kf.</font>' : '.ti,ab,kf.' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">.kf.</font>' : '.kf.' :
+        field == 'language' ? highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
+        '' // Unsupported field suffix for Ovid
+    )
+};
+
 var ovidImport = {
     id: 'ovid',
     title: 'Ovid Medline / Ovid Embase',
@@ -62367,19 +62374,7 @@ var ovidImport = {
                             if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')'; 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
-                                        '' // Unsupported field suffix for Ovid
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -62414,21 +62409,7 @@ var ovidImport = {
                         case 'phrase':
                             if (branch.field && expand) {
                                 buffer +=
-                                    branch.content +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
-                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab,kf.</font>' : '.ti,ab,kf.' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">.kf.</font>' : '.kf.' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
-                                        '' // Unsupported field suffix for Ovid
-                                    );
+                                    branch.content + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
@@ -62508,6 +62489,22 @@ var ovidImport = {
     openTerms: 'any search box',
 };
 
+const findTranslation$1 = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        '' // Unsupported field suffix for PubMed
+    );
+};
+
 var cochraneImport = {
     id: 'cochrane',
     title: 'Cochrane Library',
@@ -62541,18 +62538,7 @@ var cochraneImport = {
                             } else if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')'; 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    buffer += findTranslation$1(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -62593,20 +62579,7 @@ var cochraneImport = {
                                 buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline");
                             } else if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) + findTranslation$1(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
@@ -62712,6 +62685,23 @@ var cochraneImport = {
     openTerms: 'use search manager box',
 };
 
+const findTranslation$2 = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'language' ? highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
+        '' // Unsupported field suffix for EmBase
+    );
+};
+
 var embaseImport = {
     id: 'embase',
     title: 'Embase',
@@ -62741,19 +62731,7 @@ var embaseImport = {
                             if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')'; 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font' : ':la' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    buffer += findTranslation$2(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -62788,21 +62766,7 @@ var embaseImport = {
                         case 'phrase':
                             if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'embase', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    tools.quotePhrase(branch, 'embase', settings.highlighting) + findTranslation$2(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);

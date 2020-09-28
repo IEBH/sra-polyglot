@@ -1,6 +1,23 @@
 import tools from '../tools.js'
 import _ from 'lodash';
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'language' ? highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
+        '' // Unsupported field suffix for EmBase
+    );
+};
+
 export default {
     id: 'embase',
     title: 'Embase',
@@ -30,19 +47,7 @@ export default {
                             if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')' 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font' : ':la' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
@@ -77,21 +82,7 @@ export default {
                         case 'phrase':
                             if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'embase', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    tools.quotePhrase(branch, 'embase', settings.highlighting) + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
