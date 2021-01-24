@@ -1,6 +1,23 @@
 import tools from '../tools.js'
 import _ from 'lodash';
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">.ti,ab,kf.</font>' : '.ti,ab,kf.' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">.kf.</font>' : '.kf.' :
+        field == 'language' ? highlighting ? '<font color="LightSeaGreen">.lg.</font>' : '.lg.' :
+        '' // Unsupported field suffix for Ovid
+    )
+};
+
 export default {
     id: 'ovid',
     title: 'Ovid Medline / Ovid Embase',
@@ -35,48 +52,42 @@ export default {
                             if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')' 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
-                                        '' // Unsupported field suffix for Ovid
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' ' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
                             if (branch.field && expand) {
                                 buffer +=
-                                    branch.content +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">.ti.</font>' : '.ti.' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ab.</font>' : '.ab.' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">.ti,ab.</font>' : '.ti,ab.' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">.tw.</font>' : '.tw.' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">.mp.</font>' : '.mp.' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">.fs.</font>' : '.fs.' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">.pt.</font>' : '.pt.' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">.nm.</font>' : '.nm.' :
-                                        '' // Unsupported field suffix for Ovid
-                                    )
+                                    branch.content + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
@@ -99,12 +110,25 @@ export default {
                             buffer += 'ADJ' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>';
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'ADJ';
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + branch.content + '/</font>',
                                                                         "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
                             } else {
                                 buffer += (branch.recurse ? 'exp ' : '') + branch.content + '/';
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + (branch.recurse ? 'exp ' : '') + '*' + branch.content + '/</font>',
+                                                                        "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
+                            } else {
+                                buffer += (branch.recurse ? 'exp ' : '') + '*' + branch.content + '/';
                             }
                             break;
                         case 'raw':

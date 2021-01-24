@@ -20,11 +20,11 @@ export default {
         });
 
         // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-        ]);
+        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
+        //     {subject: /\?/g, value: '?'},
+        //     {subject: /\$/g, value: '*'},
+        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+        // ]);
 
         var compileWalker = tree =>
             tree
@@ -44,15 +44,35 @@ export default {
                             buffer += '(' + compileWalker(branch.nodes) + ')';					
                             break;
                             case 'ref':
-                                var node;
-                                for (node in branch.nodes) {
-                                    if (node == 0) {
-                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                if (settings.transposeLines) {
+                                    // Expand each line to show full query
+                                    var node;
+                                    
+                                    for (node in branch.nodes) {
+                                        if (node == 0) {
+                                            // First line is printed as is wrapped in brackets
+                                            buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                        } else {
+                                            // Remaining lines are appended with the condition
+                                            buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                        }	
+                                    }
+                                } else {
+                                    // Only print each line number in format defined by engine 
+                                    // If branch.ref is array then user specified OR/1-4
+                                    if(Array.isArray(branch.ref)) {
+                                        for (node in branch.ref) {
+                                            if (node == 0) {
+                                                buffer += "#" + branch.ref[node]
+                                            } else {
+                                                buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                            }
+                                        }
                                     } else {
-                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                    }	
+                                        buffer += "#" + branch.ref
+                                    }
                                 }
-                            break;
+                                break;
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=
@@ -63,9 +83,12 @@ export default {
                                         branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
                                         branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">[tiab]</font>' : '[tiab]' :
                                         branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
+                                        branch.field == 'title+abstract+keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[tw]</font>' : '[tw]' :
                                         branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">[sh]</font>' : '[sh]' :
                                         branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">[pt]</font>' : '[pt]' :
                                         branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">[nm]</font>' : '[nm]' :
+                                        branch.field == 'keyword' ? settings.highlighting ? '<font color="LightSeaGreen">[ot]</font>' : '[tw]' :
+                                        branch.field == 'language' ? settings.highlighting ? '<font color="LightSeaGreen">[la]</font>' : '[la]' :
                                         '' // Unsupported field suffix for PubMed
                                     );
                             } else {
@@ -81,6 +104,7 @@ export default {
                             }
                             break;
                         case 'joinNear':
+                        case 'joinNext':
                         case 'joinAnd':
                             buffer += 'AND';
                             break;
@@ -96,6 +120,14 @@ export default {
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
                             } else {
                                 buffer += tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']';
                             }
                             break;
                         case 'raw':

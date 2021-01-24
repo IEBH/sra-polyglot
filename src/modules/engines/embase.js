@@ -1,6 +1,23 @@
 import tools from '../tools.js'
 import _ from 'lodash';
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'language' ? highlighting ? '<font color="LightSeaGreen">:la</font>' : ':la' :
+        '' // Unsupported field suffix for EmBase
+    );
+};
+
 export default {
     id: 'embase',
     title: 'Embase',
@@ -18,13 +35,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -37,48 +47,42 @@ export default {
                             if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')' 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "#" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
                             if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'embase', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,de,tn</font>' : ':ti,ab,de,tn' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:lnk</font>' : ':lnk' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:it</font>' : ':it' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:tn</font>' : ':tn' :
-                                        '' // Unsupported field suffix for EmBase
-                                    );
+                                    tools.quotePhrase(branch, 'embase', settings.highlighting) + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'embase', settings.highlighting), branch.offset + branch.content.length);
@@ -101,12 +105,25 @@ export default {
                             buffer += 'NEAR/' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>';
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">';
+                            buffer += 'NEXT/' + branch.proximity;
+                            if (settings.highlighting) buffer += '</font>';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de') + '</font>',
                                                                         "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
                             } else {
                                 buffer += "'" + branch.content + "'/" + (branch.recurse ? 'exp' : 'de');
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + "'" + branch.content + (branch.recurse ? "'/exp/" : "'/de/") + 'mj' + '</font>',
+                                                                        "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
+                            } else {
+                                buffer += "'" + branch.content + (branch.recurse ? "'/exp/" : "'/de/") + 'mj';
                             }
                             break;
                         case 'raw':

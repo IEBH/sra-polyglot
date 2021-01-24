@@ -1,6 +1,22 @@
 import tools from '../tools.js'
 import _ from 'lodash';
 
+const findTranslation = (field, highlighting) => {
+    return (
+        field == 'title' ? highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
+        field == 'abstract' ? highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
+        field == 'title+abstract' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+tw' ? highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
+        field == 'title+abstract+other' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'title+abstract+keyword' ? highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
+        field == 'floatingSubheading' ? highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
+        field == 'publicationType' ? highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
+        field == 'substance' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        field == 'keyword' ? highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
+        '' // Unsupported field suffix for PubMed
+    );
+};
+
 export default {
     id: 'cochrane',
     title: 'Cochrane Library',
@@ -18,13 +34,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-        ]);
-
         var compileWalker = (tree, expand = true) =>
             tree
                 .map((branch, branchIndex) => {
@@ -41,31 +50,36 @@ export default {
                             } else if (branch.field) {
                                 buffer += '(' + compileWalker(branch.nodes, false) + ')' 
                                 if (expand) {
-                                    buffer +=
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    buffer += findTranslation(branch.field, settings.highlighting);
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }   
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "#" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
@@ -73,20 +87,11 @@ export default {
                                 if (settings.highlighting) buffer += '<font color="blue">';
                                 buffer += '[mh /' + tools.quotePhrase(branch, 'cochrane') + ']';
                                 if (settings.highlighting) buffer += '</font>';
+                            } else if (branch.field && branch.field == 'language') {
+                                buffer += tools.createTooltip(branch.content, "Cochrane does not support language searching, remove term from search", "red-underline")
                             } else if (branch.field && expand) {
                                 buffer +=
-                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) +
-                                    (
-                                        branch.field == 'title' ? settings.highlighting ? '<font color="LightSeaGreen">:ti</font>' : ':ti' :
-                                        branch.field == 'abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ab</font>' : ':ab' :
-                                        branch.field == 'title+abstract' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+tw' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab</font>' : ':ti,ab' :
-                                        branch.field == 'title+abstract+other' ? settings.highlighting ? '<font color="LightSeaGreen">:ti,ab,kw</font>' : ':ti,ab,kw' :
-                                        branch.field == 'floatingSubheading' ? settings.highlighting ? '<font color="LightSeaGreen">:fs</font>' : ':fs' :
-                                        branch.field == 'publicationType' ? settings.highlighting ? '<font color="LightSeaGreen">:pt</font>' : ':pt' :
-                                        branch.field == 'substance' ? settings.highlighting ? '<font color="LightSeaGreen">:kw</font>' : ':kw' :
-                                        '' // Unsupported field suffix for PubMed
-                                    );
+                                    tools.quotePhrase(branch, 'cochrane', settings.highlighting) + findTranslation(branch.field, settings.highlighting);
                             } else {
                                 if (settings.highlighting) {
                                     buffer += tools.createPopover(tools.quotePhrase(branch, 'cochrane', settings.highlighting), branch.offset + branch.content.length);
@@ -109,7 +114,20 @@ export default {
                             buffer += 'NEAR/' + branch.proximity;
                             if (settings.highlighting) buffer += '</font>'
                             break;
+                        case 'joinNext':
+                            if (settings.highlighting) buffer += '<font color="purple">'
+                            buffer += 'NEXT'
+                            if (settings.highlighting) buffer += '</font>'
+                            break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']';
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '[mh ' + (branch.recurse ? '' : '^') + tools.quotePhrase(branch, 'cochrane') + ']</font>',
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")

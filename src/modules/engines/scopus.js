@@ -18,13 +18,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '<span msg="NO_OPTIONAL_WILDCARD">?</span>'},
-            {subject: /\$/g, value: '<span msg="NO_OPTIONAL_WILDCARD">*</span>'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">?</span>'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -34,36 +27,61 @@ export default {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "#" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
                             if (branch.field) {
                                 buffer += (
-                                    branch.field == 'title' ? 'TITLE("' + branch.content + '")' :
-                                    branch.field == 'abstract' ? 'ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS("' + branch.content + '")' :
-                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY("' + branch.content + '")' :
-                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS("' + branch.content + '")' :
-                                    branch.field == 'publicationType' ? 'DOCTYPE("' + branch.content + '")' :
-                                    branch.field == 'substance' ? 'CHEM("' + branch.content + '")' :
-                                    '"' + branch.content + '"'
+                                    branch.field == 'title' ? 'TITLE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'abstract' ? 'ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+tw' ? 'TITLE-ABS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+other' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'title+abstract+keyword' ? 'TITLE-ABS-KEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'floatingSubheading' ? 'INDEXTERMS(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'publicationType' ? 'DOCTYPE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'substance' ? 'CHEM(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'keyword' ? 'AUTHKEY(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    branch.field == 'language' ? 'LANGUAGE(' + tools.quotePhrase(branch, 'scopus', settings.highlighting) + ')' :
+                                    tools.quotePhrase(branch, 'scopus', settings.highlighting)
                                 );
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover('"' + branch.content + '"', branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'scopus', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += '"' + branch.content + '"';										
+                                    buffer += tools.quotePhrase(branch, 'scopus', settings.highlighting);										
                                 }
                             }
                             break;
@@ -79,7 +97,18 @@ export default {
                         case 'joinNear':
                             buffer += 'W/' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'W/' + branch.proximity;
+                            break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += 'INDEXTERMS("' + branch.content + '")';
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + 'INDEXTERMS("' + branch.content + '")</font>',
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")

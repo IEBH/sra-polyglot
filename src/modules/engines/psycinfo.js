@@ -18,12 +18,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '?'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -33,38 +27,63 @@ export default {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "#" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
                             if (branch.field) {
                                 buffer +=
-                                    branch.content +
+                                    tools.quotePhrase(branch, 'psycinfo', settings.highlighting) +
                                     (
                                         branch.field == 'title' ? '.ti' :
                                         branch.field == 'abstract' ? '.ab' :
                                         branch.field == 'title+abstract' ? '.ti,ab' :
                                         branch.field == 'title+abstract+tw' ? '.ti,ab' :
                                         branch.field == 'title+abstract+other' ? '.mp.' :
+                                        branch.field == 'title+abstract+keyword' ? '.ti,ab,id.' :
                                         branch.field == 'floatingSubheading' ? '.hw' :
                                         branch.field == 'publicationType' ? '.pt' :
                                         branch.field == 'substance' ? '.hw' :
+                                        branch.field == 'keyword' ? '.id.' :
+                                        branch.field == 'language' ? '.la' :
                                         ''
                                     )
                             } else {
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover(branch.content, branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'psycinfo', settings.highlighting), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += branch.content;
+                                    buffer += tools.quotePhrase(branch, 'psycinfo', settings.highlighting);
                                 }
                             }
                             break;
@@ -80,12 +99,23 @@ export default {
                         case 'joinNear':
                             buffer += 'ADJ' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'ADJ';
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'psycinfo', settings.highlighting),
                                                                         "PsycInfo does not support MeSH terms")
                             } else {
                                 buffer +=  tools.quotePhrase(branch, 'psycinfo');
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + 'exp *' + branch.content + '/</font>',
+                                                                        "Polyglot does not translate subject terms (e.g MeSH to Emtree), this needs to be done manually")
+                            } else {
+                                buffer += 'exp *' + branch.content + '/';
                             }
                             break;
                         case 'raw':

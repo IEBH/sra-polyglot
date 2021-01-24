@@ -18,13 +18,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-            {subject: /\?/g, value: '#'},
-            {subject: /\$/g, value: '*'},
-        ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -34,32 +27,56 @@ export default {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if(settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "S" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' S' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "S" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
-                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw')) {
+                            if (branch.field && (branch.field == 'title+abstract' || branch.field == 'title+abstract+tw'|| branch.field == 'title+abstract+keyword')) {
                                 buffer +=
-                                    'TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
+                                    '(TI ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) +
                                     ' OR ' +
-                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting);
+                                    'AB ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting) + ')';
                             } else if (branch.field) {
                                 buffer += _.trimStart(
                                     (
                                         branch.field == 'title' ? 'TI' :
                                         branch.field == 'abstract' ? 'AB' :
+                                        branch.field == 'keyword' ? 'AB' :
                                         branch.field == 'floatingSubheading' ? 'MW' :
                                         branch.field == 'publicationType' ? 'PT' :
                                         branch.field == 'substance' ? 'MW' :
+                                        branch.field == 'language' ? 'LA' :
                                         ''
                                     )
                                     + ' ' + tools.quotePhrase(branch, 'cinahl', settings.highlighting)
@@ -85,12 +102,23 @@ export default {
                         case 'joinNear':
                             buffer += 'N' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'W' + branch.proximity;
+                            break;
                         case 'mesh':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip('<font color="blue">' + '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
                                                                         "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
                             } else {
                                 buffer += '(MH "' + branch.content + (branch.recurse ? '+' : '') + '")';
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")</font>',
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
+                            } else {
+                                buffer += '(MM "' + branch.content + (branch.recurse ? '+' : '') + '")';
                             }
                             break;
                         case 'raw':

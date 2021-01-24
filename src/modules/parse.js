@@ -114,9 +114,14 @@ export const parse = (query, options) => {
             leaf = branch.nodes;
         } else if (/^\)/.test(q)) {
             lastGroup = branch;
-            branch = branchStack.pop();
+            if(branchStack.length > 0) {
+                branch = branchStack.pop();
+            } else {
+                // TODO: Code for popover message
+                // branch.msg = "Extra closing bracket removed after term"
+            }
             leaf = branch.nodes;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+)\s*-\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q))) { // 1-7/OR
+        } else if (match = /^([0-9]+)\s*[‐\-]\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[1], (match[2]+1)/10), 
@@ -126,7 +131,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*-\s*([0-9]+))/i.exec(q))) { // OR/1-7
+        } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*[‐\-]\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
                 type: 'ref', 
                 ref: _.range(match[2], (match[3]+1)/10), 
@@ -136,7 +141,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q))) { // 1 AND ...
+        } else if (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             branch.nodes.push({
                 type: 'ref', 
                 ref: [match[1]],
@@ -146,9 +151,9 @@ export const parse = (query, options) => {
             offset += match[1].length;
             q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
             cropString = false;
-        } else if ((settings.transposeLines) && (match = /^(AND|OR|NOT) +([0-9]+)/i.exec(q))) { // AND 2...
+        } else if (match = /^((AND|OR|NOT) +([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
-            switch(match[1].toLowerCase()) {
+            switch(match[2].toLowerCase()) {
                 case "and":
                     branch.nodes.push({type: 'joinAnd'});
                     break;
@@ -164,13 +169,13 @@ export const parse = (query, options) => {
 
             branch.nodes.push({
                 type: 'ref', 
-                ref: [match[2]],
+                ref: [match[3]],
                 cond: '',
                 nodes: []
             }); 
-            offset += match[0].length; 
-            q = q.substr(match[0].length); 
-        } else if ((settings.transposeLines) && (match = /^([0-9]+\.?)\s+/i.exec(q))) { // 1 or 1. (Line number)
+            offset += match[1].length; 
+            q = q.substr(match[1].length); 
+        } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
             lineNumber = parseInt(match[1], 10)
             branch.number = lineNumber
             branch.isNumbered = true
@@ -201,7 +206,16 @@ export const parse = (query, options) => {
             cropString = false;
         } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
             trimLastLeaf();
-            branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
+            if (match[2]) branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
+            else branch.nodes.push({type: 'joinNear', proximity: 1});
+            leaf = undefined;
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (afterWhitespace && (match = /^(next\/|next|adj|w|w\/|pre\/|p\/)(\d+)?\b/i.exec(q))) {
+            trimLastLeaf();
+            if (match[2]) branch.nodes.push({type: 'joinNext', proximity: _.toNumber(match[2])});
+            else branch.nodes.push({type: 'joinNext', proximity: 1});
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -213,14 +227,32 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if ((match = /^(exp "(.*?)"\/)\s*/i.exec(q)) || (match = /^(exp (.*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
+        } else if (match = /^\[(majr|mesh major topic)(:NoExp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
+            leaf.type = 'meshMajor';
+            leaf.recurse = ! match[2];
+            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if ((match = /^(exp "([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp ([^*]*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
             branch.nodes.push({type: 'mesh', recurse: true, content: match[2]});
             offset += match[1].length;
             q = q.substr(match[1].length);
             cropString = false;
             afterWhitespace = true;
-        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase' && !/-/.test(leaf.content)) { // Mesh term - Ovid syntax (non-exploded)
-            leaf.type = 'mesh';
+        } else if ((match = /^(exp \*"([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp \*([^*]*?)\/)\s*/i.exec(q))) { // Major Mesh term - Ovid syntax (exploded)
+            branch.nodes.push({type: 'meshMajor', recurse: true, content: match[2]});
+            offset += match[1].length;
+            q = q.substr(match[1].length);
+            cropString = false;
+            afterWhitespace = true;
+        } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
+            // Major Mesh
+            if(leaf.content[0] == "*") {
+                leaf.content = leaf.content.substr(1)
+                leaf.type = 'meshMajor'
+            }
+            else leaf.type = 'mesh';
             leaf.recurse = false;
         } else if (match = /^<(.*?)>/.exec(q)) {
             branch.nodes.push({type: 'template', content: match[1].toLowerCase()});
@@ -234,7 +266,9 @@ export const parse = (query, options) => {
                 leaf = undefined;
             }
             lineNumber += match[0].length;
-            newLine(lineNumber);
+            if (branchStack.length > 0 && branchStack[branchStack.length-1].nodes.every(node => node.type !== "group")) { // If we are currently inside a group don't add a newline group
+                newLine(lineNumber);
+            }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -246,8 +280,8 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         } else if (
             (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm)/i.exec(q)) // term:INITIALS
+            || (match = /^\.(tw|ti,ab,kf|ti,kf,ab|ab,ti,kf|ab,kf,ti|kf,ti,ab|kf,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
+            || (match = /^:(tw|ti,ab,kw|ti,kw,ab|ab,ti,kw|ab,kw,ti|kw,ti,ab|kw,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
         ) { // Field specifier - Ovid syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf = {};
@@ -261,6 +295,20 @@ export const parse = (query, options) => {
             switch (match[1].toLowerCase()) {
                 case 'ti':
                     useLeaf.field = 'title';
+                    break;
+                case 'ti,ab,kf':
+                case 'ti,kf,ab':
+                case 'ab,ti,kf':
+                case 'ab,kf,ti':
+                case 'kf,ti,ab':
+                case 'kf,ab,ti':
+                case 'ti,ab,kw':
+                case 'ti,kw,ab':
+                case 'ab,ti,kw':
+                case 'ab,kw,ti':
+                case 'kw,ti,ab':
+                case 'kw ,ab,ti':
+                    useLeaf.field = 'title+abstract+keyword';
                     break;
                 case 'ab,ti':
                 case 'ti,ab':
@@ -289,17 +337,24 @@ export const parse = (query, options) => {
                     useLeaf.field = 'publicationType';
                     break;
                 case 'kf':
-                    useLeaf.field = 'author';
+                case 'kw':
+                    useLeaf.field = 'keyword';
                     break;
                 case 'xm':
                     useLeaf.type = 'mesh';
                     useLeaf.recurse = true;
                     break;
+                case 'af':
+                    useLeaf.field = 'allFields';
+                    break;
+                case 'lg':
+                    useLeaf.field = 'language';
+                    break;
             }
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|ot)\]/i.exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -333,6 +388,17 @@ export const parse = (query, options) => {
                 case 'pt':
                     useLeaf.field = 'publicationType';
                     break;
+                case 'all':
+                case 'all fields':
+                    useLeaf.field = 'allFields'
+                    break;
+                case 'ot':
+                    useLeaf.field = 'keyword'
+                    break;
+                case 'la':
+                case 'language':
+                    useLeaf.field = 'language'
+                    break;
             }
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -354,7 +420,7 @@ export const parse = (query, options) => {
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
-                } else if (match = /^[^\s\W]+/.exec(q)) { // Slurp the phrase until the space or close brackets
+                } else if (match = /^[^\s:/[.)]+/.exec(q)) { // Slurp the phrase until the space or any character which indicates the end of a phrase
                     leaf = {type: 'phrase', content: match[0], offset: offset};
                     branch.nodes.push(leaf);
                     offset += match[0].length;
@@ -383,27 +449,38 @@ export const parse = (query, options) => {
             var line;
             // Find the matching line
             for (reference in node.ref) {
+                var found = false;
                 for (line in tree.nodes) {
                     // If custom numbering is used only use nodes that are numbered by the user
                     if (userLineNumber) {
                         if (tree.nodes[line].number == node.ref[reference] && tree.nodes[line].isNumbered) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            found = true;
                         }
                     } else {
                         if (tree.nodes[line].number == node.ref[reference]) {
                             // Copy the nodes from that line into the reference nodes
-                            // TODO/FIXME: Wont work for 1-3/OR, need to push instead but then undefined branch error
                             node.nodes.push(Array.from(tree.nodes[line].nodes));
                             // Pop the raw node
                             node.nodes[reference].pop();
-                            break;
+                            found = true;
                         }
                     }	
+                }
+                // Line not found, push error message
+                if (!found) {
+                    node.nodes.push(
+                    [{
+                        type: "phrase", 
+                        content: tools.createTooltip(
+                            "Line " + node.ref[reference] + " not found", 
+                            "Polyglot could not find specified line in the search query", 
+                            "red-underline"
+                        )
+                    }]);
                 }
             }
         });

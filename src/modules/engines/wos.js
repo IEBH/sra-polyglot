@@ -17,14 +17,7 @@ export default {
         var settings = _.defaults(options, {
             replaceWildcards: true,
         });
-
-        // Apply wildcard replacements
-        if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-            {subject: /\?/g, value: '$'},
-            {subject: /\$/g, value: '*'},
-            {subject: /#/g, value: '<span msg="NO_SINGLE_WILDCARD">*</span>'},
-        ]);
-
+        
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -34,20 +27,46 @@ export default {
                             buffer += compileWalker(branch.nodes);
                             break;
                         case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine 
+                                // If branch.ref is array then user specified OR/1-4
+                                if(Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
+                                        if (node == 0) {
+                                            buffer += "#" + branch.ref[node]
+                                        } else {
+                                            buffer += ' ' + branch.cond + ' #' + branch.ref[node]
+                                        }
+                                    }
                                 } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                                    buffer += "#" + branch.ref
+                                }
                             }
                             break;
                         case 'phrase':
-                            buffer += tools.quotePhrase(branch, 'wos', settings.highlighting);
+                            if (branch.field && branch.field == 'language') {
+                                buffer += "LA=" + branch.content;
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'wos', settings.highlighting);
+                            }
                             break;
                         case 'joinAnd':
                             buffer += 'AND';
@@ -61,7 +80,18 @@ export default {
                         case 'joinNear':
                             buffer += 'NEAR/' + branch.proximity;
                             break;
+                        case 'joinNext':
+                            buffer += 'NEAR/' + (branch.proximity - 1);
+                            break;
                         case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),
+                                                                        "Web of Science does not support MeSH terms")
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'wos');
+                            }
+                            break;
+                        case 'meshMajor':
                             if (settings.highlighting) {
                                 buffer += tools.createTooltip(tools.quotePhrase(branch, 'wos', settings.highlighting),
                                                                         "Web of Science does not support MeSH terms")

@@ -55,6 +55,14 @@ a:hover {
 	border-bottom: 1px blue dashed;
 }
 
+.red-underline {
+	border-bottom: 1px red dashed;
+}
+
+.highlight {
+	background-color: #FFFF00;
+}
+
 .tooltip-content {
 	margin-bottom: 10px;
 }
@@ -65,6 +73,15 @@ a:hover {
 
 #checkbox {
 	margin-right: 5px;
+}
+
+.show-example {
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
+
+.push-up {
+	margin-top: -15px;
 }
 
 .tooltip {

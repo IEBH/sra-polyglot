@@ -23,7 +23,7 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> PY `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'psycinfo')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'psycinfo')).to.equal('"term1 term2"');
 	});
 
 	it('translate `"term1 term2"` -> SC `"term1 term2"`', ()=> {
@@ -59,7 +59,7 @@ describe('Translate search phrases (Ovid -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> PY `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'psycinfo')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'psycinfo')).to.equal('"term1 term2"');
 	});
 
 	it('translate `"term1 term2"` -> SC `"term1 term2"`', ()=> {

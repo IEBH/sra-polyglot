@@ -45,13 +45,17 @@ export default {
                             }
                             break;
                         case 'ref':
-                            var node;
-                            for (node in branch.nodes) {
-                                if (node == 0) {
-                                    buffer += '(' + compileWalker(branch.nodes[node]) + ')';
-                                } else {
-                                    buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                }	
+                            if (settings.transposeLines) {
+                                var node;
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }	
+                                }
+                            } else {
+                                buffer += branch.ref
                             }
                             break;
                         case 'phrase':
@@ -64,6 +68,7 @@ export default {
                             }
                             break;
                         case 'joinNear':
+                        case 'joinNext':
                         case 'joinAnd':
                             buffer = {$and: []};
                             break;
@@ -75,6 +80,10 @@ export default {
                             break;
                         case 'mesh':
                             // FIXME: No ability to recurse
+                            buffer[settings.meshField] = {$in: [branch.content]};
+                            break;
+                        case 'meshMajor':
+                            // FIXME: No ability to recurse or meshMajor
                             buffer[settings.meshField] = {$in: [branch.content]};
                             break;
                         case 'raw':
