@@ -135,6 +135,11 @@ export default {
 				}
 			}
 		},
+		translateAll: _.debounce(function() {
+			localStorage.query = this.query;
+			_(polyglot.translateAll(this.query, this.polyglotOptions))
+				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
+		}, 500),
 	},
 	async mounted() {
 		const queryString = window.location.search;
@@ -156,14 +161,11 @@ export default {
 	},
 	watch: {
 		query: function() {
-			localStorage.query = this.query;
-			_(polyglot.translateAll(this.query, this.polyglotOptions))
-				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
+			this.translateAll();
 		},
 		'polyglotOptions.transposeLines': function() {
 			localStorage.transposeLines = this.polyglotOptions.transposeLines;
-			_(polyglot.translateAll(this.query, this.polyglotOptions))
-				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
+			this.translateAll();
 		},
 	},
 };
@@ -245,8 +247,7 @@ export default {
 					</div>
 				</div>
 				<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
-					<v-runtime-template class="preview" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" :template="'<div>' + enginesQuery[engine.id] + '</div>'" ></v-runtime-template>
-					<!-- <pre class="preview" v-html="enginesQuery[engine.id]" v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'"></pre> -->
+					<span v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" v-html="enginesQuery[engine.id]"></span>
 					<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
       				<hr>
 					<!-- MongoDB not included at this stage -->
