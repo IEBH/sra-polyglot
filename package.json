@@ -6,6 +6,7 @@
   "scripts": {
     "serve": "gulp serve",
     "test": "mocha -r esm",
+    "test:v4": "mocha -r esm test/v4",
     "prepare": "babel src --out-dir lib"
   },
   "babel": {
@@ -77,7 +78,8 @@
     "rollup-plugin-vue": "^4.7.2",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10",
-    "vue2-ace-editor": "0.0.13"
+    "vue2-ace-editor": "0.0.13",
+    "xlsx": "^0.16.9"
   },
   "dependencies": {
     "esm": "^3.2.25",

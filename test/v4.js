@@ -1,26 +1,49 @@
-import fs from 'fs';
 import {expect} from 'chai';
 import polyglot from '../src';
+import xlsx from 'xlsx';
 
 /**
-* Actual tests to run
-* @type {array<Object>} A collection of tests extracted from the TSV file
-* @property {string} Explanation Base title of the test set
-* @property {string} [title...] Various 1:M tests of the set
+* Testkit settings
+* @property {string} sheet ID of the sheet to extract the syntax tests from
+* @property {array<string>} omitCols Column headings to ignore when processing the sheet (implies also `rowHeader` as an item)
+* @property {string} rowHeader Which column header should be used as the row description / header
+* @property {string} driverRow Which row to extract the polyglot drivers from (uses the `rowHeader` to match)
+* @property {string} polyglotSources Which columns (using `driverRow`) can be used as polyglot sources
+* @property {number} [dataRowStart] Row offset to start reading data from, if falsy is calculated as driverRow+1
 */
-var tests;
+var settings = {
+	sheet: 'Syntax',
+	omitCols: ['Searching type'],
+	rowHeader: 'Explanation',
+	driverRow: '(Polyglot Driver)',
+	polyglotSources: ['pubmed', 'ovid'],
+	dataRowStart: 0,
+};
 
 
 /**
-* Array of valid source material data should be taken from in a test
-* @type {array<string>} Valid source data field names
+* Collection of row sources to use when running a test
+* This is calculated from the input data
+* @type {array<Object>} Collection of sources extracted from the input data
+* @property {string} id The row ID to use to extract data per line
+* @property {string} driver The polyglot driver to use per line when testing data
 */
-var sources = ['PubMed full', 'PubMed Abbreviation', 'Ovid MEDLINE', 'Ovid MEDLINE 2'];
+var sources;
+
+
+/**
+* Collection of row targets to use when running a test
+* This is calculated from the input data
+* @type {array<Object>} Collection of targets extracted from the input data
+* @property {string} id The row ID to use to extract data per line
+* @property {string} driver The polyglot driver to use per line when targetting data
+*/
+var targets;
 
 
 /**
 * Function to translate data headers into polyglot drivers
-* @param {string} input The TSV header text
+* @param {string} input The XLSX header text
 * @returns {string|null} Either a valid polyglot driver or null if none are found
 */
 var getPolyglotDriver = input => {
@@ -34,59 +57,67 @@ var getPolyglotDriver = input => {
 	}
 };
 
+it('should parse test/data/v4.xlsx', ()=> Promise.resolve()
+	.then(()=> xlsx.readFile(`${__dirname}/data/v4.xlsx`))
+	.then(workbook => {
+		expect(workbook).to.have.nested.property(`Sheets.${settings.sheet}`);
+		return xlsx.utils.sheet_to_json(workbook.Sheets[settings.sheet]);
+	})
+	.then(sheet => { // Extract source / target rows to aim for from the data set
 
-/**
-* Combinational source vs. tests we can test from/to
-* Computed from the test header data + sources
-* @type {array<array>} An tuple of source + destination
-*/
-var targets;
+		// Find the secondary driver row of the sheet
+		var driverRowIndex = sheet.findIndex(row => row[settings.rowHeader] == settings.driverRow); // Find secondary driver row
+		if (driverRowIndex < 0) throw new Error(`Unable to locate driver description row "${settings.driverRow}" in test data`);
+		var driverRow = sheet[driverRowIndex];
 
-it('should parse test/data/fields.tsv', ()=>
-	fs.promises.readFile(`${__dirname}/data/v4.tsv`, 'utf-8')
-		.then(content => content.split(/\n/))
-		.then(lines => {
-			var headers = lines.shift().split(/\t/);
-			// Compute target structure from headers {{{
-			targets = headers
-				.filter(source => sources.includes(source))
-				.map(source =>
-					headers
-						.filter(destination =>
-							destination != 'Explanation'
-							&& destination != source
+		// Calculate sources
+		sources = Object.keys(sheet[0])
+			.filter(header =>
+				![...settings.omitCols, settings.rowHeader].includes(header) // Skip omitted columns
+				&& settings.polyglotSources.includes(driverRow[header]) // We can use this as source data
+			)
+			.map(header => ({
+				id: header,
+				driver: driverRow[header],
+			}));
+
+		// Calculate targets
+		targets = Object.keys(sheet[0])
+			.filter(header => ![...settings.omitCols, settings.rowHeader].includes(header)) // Skip omitted columns
+			.map(header => ({
+				id: header,
+				driver: driverRow[header],
+			}));
+
+		// Return sliced data - removing all header areas
+		if (!settings.dataRowStart) settings.dataRowStart = driverRowIndex + 1;
+		return sheet.slice(settings.dataRowStart); // Remove
+	})
+	.then(sheet => { // Last sanity checks before starting the test cycle
+		expect(sources).to.be.an('array');
+		expect(sources).to.have.length.above(1);
+
+		expect(targets).to.be.an('array');
+		expect(targets).to.have.length.above(1);
+
+		return sheet;
+	})
+	.then(sheet => sheet.forEach((row, rowIndex) =>
+		describe(row[settings.rowHeader], ()=>
+			sources.forEach(source =>
+				targets
+					.filter(target =>
+						source.id != target.id // Skip 1:1 translations
+						&& row[source.id] // Has a source value
+						&& row[target.id] // Has a target value
+					)
+					.forEach(target =>
+						it(`${row[settings.rowHeader]}: ${source.id} -> ${target.id}`, ()=>
+							expect(polyglot.translate(row[source.id], target.driver))
+								.to.equal(row[target.id], `Row: ${rowIndex+settings.dataRowStart+1}`)
 						)
-						.map(destination => [source, destination])
-				)
-				.reduce((t, v) => t.concat(v), []) //~ Flatten
-			// }}}
-
-			// Flatten lines into collection of tests {{{
-			tests = lines
-				.map(line => line // Parse TSV into object
-					.split(/\t/)
-					.map((item, offset) => ({
-						[headers[offset]]: item.replace(/^\s+/, '').replace(/\s+$/, ''), //~ Trim fields + glue into object tuple
-					}))
-					.reduce((total, item) => ({...total, ...item}), {}) //~ Flatten object tuples into one object
-				)
-				.filter(line => line.Explanation) // Remove duds
-			// }}}
-		})
-		.then(()=> {
-			tests.forEach(test => {
-				describe(test.Explanation, ()=> targets
-					.filter(([source, destination]) =>
-						test[source] && test[destination] // Both endpoints must have a testable value
-						&& test[source] != 'null' && test[destination] != 'null' // And they can't be excluded from testing
-						&& getPolyglotDriver(destination) // Should have a valid destination driver
 					)
-					.forEach(([source, destination]) =>
-						it(`${test.Explanation}: ${source} -> ${destination}`, ()=> {
-							expect(polyglot.translate(test[source], getPolyglotDriver(destination))).to.equal(test[destination]);
-						})
-					)
-				);
-			});
-		})
+			)
+		)
+	))
 )
