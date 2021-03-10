@@ -61486,7 +61486,48 @@ var tools = {
         if (global$2.templates[template].engines.default) return polyglot.translate(global$2.templates[template].engines.default, engine);
         return '';
     },
-
+    
+    wildCardCochrane: (text, highlighting) => {
+        let words = text.split(" ");
+        let lastMatch = -1;
+        for (let i = 0; i < words.length; i++) {
+            if (words[i].includes("?")) {
+                // Add quotation marks to previous word/s if the previous word was not a match
+                if (i - 1 > lastMatch) {
+                    words[lastMatch + 1] = highlighting 
+                        ? '<font color="DarkBlue">"' + words[lastMatch + 1]
+                        : '"' + words[lastMatch + 1];
+                    words[i - 1] = highlighting
+                        ? words[i - 1] + '"</font>'
+                        : words[i - 1] + '"';
+                }
+                lastMatch = i;
+                // Check that there is a word before and it is not a wildcard word
+                if (i > 0 && !words[i - 1].includes("?")) {                    
+                    words[i] = highlighting
+                        ? '<font color="purple">NEAR/2</font> ' + words[i]
+                        : 'NEAR/2 ' + words[i];
+                }
+                // Check that there is a word after
+                if (i < words.length -1) {
+                    words[i] = highlighting
+                        ? words[i] + ' <font color="purple">NEAR/2</font>'
+                        : words[i] + " NEAR/2";
+                }
+            }
+        }
+        // Add quotation marks to word/s after the final match
+        if (lastMatch + 1 < words.length) {
+            words[lastMatch + 1] = highlighting
+                ? '<font color="DarkBlue">"' + words[lastMatch + 1]
+                : '"' + words[lastMatch + 1];
+            words[words.length - 1] = highlighting
+                ? words[words.length -1] + '"</font>'
+                : words[words.length -1] + '"';
+        }
+        console.log(words);
+        return `(${words.join(" ")})`;
+    },
 
     /**
     * Determine if a phrase needs to be enclosed within speachmarks and return the result
@@ -61510,10 +61551,13 @@ var tools = {
                 break;
             case "cochrane":
                 text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
+                    // {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
                     {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane", "highlight")},
                     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane", "highlight")},
                 ]);
+                if (space) {
+                    return tools.wildCardCochrane(text, highlighting);
+                }
                 break;
             case "embase":
                 text = tools.multiReplace(text,[
