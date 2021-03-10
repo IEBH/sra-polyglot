@@ -9,13 +9,13 @@ import VRuntimeTemplate from "v-runtime-template";
 import 'brace/theme/chrome';
 import { createToken, getQuery } from "./api.js";
 
+import TemplateRender from "./components/TemplateRedner.vue"
+
 export default {
 	data: ()=> ({
 		global: global,
 		query: '',
 		seeds: '[]',
-		customField: '',
-		replaceAll: false,
 		editorOptions: {
 			showPrintMargin: false,
 			wrap: true,
@@ -37,7 +37,8 @@ export default {
 	components: {
 		editor: ace,
 		jsontree: JsonTree,
-		VRuntimeTemplate
+		VRuntimeTemplate,
+		TemplateRender
 	},
 	methods: {
 		clear() {
@@ -116,24 +117,6 @@ export default {
 				};
 			})(myFile);
 			reader.readAsText(myFile);
-		},
-		replaceFields(field, replace_all, offset) {
-			if (replace_all) {
-				var itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items
-				for (var x in itemsToReplace) {
-					// If original query is surrounded by quotation marks, 2 must be added to offset
-					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;
-					if (/(\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === "undefined") {
-						this.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);
-					}
-				}
-			} else {
-				// If original query is surrounded by quotation marks, 2 must be added to offset
-				offset = (/(\W)/.test(this.query[offset]))? offset : offset+2;
-				if (/(\W)/.test(this.query[offset]) || typeof this.query[offset] === "undefined") {
-					this.query = this.query.slice(0, offset) + field + this.query.slice(offset);
-				}
-			}
 		},
 		translateAll: _.debounce(function() {
 			localStorage.query = this.query;
@@ -247,7 +230,12 @@ export default {
 					</div>
 				</div>
 				<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
-					<span v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" v-html="enginesQuery[engine.id]"></span>
+					<TemplateRender 
+						v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" 
+						:template="`<div>${enginesQuery[engine.id]}</div>`"
+						:query="query"
+						@replaceFields="query = $event"
+					/>
 					<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
       				<hr>
 					<!-- MongoDB not included at this stage -->
