@@ -61476,7 +61476,57 @@ var tools = {
         if (global$2.templates[template].engines.default) return polyglot.translate(global$2.templates[template].engines.default, engine);
         return '';
     },
-
+    
+    /**
+     * Structure the wild cards correctly for cochrane to ensure no wildcards appear inside quotation marks
+     * @param {string} text The text to parse
+     * @param {Boolean} highlighting Whether to assign custom fonts
+     * @return {string} The parsed string seperated by NEAR/2
+     */
+    wildCardCochrane: (text, highlighting) => {
+        const wildcards = ["?", "$", "*"];
+        let words = text.split(" ");
+        let lastMatch = -1;
+        let foundMatch = false;
+        for (let i = 0; i < words.length; i++) {
+            if (wildcards.some(wildcard => words[i].includes(wildcard))) {
+                foundMatch = true;
+                // Add quotation marks to previous word/s if the previous word was not a match
+                if (i - 1 > lastMatch) {
+                    words[lastMatch + 1] = highlighting 
+                        ? '<font color="DarkBlue">"' + words[lastMatch + 1]
+                        : '"' + words[lastMatch + 1];
+                    words[i - 1] = highlighting
+                        ? words[i - 1] + '"</font>'
+                        : words[i - 1] + '"';
+                }
+                lastMatch = i;
+                // Check that there is a word before and it is not a wildcard word
+                if (i > 0 && !wildcards.some(wildcard => words[i - 1].includes(wildcard))) {                    
+                    words[i] = highlighting
+                        ? '<font color="purple">NEAR/2</font> ' + words[i]
+                        : 'NEAR/2 ' + words[i];
+                }
+                // Check that there is a word after
+                if (i < words.length -1) {
+                    words[i] = highlighting
+                        ? words[i] + ' <font color="purple">NEAR/2</font>'
+                        : words[i] + " NEAR/2";
+                }
+            }
+        }
+        // Add quotation marks to word/s after the final match
+        if (lastMatch + 1 < words.length) {
+            words[lastMatch + 1] = highlighting
+                ? '<font color="DarkBlue">"' + words[lastMatch + 1]
+                : '"' + words[lastMatch + 1];
+            words[words.length - 1] = highlighting
+                ? words[words.length -1] + '"</font>'
+                : words[words.length -1] + '"';
+        }
+        console.log(words);
+        return (foundMatch ? `(${words.join(" ")})` : words.join(" "));
+    },
 
     /**
     * Determine if a phrase needs to be enclosed within speachmarks and return the result
@@ -61499,12 +61549,16 @@ var tools = {
                 ]);
                 break;
             case "cochrane":
+                if (space) {
+                    text = tools.wildCardCochrane(text, highlighting);
+                }
                 text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Cochrane", "highlight")},
-                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Cochrane", "highlight")},
-                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cochrane", "highlight")},
+                    {subject: /\$/g, value: tools.createTooltip("?", "No Single Character Wildcard for Cochrane", "highlight")},
+                    // # is a comment and will therefore never be parsed
+                    // {subject: /#/g, value: tools.createTooltip("?", "No Single Character Wildcard for Cochrane", "highlight")},
                 ]);
-                break;
+                // Return text to prevent duplicate quotation marks
+                return text;
             case "embase":
                 text = tools.multiReplace(text,[
                     {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
