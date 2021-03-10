@@ -64344,12 +64344,105 @@ const getQuery = (token) => {
 };
 
 var script$1 = {
+    props: ['template', 'query'],
+	data() {
+		return {
+		    global: global$2,
+			templateRender: null,
+			// Custom properties for field replacing
+			customField: '',
+			replaceAll: false,
+		};
+	},
+	render(h) {
+		if (!this.templateRender) {
+			return h('div', 'loading...');
+		} else { // If template exists, display it
+			return this.templateRender();
+		}
+	},
+	watch: {
+		// Watch template component for changes
+		template:{
+			immediate: true, // Fire watcher on first render
+			handler() {
+				var res = Vue.compile(this.template);
+				this.templateRender = res.render;
+				// staticRenderFns belong into $options, 
+				this.$options.staticRenderFns = [];
+				// clean the cache of static elements
+				// this is a cache with the results from the staticRenderFns
+				this._staticTrees = [];
+				// Fill it with the new staticRenderFns
+				for (var i in res.staticRenderFns) {
+					//staticRenderFns.push(res.staticRenderFns[i]);
+					this.$options.staticRenderFns.push(res.staticRenderFns[i]);
+				}
+			}
+		}
+	},
+	methods: {
+		// Custom method to replace fields
+		replaceFields(field, replace_all, offset) {
+            let newQuery = this.query;
+			if (replace_all) {
+				var itemsToReplace = global$2.variables.no_field_tag.slice(0).reverse(); // Work backwards through items
+				for (var x in itemsToReplace) {
+					// If original query is surrounded by quotation marks, 2 must be added to offset
+					itemsToReplace[x] = (/(\W)/.test(newQuery[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;
+					if (/(\W)/.test(newQuery[itemsToReplace[x]]) || typeof newQuery[itemsToReplace[x]] === "undefined") {
+						newQuery = newQuery.slice(0, itemsToReplace[x]) + field + newQuery.slice(itemsToReplace[x]);
+					}
+				}
+			} else {
+				// If original query is surrounded by quotation marks, 2 must be added to offset
+				offset = (/(\W)/.test(newQuery[offset]))? offset : offset+2;
+				if (/(\W)/.test(newQuery[offset]) || typeof newQuery[offset] === "undefined") {
+					newQuery = newQuery.slice(0, offset) + field + newQuery.slice(offset);
+				}
+            }
+            this.$emit('replaceFields', newQuery);
+		},
+	}  
+};
+
+/* script */
+const __vue_script__$1 = script$1;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$1 = function (inject) {
+    if (!inject) return
+    inject("data-v-d06c99c2_0", { source: "\ndiv[data-v-d06c99c2] {\n   display: inline;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/components/TemplateRedner.vue"],"names":[],"mappings":";AAqEA;GACA,eAAA;AACA","file":"TemplateRedner.vue","sourcesContent":["<script>\nimport Vue from 'vue';\nimport global from '../../src/modules/global.js'\n\nexport default {\n    props: ['template', 'query'],\n\tdata() {\n\t\treturn {\n\t\t    global: global,\n\t\t\ttemplateRender: null,\n\t\t\t// Custom properties for field replacing\n\t\t\tcustomField: '',\n\t\t\treplaceAll: false,\n\t\t};\n\t},\n\trender(h) {\n\t\tif (!this.templateRender) {\n\t\t\treturn h('div', 'loading...');\n\t\t} else { // If template exists, display it\n\t\t\treturn this.templateRender();\n\t\t}\n\t},\n\twatch: {\n\t\t// Watch template component for changes\n\t\ttemplate:{\n\t\t\timmediate: true, // Fire watcher on first render\n\t\t\thandler() {\n\t\t\t\tvar res = Vue.compile(this.template);\n\t\t\t\tthis.templateRender = res.render;\n\t\t\t\t// staticRenderFns belong into $options, \n\t\t\t\tthis.$options.staticRenderFns = []\n\t\t\t\t// clean the cache of static elements\n\t\t\t\t// this is a cache with the results from the staticRenderFns\n\t\t\t\tthis._staticTrees = []\n\t\t\t\t// Fill it with the new staticRenderFns\n\t\t\t\tfor (var i in res.staticRenderFns) {\n\t\t\t\t\t//staticRenderFns.push(res.staticRenderFns[i]);\n\t\t\t\t\tthis.$options.staticRenderFns.push(res.staticRenderFns[i])\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t},\n\tmethods: {\n\t\t// Custom method to replace fields\n\t\treplaceFields(field, replace_all, offset) {\n            let newQuery = this.query\n\t\t\tif (replace_all) {\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\n\t\t\t\tfor (var x in itemsToReplace) {\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(newQuery[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\n\t\t\t\t\tif (/(\\W)/.test(newQuery[itemsToReplace[x]]) || typeof newQuery[itemsToReplace[x]] === \"undefined\") {\n\t\t\t\t\t\tnewQuery = newQuery.slice(0, itemsToReplace[x]) + field + newQuery.slice(itemsToReplace[x]);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\toffset = (/(\\W)/.test(newQuery[offset]))? offset : offset+2;\n\t\t\t\tif (/(\\W)/.test(newQuery[offset]) || typeof newQuery[offset] === \"undefined\") {\n\t\t\t\t\tnewQuery = newQuery.slice(0, offset) + field + newQuery.slice(offset);\n\t\t\t\t}\n            }\n            this.$emit('replaceFields', newQuery);\n\t\t},\n\t}  \n}\n</script>\n\n<style scoped>\ndiv {\n   display: inline; \n}\n</style>"]}, media: undefined });
+
+  };
+  /* scoped */
+  const __vue_scope_id__$1 = "data-v-d06c99c2";
+  /* module identifier */
+  const __vue_module_identifier__$1 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$1 = undefined;
+  /* style inject SSR */
+  
+
+  
+  var TemplateRender = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$1,
+    __vue_script__$1,
+    __vue_scope_id__$1,
+    __vue_is_functional_template__$1,
+    __vue_module_identifier__$1,
+    browser,
+    undefined
+  );
+
+var script$2 = {
 	data: ()=> ({
 		global: global$2,
 		query: '',
 		seeds: '[]',
-		customField: '',
-		replaceAll: false,
 		editorOptions: {
 			showPrintMargin: false,
 			wrap: true,
@@ -64371,7 +64464,8 @@ var script$1 = {
 	components: {
 		editor: vue2AceEditor,
 		jsontree: JsonTree,
-		VRuntimeTemplate
+		VRuntimeTemplate,
+		TemplateRender
 	},
 	methods: {
 		clear() {
@@ -64451,24 +64545,6 @@ var script$1 = {
 			})(myFile);
 			reader.readAsText(myFile);
 		},
-		replaceFields(field, replace_all, offset) {
-			if (replace_all) {
-				var itemsToReplace = global$2.variables.no_field_tag.slice(0).reverse(); // Work backwards through items
-				for (var x in itemsToReplace) {
-					// If original query is surrounded by quotation marks, 2 must be added to offset
-					itemsToReplace[x] = (/(\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;
-					if (/(\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === "undefined") {
-						this.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);
-					}
-				}
-			} else {
-				// If original query is surrounded by quotation marks, 2 must be added to offset
-				offset = (/(\W)/.test(this.query[offset]))? offset : offset+2;
-				if (/(\W)/.test(this.query[offset]) || typeof this.query[offset] === "undefined") {
-					this.query = this.query.slice(0, offset) + field + this.query.slice(offset);
-				}
-			}
-		},
 		translateAll: lodash.debounce(function() {
 			localStorage.query = this.query;
 			lodash(polyglot$2.translateAll(this.query, this.polyglotOptions))
@@ -64505,7 +64581,7 @@ var script$1 = {
 };
 
 /* script */
-const __vue_script__$1 = script$1;
+const __vue_script__$2 = script$2;
 
 /* template */
 var __vue_render__$1 = function() {
@@ -64818,9 +64894,16 @@ var __vue_render__$1 = function() {
                 _vm.enginesQuery[engine.id] &&
                 engine.id != "lexicalTreeJSON" &&
                 engine.id != "mongodb"
-                  ? _c("span", {
-                      domProps: {
-                        innerHTML: _vm._s(_vm.enginesQuery[engine.id])
+                  ? _c("TemplateRender", {
+                      attrs: {
+                        template:
+                          "<div>" + _vm.enginesQuery[engine.id] + "</div>",
+                        query: _vm.query
+                      },
+                      on: {
+                        replaceFields: function($event) {
+                          _vm.query = $event;
+                        }
                       }
                     })
                   : _vm._e(),
@@ -64914,28 +64997,28 @@ var __vue_staticRenderFns__$1 = [
 __vue_render__$1._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__$1 = function (inject) {
+  const __vue_inject_styles__$2 = function (inject) {
     if (!inject) return
-    inject("data-v-11a4320a_0", { source: "\n.text-reader[data-v-11a4320a] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-11a4320a] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-11a4320a]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-11a4320a] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AA0QA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport enginesImport from '../src/modules/engines.js'\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\tcustomField: '',\n\t\treplaceAll: false,\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: enginesImport,\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\treplaceFields(field, replace_all, offset) {\n\t\t\tif (replace_all) {\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\n\t\t\t\tfor (var x in itemsToReplace) {\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(this.query[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\n\t\t\t\t\tif (/(\\W)/.test(this.query[itemsToReplace[x]]) || typeof this.query[itemsToReplace[x]] === \"undefined\") {\n\t\t\t\t\t\tthis.query = this.query.slice(0, itemsToReplace[x]) + field + this.query.slice(itemsToReplace[x]);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\toffset = (/(\\W)/.test(this.query[offset]))? offset : offset+2;\n\t\t\t\tif (/(\\W)/.test(this.query[offset]) || typeof this.query[offset] === \"undefined\") {\n\t\t\t\t\tthis.query = this.query.slice(0, offset) + field + this.query.slice(offset);\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"container\">\n\t\t<div v-on:click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to cite the Polyglot tool\n\t\t</div>\n\t\t<div v-on:click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to access the Polyglot help guide \n\t\t</div>\n\n\t\t<div class=\"row-fluid\">\n\t\t\t<div class=\"card\">\n\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\tYour query\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t<editor\n\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t></editor>\n\t\t\t\t</div>\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n  \t\t</label>\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n  \t\t</label>\n\t\t\n\t\t<hr/>\n\n\t\t<div class=\"accordion panel-group\">\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t{{engine.title}}\n\t\t\t\t\t</a>\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\n\t\t\t\t\t<span v-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" v-html=\"enginesQuery[engine.id]\"></span>\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\n      \t\t\t\t<hr>\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
+    inject("data-v-6ef0889a_0", { source: "\n.text-reader[data-v-6ef0889a] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-6ef0889a] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-6ef0889a]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-6ef0889a] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AA8PA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport enginesImport from '../src/modules/engines.js'\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: enginesImport,\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"container\">\n\t\t<div v-on:click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to cite the Polyglot tool\n\t\t</div>\n\t\t<div v-on:click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to access the Polyglot help guide \n\t\t</div>\n\n\t\t<div class=\"row-fluid\">\n\t\t\t<div class=\"card\">\n\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\tYour query\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t<editor\n\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t></editor>\n\t\t\t\t</div>\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n  \t\t</label>\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n  \t\t</label>\n\t\t\n\t\t<hr/>\n\n\t\t<div class=\"accordion panel-group\">\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t{{engine.title}}\n\t\t\t\t\t</a>\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\n\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\tv-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" \n\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine.id]}</div>`\"\n\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t/>\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\n      \t\t\t\t<hr>\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-11a4320a";
+  const __vue_scope_id__$2 = "data-v-6ef0889a";
   /* module identifier */
-  const __vue_module_identifier__$1 = undefined;
+  const __vue_module_identifier__$2 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$1 = false;
+  const __vue_is_functional_template__$2 = false;
   /* style inject SSR */
   
 
   
   var editor = normalizeComponent_1(
     { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
-    __vue_inject_styles__$1,
-    __vue_script__$1,
-    __vue_scope_id__$1,
-    __vue_is_functional_template__$1,
-    __vue_module_identifier__$1,
+    __vue_inject_styles__$2,
+    __vue_script__$2,
+    __vue_scope_id__$2,
+    __vue_is_functional_template__$2,
+    __vue_module_identifier__$2,
     browser,
     undefined
   );
