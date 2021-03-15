@@ -237,12 +237,6 @@ export default {
 					</div>
 				</div>
 			</div>
-			<div v-on:click="openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')" class="alert alert-info text-center">
-				<div class="pull-left font-xl h1">
-					<i class="fa fa-question-circle push-up"></i>
-				</div>
-				Click here to open user reference guide for Polyglot
-			</div>
 		</div>
 	</div>
 </template>
