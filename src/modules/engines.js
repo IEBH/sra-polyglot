@@ -31,13 +31,13 @@ export default {
     // Ovid Embase {{{
     embaseOvid: { ...ovidImport, title: "Embase (via Ovid)", id: "embaseOvid" },
     // }}}
+    
+    // Embase {{{
+    embase: embaseImport,
+    // }}}
 
     // Cochrane Library {{{
     cochrane: cochraneImport,
-    // }}}
-
-    // Embase {{{
-    embase: embaseImport,
     // }}}
 
     // Web of Science {{{
