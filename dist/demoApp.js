@@ -62758,7 +62758,7 @@ const findTranslation$2 = (field, highlighting) => {
 
 var embaseImport = {
     id: 'embase',
-    title: 'Embase (via Elsavir)',
+    title: 'Embase (via Elsevier)',
     aliases: ['embase', 'e', 'eb'],
 
     /**
