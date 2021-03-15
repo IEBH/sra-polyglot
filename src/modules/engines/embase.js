@@ -20,7 +20,7 @@ const findTranslation = (field, highlighting) => {
 
 export default {
     id: 'embase',
-    title: 'Embase',
+    title: 'Embase (via Elsavir)',
     aliases: ['embase', 'e', 'eb'],
 
     /**

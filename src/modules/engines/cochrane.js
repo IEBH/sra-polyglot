@@ -19,7 +19,7 @@ const findTranslation = (field, highlighting) => {
 
 export default {
     id: 'cochrane',
-    title: 'Cochrane Library',
+    title: 'Cochrane Library (via Wiley)',
     aliases: ['cochrane', 'c', 'cl'],
 
     /**

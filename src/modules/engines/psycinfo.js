@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 export default {
     id: 'psycinfo',
-    title: 'PsycInfo',
+    title: 'PsycINFO (via Ovid)',
     aliases: ['p', 'pi'],
 
     /**

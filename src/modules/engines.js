@@ -25,7 +25,11 @@ export default {
     // }}}
 
     // Ovid Medline {{{
-    ovid: ovidImport,
+    medlineOvid: { ...ovidImport, title: "Medline (via Ovid)", id: "medlineOvid" },
+    // }}}
+
+    // Ovid Embase {{{
+    embaseOvid: { ...ovidImport, title: "Embase (via Ovid)", id: "embaseOvid" },
     // }}}
 
     // Cochrane Library {{{

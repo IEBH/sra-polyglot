@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 export default {
     id: 'cinahl',
-    title: 'CINAHL',
+    title: 'CINAHL (via EBSCO)',
     aliases: ['cinahl', 'ci', 'cnal'],
 
     /**

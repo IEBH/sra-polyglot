@@ -62571,7 +62571,7 @@ const findTranslation$1 = (field, highlighting) => {
 
 var cochraneImport = {
     id: 'cochrane',
-    title: 'Cochrane Library',
+    title: 'Cochrane Library (via Wiley)',
     aliases: ['cochrane', 'c', 'cl'],
 
     /**
@@ -62768,7 +62768,7 @@ const findTranslation$2 = (field, highlighting) => {
 
 var embaseImport = {
     id: 'embase',
-    title: 'Embase',
+    title: 'Embase (via Elsavir)',
     aliases: ['embase', 'e', 'eb'],
 
     /**
@@ -63078,7 +63078,7 @@ var wosImport = {
 
 var cinahlImport = {
     id: 'cinahl',
-    title: 'CINAHL',
+    title: 'CINAHL (via EBSCO)',
     aliases: ['cinahl', 'ci', 'cnal'],
 
     /**
@@ -63234,7 +63234,7 @@ var cinahlImport = {
 
 var psycinfoImport = {
     id: 'psycinfo',
-    title: 'PsycInfo',
+    title: 'PsycINFO (via Ovid)',
     aliases: ['p', 'pi'],
 
     /**
@@ -63555,7 +63555,11 @@ var engines = {
     // }}}
 
     // Ovid Medline {{{
-    ovid: ovidImport,
+    medlineOvid: { ...ovidImport, title: "Medline (via Ovid)", id: "medlineOvid" },
+    // }}}
+
+    // Ovid Embase {{{
+    embaseOvid: { ...ovidImport, title: "Embase (via Ovid)", id: "embaseOvid" },
     // }}}
 
     // Cochrane Library {{{
