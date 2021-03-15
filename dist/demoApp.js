@@ -64646,380 +64646,380 @@ var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c("div", { staticClass: "container" }, [
-    _c(
-      "div",
-      {
-        staticClass: "alert alert-info text-center",
-        on: {
-          click: function($event) {
-            return _vm.openLink("https://www.ncbi.nlm.nih.gov/pubmed/32256231")
-          }
-        }
-      },
-      [_vm._m(0), _vm._v("\n\t\t\tClick here to cite the Polyglot tool\n\t\t")]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "alert alert-info text-center",
-        on: {
-          click: function($event) {
-            return _vm.openLink("http://sr-accelerator.com/#/help/polyglot")
-          }
-        }
-      },
-      [
-        _vm._m(1),
-        _vm._v("\n\t\t\tClick here to access the Polyglot help guide \n\t\t")
-      ]
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "row-fluid" }, [
-      _c("div", { staticClass: "card" }, [
-        _c("div", { staticClass: "card-header" }, [
-          _vm._v("\n\t\t\t\t\tYour query\n\t\t\t\t\t"),
-          _c("div", { staticClass: "pull-right" }, [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.polyglotOptions.transposeLines,
-                  expression: "polyglotOptions.transposeLines"
-                }
-              ],
-              attrs: { type: "checkbox", id: "checkbox" },
-              domProps: {
-                checked: Array.isArray(_vm.polyglotOptions.transposeLines)
-                  ? _vm._i(_vm.polyglotOptions.transposeLines, null) > -1
-                  : _vm.polyglotOptions.transposeLines
-              },
-              on: {
-                change: function($event) {
-                  var $$a = _vm.polyglotOptions.transposeLines,
-                    $$el = $event.target,
-                    $$c = $$el.checked ? true : false;
-                  if (Array.isArray($$a)) {
-                    var $$v = null,
-                      $$i = _vm._i($$a, $$v);
-                    if ($$el.checked) {
-                      $$i < 0 &&
-                        _vm.$set(
-                          _vm.polyglotOptions,
-                          "transposeLines",
-                          $$a.concat([$$v])
-                        );
-                    } else {
-                      $$i > -1 &&
-                        _vm.$set(
-                          _vm.polyglotOptions,
-                          "transposeLines",
-                          $$a.slice(0, $$i).concat($$a.slice($$i + 1))
-                        );
-                    }
-                  } else {
-                    _vm.$set(_vm.polyglotOptions, "transposeLines", $$c);
-                  }
-                }
+  return _c("div", [
+    _c("nav", { staticClass: "navbar navbar-expand-lg navbar-dark bg-dark" }, [
+      _c("a", { staticClass: "navbar-brand", attrs: { href: "#" } }, [
+        _vm._v("Polyglot")
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "ml-auto" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-success",
+            on: {
+              click: function($event) {
+                return _vm.openLink(
+                  "https://www.ncbi.nlm.nih.gov/pubmed/32256231"
+                )
               }
-            }),
-            _vm._v(" "),
-            _c("label", { attrs: { for: "checkbox" } }, [
-              _vm._v("Replace Line References")
-            ]),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "btn btn-sm btn-default",
+            }
+          },
+          [_vm._v("Cite")]
+        ),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-info ml-2",
+            on: {
+              click: function($event) {
+                return _vm.openLink("http://sr-accelerator.com/#/help/polyglot")
+              }
+            }
+          },
+          [_vm._v("Help")]
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "container mt-3" }, [
+      _c("div", { staticClass: "row-fluid" }, [
+        _c("div", { staticClass: "card" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _vm._v("\n\t\t\t\t\tYour query\n\t\t\t\t\t"),
+            _c("div", { staticClass: "pull-right" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.polyglotOptions.transposeLines,
+                    expression: "polyglotOptions.transposeLines"
+                  }
+                ],
+                attrs: { type: "checkbox", id: "checkbox" },
+                domProps: {
+                  checked: Array.isArray(_vm.polyglotOptions.transposeLines)
+                    ? _vm._i(_vm.polyglotOptions.transposeLines, null) > -1
+                    : _vm.polyglotOptions.transposeLines
+                },
                 on: {
-                  click: function($event) {
-                    return _vm.clear()
+                  change: function($event) {
+                    var $$a = _vm.polyglotOptions.transposeLines,
+                      $$el = $event.target,
+                      $$c = $$el.checked ? true : false;
+                    if (Array.isArray($$a)) {
+                      var $$v = null,
+                        $$i = _vm._i($$a, $$v);
+                      if ($$el.checked) {
+                        $$i < 0 &&
+                          _vm.$set(
+                            _vm.polyglotOptions,
+                            "transposeLines",
+                            $$a.concat([$$v])
+                          );
+                      } else {
+                        $$i > -1 &&
+                          _vm.$set(
+                            _vm.polyglotOptions,
+                            "transposeLines",
+                            $$a.slice(0, $$i).concat($$a.slice($$i + 1))
+                          );
+                      }
+                    } else {
+                      _vm.$set(_vm.polyglotOptions, "transposeLines", $$c);
+                    }
                   }
                 }
-              },
-              [
-                _c("i", {
-                  staticClass: "fa fa-eraser",
-                  attrs: { title: "Clear search" }
-                })
-              ]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "btn btn-sm btn-default",
-                on: {
-                  click: function($event) {
-                    return _vm.copyQuery()
+              }),
+              _vm._v(" "),
+              _c("label", { attrs: { for: "checkbox" } }, [
+                _vm._v("Replace Line References")
+              ]),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-sm btn-default",
+                  on: {
+                    click: function($event) {
+                      return _vm.clear()
+                    }
                   }
-                }
-              },
-              [
-                _c("i", {
-                  staticClass: "fa fa-clipboard",
-                  attrs: { title: "Copy to clipboard" }
-                })
-              ]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "btn btn-sm btn-default",
-                on: {
-                  click: function($event) {
-                    return _vm.showExample()
+                },
+                [
+                  _c("i", {
+                    staticClass: "fa fa-eraser",
+                    attrs: { title: "Clear search" }
+                  })
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-sm btn-default",
+                  on: {
+                    click: function($event) {
+                      return _vm.copyQuery()
+                    }
                   }
+                },
+                [
+                  _c("i", {
+                    staticClass: "fa fa-clipboard",
+                    attrs: { title: "Copy to clipboard" }
+                  })
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "btn btn-sm btn-default",
+                  on: {
+                    click: function($event) {
+                      return _vm.showExample()
+                    }
+                  }
+                },
+                [
+                  _c("i", {
+                    staticClass: "fa fa-random",
+                    attrs: { title: "Show a random example" }
+                  })
+                ]
+              ),
+              _vm._v(" "),
+              _c("span", { staticClass: "dropdown" }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass: "dropdown-menu",
+                    attrs: { "aria-labelledby": "dropdownMenuButton" }
+                  },
+                  _vm._l(_vm.global.templates, function(template, key) {
+                    return _c(
+                      "a",
+                      {
+                        key: key,
+                        staticClass: "dropdown-item",
+                        attrs: { href: "#" },
+                        on: {
+                          click: function($event) {
+                            return _vm.insertTemplate(key)
+                          }
+                        }
+                      },
+                      [_vm._v(_vm._s(template.name))]
+                    )
+                  }),
+                  0
+                )
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body p-0" },
+            [
+              _c("editor", {
+                ref: "queryEditor",
+                attrs: {
+                  lang: "polyglot",
+                  theme: "chrome",
+                  width: "100%",
+                  height: "380",
+                  options: _vm.editorOptions
+                },
+                on: { init: _vm.editorInit },
+                model: {
+                  value: _vm.query,
+                  callback: function($$v) {
+                    _vm.query = $$v;
+                  },
+                  expression: "query"
                 }
-              },
-              [
-                _c("i", {
-                  staticClass: "fa fa-random",
-                  attrs: { title: "Show a random example" }
-                })
-              ]
-            ),
-            _vm._v(" "),
-            _c("span", { staticClass: "dropdown" }, [
-              _vm._m(2),
+              })
+            ],
+            1
+          ),
+          _vm._v(" "),
+          !_vm.query
+            ? _c(
+                "div",
+                {
+                  staticClass: "card-footer text-center",
+                  on: {
+                    click: function($event) {
+                      return _vm.showExample()
+                    }
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t"
+                  ),
+                  _c("span", { staticClass: "text-muted" }, [
+                    _vm._v("(or click here to see an example)")
+                  ])
+                ]
+              )
+            : _vm._e()
+        ])
+      ]),
+      _vm._v(" "),
+      _c("label", { staticClass: "text-reader" }, [
+        _c(
+          "span",
+          {
+            staticClass: "select-button",
+            on: { click: _vm.openSearchRefiner }
+          },
+          [_vm._v("Open Query in SearchRefiner")]
+        )
+      ]),
+      _vm._v(" "),
+      _c("label", { staticClass: "text-reader" }, [
+        _c("span", { staticClass: "select-button" }, [
+          _vm._v("Import Search From .txt File")
+        ]),
+        _vm._v(" "),
+        _c("input", {
+          attrs: { type: "file" },
+          on: { change: _vm.loadTextFromFile }
+        })
+      ]),
+      _vm._v(" "),
+      _c("hr"),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "accordion panel-group" },
+        _vm._l(_vm.engines, function(engine) {
+          return _c(
+            "div",
+            {
+              key: engine.id,
+              staticClass: "card",
+              attrs: { id: "customcard" }
+            },
+            [
+              _c(
+                "div",
+                {
+                  staticClass: "card-header",
+                  on: {
+                    click: function($event) {
+                      return _vm.toggleExpandEngine(engine)
+                    }
+                  }
+                },
+                [
+                  _c("a", { staticClass: "accordion-toggle collapsed" }, [
+                    _c("i", {
+                      staticClass: "fa fa-fw",
+                      class: _vm.enginesExpanded[engine.id]
+                        ? "fa-chevron-down"
+                        : "fa-chevron-right"
+                    }),
+                    _vm._v(
+                      "\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t"
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "pull-right" }, [
+                    engine.id != "lexicalTreeJSON"
+                      ? _c(
+                          "a",
+                          {
+                            staticClass: "btn btn-sm btn-default",
+                            on: {
+                              click: function($event) {
+                                $event.stopPropagation();
+                                return _vm.copyContent(engine.id)
+                              }
+                            }
+                          },
+                          [
+                            _c("i", {
+                              staticClass: "fa fa-clipboard",
+                              attrs: { title: "Copy to clipboard" }
+                            })
+                          ]
+                        )
+                      : _vm._e()
+                  ])
+                ]
+              ),
               _vm._v(" "),
               _c(
                 "div",
                 {
-                  staticClass: "dropdown-menu",
-                  attrs: { "aria-labelledby": "dropdownMenuButton" }
+                  staticClass: "card-body collapse",
+                  class: _vm.enginesExpanded[engine.id] && "show"
                 },
-                _vm._l(_vm.global.templates, function(template, key) {
-                  return _c(
-                    "a",
-                    {
-                      key: key,
-                      staticClass: "dropdown-item",
-                      attrs: { href: "#" },
-                      on: {
-                        click: function($event) {
-                          return _vm.insertTemplate(key)
-                        }
-                      }
-                    },
-                    [_vm._v(_vm._s(template.name))]
-                  )
-                }),
-                0
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "card-body p-0" },
-          [
-            _c("editor", {
-              ref: "queryEditor",
-              attrs: {
-                lang: "polyglot",
-                theme: "chrome",
-                width: "100%",
-                height: "380",
-                options: _vm.editorOptions
-              },
-              on: { init: _vm.editorInit },
-              model: {
-                value: _vm.query,
-                callback: function($$v) {
-                  _vm.query = $$v;
-                },
-                expression: "query"
-              }
-            })
-          ],
-          1
-        ),
-        _vm._v(" "),
-        !_vm.query
-          ? _c(
-              "div",
-              {
-                staticClass: "card-footer text-center",
-                on: {
-                  click: function($event) {
-                    return _vm.showExample()
-                  }
-                }
-              },
-              [
-                _vm._v(
-                  "\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t"
-                ),
-                _c("span", { staticClass: "text-muted" }, [
-                  _vm._v("(or click here to see an example)")
-                ])
-              ]
-            )
-          : _vm._e()
-      ])
-    ]),
-    _vm._v(" "),
-    _c("label", { staticClass: "text-reader" }, [
-      _c(
-        "span",
-        { staticClass: "select-button", on: { click: _vm.openSearchRefiner } },
-        [_vm._v("Open Query in SearchRefiner")]
-      )
-    ]),
-    _vm._v(" "),
-    _c("label", { staticClass: "text-reader" }, [
-      _c("span", { staticClass: "select-button" }, [
-        _vm._v("Import Search From .txt File")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        attrs: { type: "file" },
-        on: { change: _vm.loadTextFromFile }
-      })
-    ]),
-    _vm._v(" "),
-    _c("hr"),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "accordion panel-group" },
-      _vm._l(_vm.engines, function(engine) {
-        return _c(
-          "div",
-          { key: engine.id, staticClass: "card", attrs: { id: "customcard" } },
-          [
-            _c(
-              "div",
-              {
-                staticClass: "card-header",
-                on: {
-                  click: function($event) {
-                    return _vm.toggleExpandEngine(engine)
-                  }
-                }
-              },
-              [
-                _c("a", { staticClass: "accordion-toggle collapsed" }, [
-                  _c("i", {
-                    staticClass: "fa fa-fw",
-                    class: _vm.enginesExpanded[engine.id]
-                      ? "fa-chevron-down"
-                      : "fa-chevron-right"
-                  }),
-                  _vm._v(
-                    "\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t"
-                  )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "pull-right" }, [
-                  engine.id != "lexicalTreeJSON"
-                    ? _c(
-                        "a",
-                        {
-                          staticClass: "btn btn-sm btn-default",
-                          on: {
-                            click: function($event) {
-                              $event.stopPropagation();
-                              return _vm.copyContent(engine.id)
-                            }
-                          }
+                [
+                  _vm.enginesQuery[engine.id] &&
+                  engine.id != "lexicalTreeJSON" &&
+                  engine.id != "mongodb"
+                    ? _c("TemplateRender", {
+                        attrs: {
+                          template:
+                            "<div>" + _vm.enginesQuery[engine.id] + "</div>",
+                          query: _vm.query
                         },
-                        [
-                          _c("i", {
-                            staticClass: "fa fa-clipboard",
-                            attrs: { title: "Copy to clipboard" }
-                          })
-                        ]
-                      )
-                    : _vm._e()
-                ])
-              ]
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticClass: "card-body collapse",
-                class: _vm.enginesExpanded[engine.id] && "show"
-              },
-              [
-                _vm.enginesQuery[engine.id] &&
-                engine.id != "lexicalTreeJSON" &&
-                engine.id != "mongodb"
-                  ? _c("TemplateRender", {
-                      attrs: {
-                        template:
-                          "<div>" + _vm.enginesQuery[engine.id] + "</div>",
-                        query: _vm.query
-                      },
-                      on: {
-                        replaceFields: function($event) {
-                          _vm.query = $event;
+                        on: {
+                          replaceFields: function($event) {
+                            _vm.query = $event;
+                          }
                         }
-                      }
-                    })
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
-                  ? _c("jsontree", {
-                      attrs: { data: _vm.enginesQuery[engine.id] }
-                    })
-                  : _vm._e(),
-                _vm._v(" "),
-                _c("hr")
-              ],
-              1
-            )
-          ]
-        )
-      }),
-      0
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "alert alert-info text-center",
-        on: {
-          click: function($event) {
-            return _vm.openLink(
-              "https://github.com/IEBH/sra-polyglot/blob/master/README.md"
-            )
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
+                    ? _c("jsontree", {
+                        attrs: { data: _vm.enginesQuery[engine.id] }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("hr")
+                ],
+                1
+              )
+            ]
+          )
+        }),
+        0
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "alert alert-info text-center",
+          on: {
+            click: function($event) {
+              return _vm.openLink(
+                "https://github.com/IEBH/sra-polyglot/blob/master/README.md"
+              )
+            }
           }
-        }
-      },
-      [
-        _vm._m(3),
-        _vm._v(
-          "\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t"
-        )
-      ]
-    )
+        },
+        [
+          _vm._m(1),
+          _vm._v(
+            "\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t"
+          )
+        ]
+      )
+    ])
   ])
 };
 var __vue_staticRenderFns__$1 = [
-  function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "pull-left font-xl h1" }, [
-      _c("i", { staticClass: "fa fa-question-circle push-up" })
-    ])
-  },
-  function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "pull-left font-xl h1" }, [
-      _c("i", { staticClass: "fa fa-question-circle push-up" })
-    ])
-  },
   function() {
     var _vm = this;
     var _h = _vm.$createElement;
@@ -65057,11 +65057,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$2 = function (inject) {
     if (!inject) return
-    inject("data-v-6ef0889a_0", { source: "\n.text-reader[data-v-6ef0889a] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-6ef0889a] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-6ef0889a]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-6ef0889a] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AA8PA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport enginesImport from '../src/modules/engines.js'\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: enginesImport,\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"container\">\n\t\t<div v-on:click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to cite the Polyglot tool\n\t\t</div>\n\t\t<div v-on:click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to access the Polyglot help guide \n\t\t</div>\n\n\t\t<div class=\"row-fluid\">\n\t\t\t<div class=\"card\">\n\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\tYour query\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t<editor\n\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t></editor>\n\t\t\t\t</div>\n\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n  \t\t</label>\n\t\t<label class=\"text-reader\">\n\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n  \t\t</label>\n\t\t\n\t\t<hr/>\n\n\t\t<div class=\"accordion panel-group\">\n\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\n\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t{{engine.title}}\n\t\t\t\t\t</a>\n\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\n\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\tv-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" \n\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine.id]}</div>`\"\n\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t/>\n\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\n      \t\t\t\t<hr>\n\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\n\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t</div>\n\t\t\tClick here to open user reference guide for Polyglot\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
+    inject("data-v-70d9b11e_0", { source: "\n.text-reader[data-v-70d9b11e] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-70d9b11e] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-70d9b11e]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-70d9b11e] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AA0PA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport enginesImport from '../src/modules/engines.js'\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: enginesImport,\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div>\n\t\t<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\n\t\t\t<a class=\"navbar-brand\" href=\"#\">Polyglot</a>\n\t\t\t<div class=\"ml-auto\">\n\t\t\t\t<button class=\"btn btn-success\" @click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\">Cite</button>\n\t\t\t\t<button class=\"btn btn-info ml-2\" @click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\">Help</button>\n\t\t\t</div>\n\t\t</nav>\n\t\t<div class=\"container mt-3\">\n\t\t\t<div class=\"row-fluid\">\n\t\t\t\t<div class=\"card\">\n\t\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\t\tYour query\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t\t<editor\n\t\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t\t></editor>\n\t\t\t\t\t</div>\n\t\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n\t\t\t</label>\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n\t\t\t</label>\n\t\t\t\n\t\t\t<hr/>\n\n\t\t\t<div class=\"accordion panel-group\">\n\t\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\n\t\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t\t{{engine.title}}\n\t\t\t\t\t\t</a>\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\n\t\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\t\tv-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" \n\t\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine.id]}</div>`\"\n\t\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\n\t\t\t\t\t\t<hr>\n\t\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div v-on:click=\"openLink('https://github.com/IEBH/sra-polyglot/blob/master/README.md')\" class=\"alert alert-info text-center\">\n\t\t\t\t<div class=\"pull-left font-xl h1\">\n\t\t\t\t\t<i class=\"fa fa-question-circle push-up\"></i>\n\t\t\t\t</div>\n\t\t\t\tClick here to open user reference guide for Polyglot\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$2 = "data-v-6ef0889a";
+  const __vue_scope_id__$2 = "data-v-70d9b11e";
   /* module identifier */
   const __vue_module_identifier__$2 = undefined;
   /* functional template */
