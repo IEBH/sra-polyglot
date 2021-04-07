@@ -61395,7 +61395,7 @@ var global$2 = {
 * Collection of utility functions to apply common behaviour to a compiled tree
 * @var {Object}
 */
-var tools = {
+const tools = {
     /**
     * Visit the given node types within a deeply nested tree and run a function
     * This function may mutate the input tree depending on the actions of the callbacks
