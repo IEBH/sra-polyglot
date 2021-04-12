@@ -5,8 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "serve": "gulp",
-    "test": "mocha -r esm",
-    "test:v4": "mocha -r esm test/v4",
+    "test": "mocha -r esm test/v4",
+    "test:old": "mocha -r esm './test/**/!(v4).js'",
+    "test:all": "mocha -r esm",
     "prepare": "babel src --out-dir lib"
   },
   "babel": {
