@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 import polyglot from '../src';
-describe('Translate field groups (Ovid -> CINAHL)', ()=> {
+describe('Translate field groups (medlineOvid -> CINAHL)', ()=> {
 
 	it('translate `(term1).tw.` -> CI `(TI term1 OR AB term1)`', ()=> {
 		expect(polyglot.translate('(term1).tw.', 'cinahl')).to.equal('((TI term1 OR AB term1))');

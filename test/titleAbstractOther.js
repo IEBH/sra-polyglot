@@ -7,7 +7,7 @@ describe('Translate title + abstract + other searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[tw]` -> OV `term.mp.`', ()=> {
-		expect(polyglot.translate('term[tw]', 'ovid')).to.equal('term.mp.');
+		expect(polyglot.translate('term[tw]', 'medlineOvid')).to.equal('term.mp.');
 	});
 
 	it('translate `term[tw]` -> CO `term:ti,ab,kw`', ()=> {
@@ -36,14 +36,14 @@ describe('Translate title + abstract + other searches (PubMed -> *)', ()=> {
 
 });
 
-describe('Translate title + abstract + other searches (Ovid -> *)', ()=> {
+describe('Translate title + abstract + other searches (medlineOvid -> *)', ()=> {
 
 	it('translate `term.mp.` -> PM `term[tw]`', ()=> {
 		expect(polyglot.translate('term.mp.', 'pubmed')).to.equal('term[tw]');
 	});
 
 	it('translate `term.mp.` -> OV `term.mp.`', ()=> {
-		expect(polyglot.translate('term.mp.', 'ovid')).to.equal('term.mp.');
+		expect(polyglot.translate('term.mp.', 'medlineOvid')).to.equal('term.mp.');
 	});
 
 	it('translate `term.mp.` -> CO `term:ti,ab,kw`', ()=> {
@@ -72,14 +72,14 @@ describe('Translate title + abstract + other searches (Ovid -> *)', ()=> {
 
 });
 
-describe('Translate title + abstract + other searches, with automated gunk (Ovid -> *)', ()=> {
+describe('Translate title + abstract + other searches, with automated gunk (medlineOvid -> *)', ()=> {
 
 	it('translate `term.mp. [...]` -> PM `term[tw]`', ()=> {
 		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'pubmed')).to.equal('term[tw]');
 	});
 
 	it('translate `term.mp. [...]` -> OV `term.mp.`', ()=> {
-		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'ovid')).to.equal('term.mp.');
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'medlineOvid')).to.equal('term.mp.');
 	});
 
 	it('translate `term.mp. [...]` -> CO `term:ti,ab,kw`', ()=> {

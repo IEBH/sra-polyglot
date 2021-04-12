@@ -7,7 +7,7 @@ describe('Translate floating subheading searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[sh]` -> OV `term.fs`', ()=> {
-		expect(polyglot.translate('term[sh]', 'ovid')).to.equal('term.fs.');
+		expect(polyglot.translate('term[sh]', 'medlineOvid')).to.equal('term.fs.');
 	});
 
 	it('translate `term[sh]` -> CO `[mh /term]`', ()=> {
@@ -36,14 +36,14 @@ describe('Translate floating subheading searches (PubMed -> *)', ()=> {
 
 });
 
-describe('Translate floating subheading searches (Ovid -> *)', ()=> {
+describe('Translate floating subheading searches (medlineOvid -> *)', ()=> {
 
 	it('translate `term:fs` -> PM `term[sh]`', ()=> {
 		expect(polyglot.translate('term:fs', 'pubmed')).to.equal('term[sh]');
 	});
 
 	it('translate `term:fs` -> OV `term.fs`', ()=> {
-		expect(polyglot.translate('term:fs', 'ovid')).to.equal('term.fs.');
+		expect(polyglot.translate('term:fs', 'medlineOvid')).to.equal('term.fs.');
 	});
 
 	it('translate `term:fs` -> CO `[mh /term]`', ()=> {

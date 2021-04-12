@@ -7,7 +7,7 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> OV `term1 term2`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'ovid')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'medlineOvid')).to.equal('term1 term2');
 	});
 
 	it('translate `"term1 term2"` -> CO `"term1 term2"`', ()=> {
@@ -36,14 +36,14 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 
 });
 
-describe('Translate search phrases (Ovid -> *)', ()=> {
+describe('Translate search phrases (medlineOvid -> *)', ()=> {
 
 	it('translate `"term1 term2"` -> PM `"term1 term2"`', ()=> {
 		expect(polyglot.translate('"term1 term2"', 'pubmed')).to.equal('"term1 term2"');
 	});
 
 	it('translate `"term1 term2"` -> OV `term1 term2`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'ovid')).to.equal('term1 term2');
+		expect(polyglot.translate('"term1 term2"', 'medlineOvid')).to.equal('term1 term2');
 	});
 
 	it('translate `"term1 term2"` -> CO `"term1 term2"`', ()=> {

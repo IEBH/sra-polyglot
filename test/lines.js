@@ -15,7 +15,7 @@ describe.skip('Line numbers', ()=> {
 
 		// All engines should act the same so don't bother to break them up into different tests
 		expect(polyglot.translate(input, 'pubmed')).to.equal(output);
-		expect(polyglot.translate(input, 'ovid')).to.equal(output);
+		expect(polyglot.translate(input, 'medlineOvid')).to.equal(output);
 		expect(polyglot.translate(input, 'cochrane')).to.equal(output);
 		expect(polyglot.translate(input, 'embase')).to.equal(output);
 		expect(polyglot.translate(input, 'cinahl')).to.equal(output);
@@ -45,7 +45,7 @@ describe('Line expression expansion', ()=> {
 	});
 
 	it('translate line expansion format -> OV', ()=> {
-		expect(polyglot.translate(input, 'ovid')).to.equal(
+		expect(polyglot.translate(input, 'medlineOvid')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
 			'Baz OR<br/>' +

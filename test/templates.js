@@ -7,8 +7,8 @@ describe('Translate the meta template `<engine>`', ()=> {
 		expect(polyglot.translate('<engine>', 'pubmed')).to.equal('pubmed');
 	});
 
-	it('translate `<engine>` -> OV `ovid`', ()=> {
-		expect(polyglot.translate('<engine>', 'ovid')).to.equal('ovid');
+	it('translate `<engine>` -> OV `medlineOvid`', ()=> {
+		expect(polyglot.translate('<engine>', 'medlineOvid')).to.equal('ovid');
 	});
 
 	it('translate `<engine>` -> CO `cochrane`', ()=> {
@@ -45,7 +45,7 @@ describe('Translate the meta template `<rct filter>`', ()=> {
 	});
 
 	it('translate `<RCT Filter>` -> OV', ()=> {
-		expect(polyglot.translate('<RCT Filter>', 'ovid')).to.equal('((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)');
+		expect(polyglot.translate('<RCT Filter>', 'medlineOvid')).to.equal('((randomized controlled trial or controlled clinical trial).pt. or randomized.ab. or randomised.ab. or placebo.ab. or drug therapy.fs. or randomly.ab. or trial.ab. or groups.ab.) not (exp animals/ not humans.sh.)');
 	});
 
 	it('translate `<RCT Filter>` -> CO', ()=> {
@@ -82,7 +82,7 @@ describe('Translate the meta template `<sr filter>`', ()=> {
 	});
 
 	it.skip('translate `<SR Filter>` -> OV', ()=> {
-		expect(polyglot.translate('<SR Filter>', 'ovid')).to.equal('Medline.tw. OR Pubmed.tw. OR (systematic.tw. AND review.tw.) OR meta-analysis.pt. OR CDSR.jn.');
+		expect(polyglot.translate('<SR Filter>', 'medlineOvid')).to.equal('Medline.tw. OR Pubmed.tw. OR (systematic.tw. AND review.tw.) OR meta-analysis.pt. OR CDSR.jn.');
 	});
 
 	it('translate `<SR Filter>` -> CO', ()=> {

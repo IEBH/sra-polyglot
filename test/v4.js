@@ -16,7 +16,7 @@ var settings = {
 	omitCols: ['Searching type'],
 	rowHeader: 'Explanation',
 	driverRow: '(Polyglot Driver)',
-	polyglotSources: ['pubmed', 'ovid'],
+	polyglotSources: ['pubmed', 'medlineOvid'],
 	dataRowStart: 0,
 };
 
@@ -48,7 +48,7 @@ var targets;
 */
 var getPolyglotDriver = input => {
 	var found;
-	if (found = /^(?<prefix>cinahl|cochrane|embase|psycinfo|pubmed|ovid|wos)/i.exec(input)) { // Use simple prefix
+	if (found = /^(?<prefix>cinahl|cochrane|embase|psycinfo|pubmed|medlineOvid|wos)/i.exec(input)) { // Use simple prefix
 		return found.groups.prefix.toLowerCase();
 	} else if (/^web of science/.test(input)) {
 		return 'wos';

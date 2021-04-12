@@ -7,7 +7,7 @@ describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 	});
 
 	it('translate `term*` -> OV `term*`', ()=> {
-		expect(polyglot.translate('term*', 'ovid')).to.equal('term*');
+		expect(polyglot.translate('term*', 'medlineOvid')).to.equal('term*');
 	});
 
 	it('translate `term*` -> CO `term*`', ()=> {
@@ -43,11 +43,11 @@ describe('Translate wildcards searches (single character "#" style)', ()=> {
 	});
 
 	it('translate `term#` -> OV `term#`', ()=> {
-		expect(polyglot.translate('term#', 'ovid')).to.equal('term#');
+		expect(polyglot.translate('term#', 'medlineOvid')).to.equal('term#');
 	});
 
-	it('translate `term#` -> CO `term*`', ()=> {
-		expect(polyglot.translate('term#', 'cochrane')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for Cochrane\'">*</span>');
+	it('translate `term#` -> CO `term#`', ()=> {
+		expect(polyglot.translate('term#', 'cochrane')).to.equal('term#');
 	});
 
 	it('translate `term#` -> EM `term*`', ()=> {
@@ -79,11 +79,11 @@ describe('Translate wildcards searches (single character PubMed "?" style)', ()=
 	});
 
 	it('translate `term?` -> OV `term?`', ()=> {
-		expect(polyglot.translate('term?', 'ovid')).to.equal('term?');
+		expect(polyglot.translate('term?', 'medlineOvid')).to.equal('term?');
 	});
 
 	it('translate `term?` -> CO `term?`', ()=> {
-		expect(polyglot.translate('term?', 'cochrane')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Cochrane\'">?</span>');
+		expect(polyglot.translate('term?', 'cochrane')).to.equal('term?');
 	});
 
 	it('translate `term?` -> EM `term?`', ()=> {
@@ -108,18 +108,18 @@ describe('Translate wildcards searches (single character PubMed "?" style)', ()=
 
 });
 
-describe('Translate wildcards searches (single character Ovid "$" style)', ()=> {
+describe('Translate wildcards searches (single character medlineOvid "$" style)', ()=> {
 
 	it('translate `term$` -> PM `term*`', ()=> {
 		expect(polyglot.translate('term$', 'pubmed')).to.equal('term*');
 	});
 
 	it('translate `term$` -> OV `term$`', ()=> {
-		expect(polyglot.translate('term$', 'ovid')).to.equal('term$');
+		expect(polyglot.translate('term$', 'medlineOvid')).to.equal('term$');
 	});
 
-	it('translate `term$` -> CO `term*`', ()=> {
-		expect(polyglot.translate('term$', 'cochrane')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Cochrane\'">*</span>');
+	it('translate `term$` -> CO `term?`', ()=> {
+		expect(polyglot.translate('term$', 'cochrane')).to.equal('term<span class="highlight" v-tooltip="\'No Single Character Wildcard for Cochrane\'">?</span>');
 	});
 
 	it('translate `term$` -> EM `term*`', ()=> {

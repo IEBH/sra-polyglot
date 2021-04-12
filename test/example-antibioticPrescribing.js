@@ -210,8 +210,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Ovid format', ()=> {
-		expect(polyglot.translate(example.query, 'ovid', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into medlineOvid format', ()=> {
+		expect(polyglot.translate(example.query, 'medlineOvid', {groupLines: true, html: false})).to.equal(
 			'(exp Primary Health Care/ OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
 			'AND\n\n' +
 			'(exp Treatment Failure/ OR Treatment failure OR Treatment failures)\n\n' +

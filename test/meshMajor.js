@@ -7,7 +7,7 @@ describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Majr]` -> OV `exp *term/`', ()=> {
-		expect(polyglot.translate('term[Majr]', 'ovid')).to.equal('exp *term/');
+		expect(polyglot.translate('term[Majr]', 'medlineOvid')).to.equal('exp *term/');
 	});
 
 	it('translate `term[Majr]` -> CO `[mh term]`', ()=> {
@@ -43,7 +43,7 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `term[MeSH Major Topic]` -> OV `exp *term/`', ()=> {
-		expect(polyglot.translate('term[MeSH Major Topic]', 'ovid')).to.equal('exp *term/');
+		expect(polyglot.translate('term[MeSH Major Topic]', 'medlineOvid')).to.equal('exp *term/');
 	});
 
 	it('translate `term[MeSH Major Topic]` -> CO `[mh term]`', ()=> {
@@ -72,14 +72,14 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 
 });
 
-describe('Translate Translate MeSH major terms (Ovid -> *)', ()=> {
+describe('Translate Translate MeSH major terms (medlineOvid -> *)', ()=> {
 
 	it('translate `exp *term/` -> PM `term[Majr]`', ()=> {
 		expect(polyglot.translate('exp *term/', 'pubmed')).to.equal('term[Majr]');
 	});
 
 	it('translate `exp *term/` -> OV `exp *term/`', ()=> {
-		expect(polyglot.translate('exp *term/', 'ovid')).to.equal('exp *term/');
+		expect(polyglot.translate('exp *term/', 'medlineOvid')).to.equal('exp *term/');
 	});
 
 	it('translate `termexp *term/` -> CO `[mh term]`', ()=> {
