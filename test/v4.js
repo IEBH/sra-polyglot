@@ -48,9 +48,11 @@ var targets;
 */
 var getPolyglotDriver = input => {
 	var found;
-	if (found = /^(?<prefix>cinahl|cochrane|embase|psycinfo|pubmed|medlineOvid|wos)/i.exec(input)) { // Use simple prefix
+	if (found = /^(?<prefix>cinahl|cochrane|embase|psycinfo|pubmed|wos|scopus)/i.exec(input)) { // Use simple prefix
 		return found.groups.prefix.toLowerCase();
-	} else if (/^web of science/.test(input)) {
+	} else if (/^ovid/i.test(input)) {
+		return 'medlineOvid';
+	} else if (/^web of science/i.test(input)) {
 		return 'wos';
 	} else {
 		return null;
@@ -78,7 +80,7 @@ it('should parse test/data/v4.xlsx', ()=> Promise.resolve()
 			)
 			.map(header => ({
 				id: header,
-				driver: driverRow[header],
+				driver: getPolyglotDriver(header),
 			}));
 
 		// Calculate targets
@@ -86,7 +88,7 @@ it('should parse test/data/v4.xlsx', ()=> Promise.resolve()
 			.filter(header => ![...settings.omitCols, settings.rowHeader].includes(header)) // Skip omitted columns
 			.map(header => ({
 				id: header,
-				driver: driverRow[header],
+				driver: getPolyglotDriver(header),
 			}));
 
 		// Return sliced data - removing all header areas
