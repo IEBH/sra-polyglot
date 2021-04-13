@@ -63454,7 +63454,7 @@ var scopusImport = {
 *
 * @var {array}
 */
-var engines = {
+var enginesImport = {
     // PubMed {{{
     pubmed: pubmedImport,
     // }}}
@@ -63513,6 +63513,164 @@ var engines = {
     // }}}
 };
 
+// Replace below string when updating with value in data/engineObject.json
+var engineObject = JSON.parse(`{"PubMed abbreviation":{"Text word":"[tw]","Abstract":"[ab]","Author":"[au]","Conflict of interest":"[cois]","Date of publication":"[DP]","Language":"[LA]","Title/abstract search":"[tiab]","Title search":"[ti]","Keyword Field (.kf.)":"[ot]","Title, abstract, keyword (.ti,ab,kf.)":"[tw]","Affiliation":"[AD]","Article identifier":"[AID]","Author IDs, such as ORCiD":"[AUID]","Book citation field":"[BOOK]","Entry Date, NLM internal Date Completed":"[DCOM]","Corporate author":"[CN]","The date that the citation record was first created":"[CRDT]","ER/RN numbers":"[RN]","Editors for book or chapter citation":"[ED]","Date the entry was added to PubMed":"[EDAT]","First personal author name in a citation":"[1AU]","Full authors name":"[FAU]","Full investigators name":"[FIR]","Grant and financial support numbers":"[GR]","Names of principal investigator(s) or collaborators":"[IR]","ISBN for book or chapter":"[ISBN]","Journal issue numbers":"[IP]","Journal title, abbreviation or ISSN":"[TA]","Last author's name in citation":"[LASTAU]","DOI or publisher ID for online articles":"[LID]","date the citation was indexed with MeSH Terms":"[MHDR]","A completed citation's most recent update":"[LR]","NLM ID for journal":"[JID]","The first number the article appears on":"[PG]","Retrieves results where the name is the subject, rather than author":"[PS]","Substances known to have a pharmacological action":"[PA]","Journals country of publication":"[PL]","PubMed indentifier":"[PMID]","Type of material the article represents, e.g. clinical trial":"[PT]","Publisher name, for NCBI BookShelf citations":"[PUBN]","Secondary source databanks and accession numbers, e.g., GenBank, GEO, PubChem, ClinicalTrials.gov, ISRCTN":"[SI]","The Journal Subset (SB) field identifies the subset for MEDLINE records from certain journal lists or records on specialized topics":"[SB]","Includes chemical, protocol, disease or organism terms":"[NM]","Includes all words and numbers in the title, abstract, other abstract, MeSH terms, MeSH Subheadings, Publication Types, Substance Names, Personal Name as Subject, Corporate Author, Secondary Source, Comment/Correction Notes, and Other Terms (see Other Term [OT] above) typically non-MeSH subject terms (keywords)":"[TW]","Words and numbers of original, non-English title":"[TT]","Volume number of published article":"[VI]"},"Ovid MEDLINE":{"Text word":".mp.","Abstract":".ab","Author":".au.","Conflict of interest":".ci.","Date of publication":".dp.","Language":".lg.","Title/abstract search":".tw.","Title search":".ti.","Keyword Field (.kf.)":".kf.","Title, abstract, keyword (.ti,ab,kf.)":".ti,ab,kf.","Affiliation":".in.","Article identifier":".id.","Author IDs, such as ORCiD":".ai.","Book citation field":".bt.","Entry Date, NLM internal Date Completed":".ed.","Corporate author":".au.","The date that the citation record was first created":".dt.","ER/RN numbers":".rn.","Editors for book or chapter citation":".fe.","Date the entry was added to PubMed":".ed.","First personal author name in a citation":".pa.","Full authors name":".fa.","Full investigators name":".ir.","Grant and financial support numbers":".no.","Names of principal investigator(s) or collaborators":".au.","ISBN for book or chapter":".ib.","Journal issue numbers":".ip.","Journal title, abbreviation or ISSN":".jn,jw,nj,ib.","Last author's name in citation":".id.","DOI or publisher ID for online articles":".do.","date the citation was indexed with MeSH Terms":".da.","NLM ID for journal":".jc.","The first number the article appears on":".pg.","Retrieves results where the name is the subject, rather than author":".pn.","Substances known to have a pharmacological action":".mp.","Journals country of publication":".pl.","PubMed indentifier":".ui.","Type of material the article represents, e.g. clinical trial":".pt.","Publisher name, for NCBI BookShelf citations":".mp.","Secondary source databanks and accession numbers, e.g., GenBank, GEO, PubChem, ClinicalTrials.gov, ISRCTN":".si.","The Journal Subset (SB) field identifies the subset for MEDLINE records from certain journal lists or records on specialized topics":".sb.","Includes chemical, protocol, disease or organism terms":".ps,px,rs,rx,os,ox.","Includes all words and numbers in the title, abstract, other abstract, MeSH terms, MeSH Subheadings, Publication Types, Substance Names, Personal Name as Subject, Corporate Author, Secondary Source, Comment/Correction Notes, and Other Terms (see Other Term [OT] above) typically non-MeSH subject terms (keywords)":".tw.","Words and numbers of original, non-English title":".ot.","Volume number of published article":".vo."}}`);
+
+var generic = {
+    id: 'pubmed',
+    title: 'PubMed',
+    aliases: ['pubmed', 'p', 'pm', 'pubm'],
+
+    /**
+    * Compile a tree structure to PubMed output
+    * @param {array} tree The parsed tree to process
+    * @param {Object} [options] Optional options to use when compiling
+    * @param {boolean} [options.replaceWildcards=true] Whether to replace wildcard characters (usually '?' or '$') within phrase nodes with this engines equivelent
+    * @return {string} The compiled output
+    */
+    compile: (tree, options, engine) => {
+        var settings = lodash.defaults(options, {
+            replaceWildcards: true,
+        });
+
+        // Apply wildcard replacements
+        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
+        //     {subject: /\?/g, value: '?'},
+        //     {subject: /\$/g, value: '*'},
+        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
+        // ]);
+
+        var compileWalker = tree =>
+            tree
+                .map((branch, branchIndex) => {
+                    var buffer = '';
+                    switch (branch.type) {
+                        case 'line':
+                            buffer += compileWalker(branch.nodes);
+                            break;
+                        case 'group':
+                            if (branch.field) {
+                                // If the group has a filter decorate all its children with that field
+                                // This mutates the tree for the other engine compile functions
+                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                            } 
+                            buffer += '(' + compileWalker(branch.nodes) + ')';					
+                            break;
+                            case 'ref':
+                                if (settings.transposeLines) {
+                                    // Expand each line to show full query
+                                    var node;
+                                    
+                                    for (node in branch.nodes) {
+                                        if (node == 0) {
+                                            // First line is printed as is wrapped in brackets
+                                            buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                        } else {
+                                            // Remaining lines are appended with the condition
+                                            buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                        }	
+                                    }
+                                } else {
+                                    // Only print each line number in format defined by engine 
+                                    // If branch.ref is array then user specified OR/1-4
+                                    if(Array.isArray(branch.ref)) {
+                                        for (node in branch.ref) {
+                                            if (node == 0) {
+                                                buffer += "#" + branch.ref[node];
+                                            } else {
+                                                buffer += ' ' + branch.cond + ' #' + branch.ref[node];
+                                            }
+                                        }
+                                    } else {
+                                        buffer += "#" + branch.ref;
+                                    }
+                                }
+                                break;
+                        case 'phrase':
+                            if (branch.field) {
+                                let fieldCode = engineObject[engine][branch.field];
+                                buffer +=
+                                    tools.quotePhrase(branch, 'pubmed', settings.highlighting) +
+                                    (
+                                        settings.highlighting ? `<font color="LightSeaGreen">${fieldCode}</font>` : '[ti]'
+                                        // TODO: Unsupported field suffix for PubMed
+                                    );
+                            } else {
+                                // If no field tag exists create popover with ability to replace field tag
+                                if (global$2.variables.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {
+                                    global$2.variables.no_field_tag.push(branch.offset + branch.content.length);
+                                }
+                                if (settings.highlighting) {
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
+                                } else {
+                                    buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                }
+                            }
+                            break;
+                        case 'joinNear':
+                        case 'joinNext':
+                        case 'joinAnd':
+                            buffer += 'AND';
+                            break;
+                        case 'joinOr':
+                            buffer += 'OR';
+                            break;
+                        case 'joinNot':
+                            buffer += 'NOT';
+                            break;
+                        case 'mesh':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
+                            }
+                            break;
+                        case 'meshMajor':
+                            if (settings.highlighting) {
+                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
+                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually");
+                            } else {
+                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']';
+                            }
+                            break;
+                        case 'raw':
+                            buffer += branch.content;
+                            break;
+                        case 'template':
+                            buffer += tools.resolveTemplate(branch.content, 'pubmed');
+                            break;
+                        case 'comment':
+                            // Do nothing
+                            break;
+                        default:
+                            throw new Error('Unsupported object tree type: ' + branch.type);
+                    }
+
+                    return buffer
+                        // Add spacing provided... its not a raw buffer or the last entity within the structure
+                        + (
+                            branch.type == 'raw' || // Its not a raw node
+                            branch.type == 'line' || // Its not a line node
+                            branchIndex == tree.length-1 || // Its not the last item in the sequence
+                            (branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
+                            ? '' : ' '
+                        );
+                })
+                .join('');
+        return compileWalker(tree);
+    },
+    open: query => ({
+        method: 'GET',
+        action: 'https://www.ncbi.nlm.nih.gov/pubmed',
+        fields: {
+            term: query,
+        },
+    }),
+    openTerms: 'any search box',
+};
+
 let polyglot$1;
 var polyglot$2 = polyglot$1 = {
 
@@ -63555,6 +63713,17 @@ var polyglot$2 = polyglot$1 = {
 				output[id] = polyglot$1.postProcess(engine.compile(lodash.cloneDeep(tree), options), options);
 			}
 		});
+		return output;
+	},
+
+	translateAllGeneric: (query, options) => {
+		var output = {};
+		var tree = parse$1(query, options);
+		const engines = Object.keys(engineObject);
+		engines.forEach(engine => {
+			output[engine] = polyglot$1.postProcess(generic.compile(lodash.cloneDeep(tree), options, engine), options);
+		});
+		output['lexicalTreeJSON'] = enginesImport.lexicalTreeJSON.compile(tree, options), options;
 		return output;
 	},
 
@@ -64420,7 +64589,7 @@ var script$2 = {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		engines: engines,
+		engines: [...Object.keys(engineObject), 'lexicalTreeJSON'],
 		enginesExpanded: {},
 		enginesQuery: {},
 		polyglotOptions: {
@@ -64502,7 +64671,7 @@ var script$2 = {
 			editor.insert("<" + key + ">");
 		},
 		toggleExpandEngine(engine) {
-			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
+			this.$set(this.enginesExpanded, engine, !this.enginesExpanded[engine]);
 		},
 		editorInit() { // Ace editor settings
 			window.ace.config.set('modePath', 'syntax/ace');
@@ -64520,7 +64689,7 @@ var script$2 = {
 		},
 		translateAll: lodash.debounce(function() {
 			localStorage.query = this.query;
-			lodash(polyglot$2.translateAll(this.query, this.polyglotOptions))
+			lodash(polyglot$2.translateAllGeneric(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query));
 		}, 500),
 	},
@@ -64818,11 +64987,7 @@ var __vue_render__$1 = function() {
         _vm._l(_vm.engines, function(engine) {
           return _c(
             "div",
-            {
-              key: engine.id,
-              staticClass: "card",
-              attrs: { id: "customcard" }
-            },
+            { key: engine, staticClass: "card", attrs: { id: "customcard" } },
             [
               _c(
                 "div",
@@ -64838,17 +65003,15 @@ var __vue_render__$1 = function() {
                   _c("a", { staticClass: "accordion-toggle collapsed" }, [
                     _c("i", {
                       staticClass: "fa fa-fw",
-                      class: _vm.enginesExpanded[engine.id]
+                      class: _vm.enginesExpanded[engine]
                         ? "fa-chevron-down"
                         : "fa-chevron-right"
                     }),
-                    _vm._v(
-                      "\n\t\t\t\t\t\t" + _vm._s(engine.title) + "\n\t\t\t\t\t"
-                    )
+                    _vm._v("\n\t\t\t\t\t\t" + _vm._s(engine) + "\n\t\t\t\t\t")
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "pull-right" }, [
-                    engine.id != "lexicalTreeJSON"
+                    engine != "lexicalTreeJSON"
                       ? _c(
                           "a",
                           {
@@ -64856,7 +65019,7 @@ var __vue_render__$1 = function() {
                             on: {
                               click: function($event) {
                                 $event.stopPropagation();
-                                return _vm.copyContent(engine.id)
+                                return _vm.copyContent(engine)
                               }
                             }
                           },
@@ -64876,16 +65039,16 @@ var __vue_render__$1 = function() {
                 "div",
                 {
                   staticClass: "card-body collapse",
-                  class: _vm.enginesExpanded[engine.id] && "show"
+                  class: _vm.enginesExpanded[engine] && "show"
                 },
                 [
-                  _vm.enginesQuery[engine.id] &&
-                  engine.id != "lexicalTreeJSON" &&
-                  engine.id != "mongodb"
+                  _vm.enginesQuery[engine] &&
+                  engine != "lexicalTreeJSON" &&
+                  engine != "mongodb"
                     ? _c("TemplateRender", {
                         attrs: {
                           template:
-                            "<div>" + _vm.enginesQuery[engine.id] + "</div>",
+                            "<div>" + _vm.enginesQuery[engine] + "</div>",
                           query: _vm.query
                         },
                         on: {
@@ -64896,9 +65059,9 @@ var __vue_render__$1 = function() {
                       })
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.enginesQuery[engine.id] && engine.id == "lexicalTreeJSON"
+                  _vm.enginesQuery[engine] && engine == "lexicalTreeJSON"
                     ? _c("jsontree", {
-                        attrs: { data: _vm.enginesQuery[engine.id] }
+                        attrs: { data: _vm.enginesQuery[engine] }
                       })
                     : _vm._e(),
                   _vm._v(" "),
@@ -64944,11 +65107,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$2 = function (inject) {
     if (!inject) return
-    inject("data-v-f0f1bf86_0", { source: "\n.text-reader[data-v-f0f1bf86] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-f0f1bf86] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-f0f1bf86]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-f0f1bf86] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AAoPA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport enginesImport from '../src/modules/engines.js'\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: enginesImport,\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAll(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div>\n\t\t<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\n\t\t\t<a class=\"navbar-brand\" href=\"#\">Polyglot</a>\n\t\t\t<div class=\"ml-auto\">\n\t\t\t\t<button class=\"btn btn-success\" @click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\">Cite</button>\n\t\t\t\t<button class=\"btn btn-info ml-2\" @click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\">Help</button>\n\t\t\t</div>\n\t\t</nav>\n\t\t<div class=\"container mt-3\">\n\t\t\t<div class=\"row-fluid\">\n\t\t\t\t<div class=\"card\">\n\t\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\t\tYour query\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t\t<editor\n\t\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t\t></editor>\n\t\t\t\t\t</div>\n\t\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n\t\t\t</label>\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n\t\t\t</label>\n\t\t\t\n\t\t\t<hr/>\n\n\t\t\t<div class=\"accordion panel-group\">\n\t\t\t\t<div v-for=\"engine in engines\" :key=\"engine.id\" class=\"card\" id=\"customcard\">\n\t\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t\t{{engine.title}}\n\t\t\t\t\t\t</a>\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<a v-if=\"engine.id != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine.id)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine.id] && 'show'\">\n\t\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\t\tv-if=\"enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'\" \n\t\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine.id]}</div>`\"\n\t\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine.id]\"></jsontree>\n\t\t\t\t\t\t<hr>\n\t\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
+    inject("data-v-254cc916_0", { source: "\n.text-reader[data-v-254cc916] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-254cc916] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-254cc916]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-254cc916] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AAqPA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nimport engineObject from \"../src/data/engineObject.js\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: [...Object.keys(engineObject), 'lexicalTreeJSON'],\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine, !this.enginesExpanded[engine]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAllGeneric(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div>\n\t\t<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\n\t\t\t<a class=\"navbar-brand\" href=\"#\">Polyglot</a>\n\t\t\t<div class=\"ml-auto\">\n\t\t\t\t<button class=\"btn btn-success\" @click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\">Cite</button>\n\t\t\t\t<button class=\"btn btn-info ml-2\" @click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\">Help</button>\n\t\t\t</div>\n\t\t</nav>\n\t\t<div class=\"container mt-3\">\n\t\t\t<div class=\"row-fluid\">\n\t\t\t\t<div class=\"card\">\n\t\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\t\tYour query\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t\t<editor\n\t\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t\t></editor>\n\t\t\t\t\t</div>\n\t\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n\t\t\t</label>\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n\t\t\t</label>\n\t\t\t\n\t\t\t<hr/>\n\n\t\t\t<div class=\"accordion panel-group\">\n\t\t\t\t<div v-for=\"engine in engines\" :key=\"engine\" class=\"card\" id=\"customcard\">\n\t\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t\t{{engine}}\n\t\t\t\t\t\t</a>\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<a v-if=\"engine != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine] && 'show'\">\n\t\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\t\tv-if=\"enginesQuery[engine] && engine != 'lexicalTreeJSON' && engine != 'mongodb'\" \n\t\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine]}</div>`\"\n\t\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine] && engine == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine]\"></jsontree>\n\t\t\t\t\t\t<hr>\n\t\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$2 = "data-v-f0f1bf86";
+  const __vue_scope_id__$2 = "data-v-254cc916";
   /* module identifier */
   const __vue_module_identifier__$2 = undefined;
   /* functional template */

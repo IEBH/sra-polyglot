@@ -1,6 +1,8 @@
 import { parse } from './modules/parse.js';
-import engines from './modules/engines.js';
+import enginesImport from './modules/engines.js';
 import _ from 'lodash';
+import generic from './modules/engines/generic.js'
+import engineObject from "./data/engineObject.js"
 
 let polyglot;
 export default polyglot = {
@@ -44,6 +46,17 @@ export default polyglot = {
 				output[id] = polyglot.postProcess(engine.compile(_.cloneDeep(tree), options), options)
 			}
 		});
+		return output;
+	},
+
+	translateAllGeneric: (query, options) => {
+		var output = {};
+		var tree = parse(query, options);
+		const engines = Object.keys(engineObject);
+		engines.forEach(engine => {
+			output[engine] = polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
+		})
+		output['lexicalTreeJSON'] = enginesImport.lexicalTreeJSON.compile(tree, options), options
 		return output;
 	},
 

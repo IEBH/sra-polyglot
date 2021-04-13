@@ -2,7 +2,6 @@
 import _ from 'lodash';
 import ace from 'vue2-ace-editor';
 import polyglot from '../src';
-import enginesImport from '../src/modules/engines.js'
 import global from '../src/modules/global.js'
 import JsonTree from 'vue-json-tree'
 import VRuntimeTemplate from "v-runtime-template";
@@ -10,6 +9,8 @@ import 'brace/theme/chrome';
 import { createToken, getQuery } from "./api.js";
 
 import TemplateRender from "./components/TemplateRedner.vue"
+
+import engineObject from "../src/data/engineObject.js"
 
 export default {
 	data: ()=> ({
@@ -20,7 +21,7 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		engines: enginesImport,
+		engines: [...Object.keys(engineObject), 'lexicalTreeJSON'],
 		enginesExpanded: {},
 		enginesQuery: {},
 		polyglotOptions: {
@@ -102,7 +103,7 @@ export default {
 			editor.insert("<" + key + ">");
 		},
 		toggleExpandEngine(engine) {
-			this.$set(this.enginesExpanded, engine.id, !this.enginesExpanded[engine.id]);
+			this.$set(this.enginesExpanded, engine, !this.enginesExpanded[engine]);
 		},
 		editorInit() { // Ace editor settings
 			window.ace.config.set('modePath', 'syntax/ace');
@@ -120,7 +121,7 @@ export default {
 		},
 		translateAll: _.debounce(function() {
 			localStorage.query = this.query;
-			_(polyglot.translateAll(this.query, this.polyglotOptions))
+			_(polyglot.translateAllGeneric(this.query, this.polyglotOptions))
 				.forEach((query, key) => this.$set(this.enginesQuery, key, query))
 		}, 500),
 	},
@@ -214,24 +215,24 @@ export default {
 			<hr/>
 
 			<div class="accordion panel-group">
-				<div v-for="engine in engines" :key="engine.id" class="card" id="customcard">
+				<div v-for="engine in engines" :key="engine" class="card" id="customcard">
 					<div class="card-header" v-on:click="toggleExpandEngine(engine)" >
 						<a class="accordion-toggle collapsed">
-							<i class="fa fa-fw" :class="enginesExpanded[engine.id] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-							{{engine.title}}
+							<i class="fa fa-fw" :class="enginesExpanded[engine] ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+							{{engine}}
 						</a>
 						<div class="pull-right">
-							<a v-if="engine.id != 'lexicalTreeJSON'" v-on:click.stop="copyContent(engine.id)" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
+							<a v-if="engine != 'lexicalTreeJSON'" v-on:click.stop="copyContent(engine)" class="btn btn-sm btn-default"><i class="fa fa-clipboard" title="Copy to clipboard"></i></a>
 						</div>
 					</div>
-					<div class="card-body collapse" :class="enginesExpanded[engine.id] && 'show'">
+					<div class="card-body collapse" :class="enginesExpanded[engine] && 'show'">
 						<TemplateRender 
-							v-if="enginesQuery[engine.id] && engine.id != 'lexicalTreeJSON' && engine.id != 'mongodb'" 
-							:template="`<div>${enginesQuery[engine.id]}</div>`"
+							v-if="enginesQuery[engine] && engine != 'lexicalTreeJSON' && engine != 'mongodb'" 
+							:template="`<div>${enginesQuery[engine]}</div>`"
 							:query="query"
 							@replaceFields="query = $event"
 						/>
-						<jsontree v-if="enginesQuery[engine.id] && engine.id == 'lexicalTreeJSON'" :data="enginesQuery[engine.id]"></jsontree>
+						<jsontree v-if="enginesQuery[engine] && engine == 'lexicalTreeJSON'" :data="enginesQuery[engine]"></jsontree>
 						<hr>
 						<!-- MongoDB not included at this stage -->
 					</div>
