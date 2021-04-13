@@ -1,4 +1,12 @@
+import * as fs from 'fs';
 import xlsxToParseMap from "./modules/xlsxToParseMap.js"
+
+function mapToJson(map) {
+	return JSON.stringify([...map]);
+}
+function jsonToMap(jsonStr) {
+	return new Map(JSON.parse(jsonStr));
+}
 
 /**
 * Testkit settings
@@ -14,4 +22,6 @@ var settings = {
 	dataRowStart: 1,
 };
 
-xlsxToParseMap(settings).then(lookupMap => console.log(lookupMap));
+xlsxToParseMap(settings).then(parseMap => {
+	fs.writeFileSync('parseMap.json', mapToJson(parseMap));
+});

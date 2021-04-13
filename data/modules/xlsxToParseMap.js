@@ -25,11 +25,11 @@ export default settings => {
                     id: header
                 }));
             // Return sliced data - removing all header areas
-            return sheet.slice(settings.dataRowStart); // Remove
+            return sheet.slice(settings.dataRowStart); // Remove first row
         })
         // Create lookup map 
         .then(sheet => {
-            let lookupMap = new Map();
+            let parseMap = new Map();
             sheet.forEach((row, rowIndex) => {
                 sources.forEach(source => {
                     if(row[source.id]) {
@@ -37,7 +37,7 @@ export default settings => {
                         if (match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
-                            lookupMap.set(match.groups.fieldCode, row[settings.rowHeader])
+                            parseMap.set(match.groups.fieldCode, row[settings.rowHeader])
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }
@@ -46,6 +46,6 @@ export default settings => {
                     }
                 })
             })
-            return lookupMap;
+            return parseMap;
         })
 }
