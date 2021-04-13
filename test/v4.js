@@ -59,8 +59,8 @@ var getPolyglotDriver = input => {
 	}
 };
 
-it('should parse test/data/v4.xlsx', ()=> Promise.resolve()
-	.then(()=> xlsx.readFile(`${__dirname}/data/v4.xlsx`))
+it('should parse data/v4.xlsx', ()=> Promise.resolve()
+	.then(()=> xlsx.readFile(`${__dirname}/../data/v4.xlsx`))
 	.then(workbook => {
 		expect(workbook).to.have.nested.property(`Sheets.${settings.sheet}`);
 		return xlsx.utils.sheet_to_json(workbook.Sheets[settings.sheet]);
