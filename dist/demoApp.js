@@ -6,6 +6,10 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
+function getCjsExportFromNamespace (n) {
+	return n && n.default || n;
+}
+
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -61220,6 +61224,12 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
+var emmet = /*#__PURE__*/Object.freeze({
+
+});
+
+getCjsExportFromNamespace(emmet);
+
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -61524,7 +61534,6 @@ const tools = {
                 ? words[words.length -1] + '"</font>'
                 : words[words.length -1] + '"';
         }
-        console.log(words);
         return (foundMatch ? `(${words.join(" ")})` : words.join(" "));
     },
 
@@ -61732,6 +61741,17 @@ const tools = {
     },
 };
 
+function jsonToMap(jsonStr) {
+	return new Map(JSON.parse(jsonStr));
+}
+// Replace below string when updating with value in data/parseMap.json
+var parseMap = jsonToMap(`[["[tw]","Title, abstract, keyword (.ti,ab,kf.)"],[".mp.","Publisher name, for NCBI BookShelf citations"],["[ab]","Abstract"],[".ab","Abstract"],["[au]","Author"],[".au.","Names of principal investigator(s) or collaborators"],["[cois]","Conflict of interest"],[".ci.","Conflict of interest"],["[DP]","Date of publication"],[".dp.","Date of publication"],["[LA]","Language"],[".lg.","Language"],["[tiab]","Title/abstract search"],[".tw.","Includes all words and numbers in the title, abstract, other abstract, MeSH terms, MeSH Subheadings, Publication Types, Substance Names, Personal Name as Subject, Corporate Author, Secondary Source, Comment/Correction Notes, and Other Terms (see Other Term [OT] above) typically non-MeSH subject terms (keywords)"],["[ti]","Title search"],[".ti.","Title search"],["[ot]","Keyword Field (.kf.)"],[".kf.","Keyword Field (.kf.)"],[".ti,ab,kf.","Title, abstract, keyword (.ti,ab,kf.)"],["[AD]","Affiliation"],[".in.","Affiliation"],["[AID]","Article identifier"],[".id.","Last author's name in citation"],["[AUID]","Author IDs, such as ORCiD"],[".ai.","Author IDs, such as ORCiD"],["[BOOK]","Book citation field"],[".bt.","Book citation field"],["[DCOM]","Entry Date, NLM internal Date Completed"],[".ed.","Date the entry was added to PubMed"],["[CN]","Corporate author"],["[CRDT]","The date that the citation record was first created"],[".dt.","The date that the citation record was first created"],["[RN]","ER/RN numbers"],[".rn.","ER/RN numbers"],["[ED]","Editors for book or chapter citation"],[".fe.","Editors for book or chapter citation"],["[EDAT]","Date the entry was added to PubMed"],["[1AU]","First personal author name in a citation"],[".pa.","First personal author name in a citation"],["[FAU]","Full authors name"],[".fa.","Full authors name"],["[FIR]","Full investigators name"],[".ir.","Full investigators name"],["[GR]","Grant and financial support numbers"],[".no.","Grant and financial support numbers"],["[IR]","Names of principal investigator(s) or collaborators"],["[ISBN]","ISBN for book or chapter"],[".ib.","ISBN for book or chapter"],["[IP]","Journal issue numbers"],[".ip.","Journal issue numbers"],["[TA]","Journal title, abbreviation or ISSN"],[".jn,jw,nj,ib.","Journal title, abbreviation or ISSN"],["[LASTAU]","Last author's name in citation"],["[LID]","DOI or publisher ID for online articles"],[".do.","DOI or publisher ID for online articles"],["[MHDR]","date the citation was indexed with MeSH Terms"],[".da.","date the citation was indexed with MeSH Terms"],["[LR]","A completed citation's most recent update"],["[JID]","NLM ID for journal"],[".jc.","NLM ID for journal"],["[PG]","The first number the article appears on"],[".pg.","The first number the article appears on"],["[PS]","Retrieves results where the name is the subject, rather than author"],[".pn.","Retrieves results where the name is the subject, rather than author"],["[PA]","Substances known to have a pharmacological action"],["[PL]","Journals country of publication"],[".pl.","Journals country of publication"],["[PMID]","PubMed indentifier"],[".ui.","PubMed indentifier"],["[PT]","Type of material the article represents, e.g. clinical trial"],[".pt.","Type of material the article represents, e.g. clinical trial"],["[PUBN]","Publisher name, for NCBI BookShelf citations"],["[SI]","Secondary source databanks and accession numbers, e.g., GenBank, GEO, PubChem, ClinicalTrials.gov, ISRCTN"],[".si.","Secondary source databanks and accession numbers, e.g., GenBank, GEO, PubChem, ClinicalTrials.gov, ISRCTN"],["[SB]","The Journal Subset (SB) field identifies the subset for MEDLINE records from certain journal lists or records on specialized topics"],[".sb.","The Journal Subset (SB) field identifies the subset for MEDLINE records from certain journal lists or records on specialized topics"],["[NM]","Includes chemical, protocol, disease or organism terms"],[".ps,px,rs,rx,os,ox.","Includes chemical, protocol, disease or organism terms"],["[TW]","Includes all words and numbers in the title, abstract, other abstract, MeSH terms, MeSH Subheadings, Publication Types, Substance Names, Personal Name as Subject, Corporate Author, Secondary Source, Comment/Correction Notes, and Other Terms (see Other Term [OT] above) typically non-MeSH subject terms (keywords)"],["[TT]","Words and numbers of original, non-English title"],[".ot.","Words and numbers of original, non-English title"],["[VI]","Volume number of published article"],[".vo.","Volume number of published article"]]`);
+
+// Escape all regular expression chars except for pipe
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 /**
 * Parse a given string into a lexical object tree
 * This tree can then be recompiled via each engines compile()
@@ -61828,6 +61848,9 @@ const parse$1 = (query, options) => {
     var userLineNumber = false;
     // Variable to store byte offset of string at current point
     var offset = 0;
+
+    // Create string of field codes seperated by pipe operator
+    var fieldCodes = escapeRegExp(Array.from(parseMap.keys()).join("|"));
 
     while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -62002,83 +62025,9 @@ const parse$1 = (query, options) => {
             q = q.substr(match[0].length);
             cropString = false;
             afterWhitespace = true;
-        } else if (
-            (match = /^\.(mp)\. \[mp=.+?\]/i.exec(q)) // term.INITIALS. [JUNK] (special case for Ovid automated output)
-            || (match = /^\.(tw|ti,ab,kf|ti,kf,ab|ab,ti,kf|ab,kf,ti|kf,ti,ab|kf,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kf)\.?/i.exec(q)) // term.INITIALS.
-            || (match = /^:(tw|ti,ab,kw|ti,kw,ab|ab,ti,kw|ab,kw,ti|kw,ti,ab|kw,ab,ti|ti,ab|ab,ti|ti|ab|mp|nm|pt|fs|sh|xm|af|lg|kw)/i.exec(q)) // term:INITIALS
-        ) { // Field specifier - Ovid syntax
-            // Figure out the leaf to use (usually the last one) or the previously used group {{{
-            var useLeaf = {};
-            if (lodash.isObject(leaf) && leaf.type == 'phrase') {
-                useLeaf = leaf;
-            } else if (lodash.isArray(leaf) && lastGroup) {
-                useLeaf = lastGroup;
-            }
-            // }}}
-
-            switch (match[1].toLowerCase()) {
-                case 'ti':
-                    useLeaf.field = 'title';
-                    break;
-                case 'ti,ab,kf':
-                case 'ti,kf,ab':
-                case 'ab,ti,kf':
-                case 'ab,kf,ti':
-                case 'kf,ti,ab':
-                case 'kf,ab,ti':
-                case 'ti,ab,kw':
-                case 'ti,kw,ab':
-                case 'ab,ti,kw':
-                case 'ab,kw,ti':
-                case 'kw,ti,ab':
-                case 'kw ,ab,ti':
-                    useLeaf.field = 'title+abstract+keyword';
-                    break;
-                case 'ab,ti':
-                case 'ti,ab':
-                    useLeaf.field = 'title+abstract';
-                    break;
-                case 'tw':
-                    useLeaf.field = 'title+abstract+tw';
-                    break;
-                case 'mp':
-                    useLeaf.field = 'title+abstract+other';
-                    break;
-                case 'ab':
-                    useLeaf.field = 'abstract';
-                    break;
-                case 'fs':
-                    useLeaf.field = 'floatingSubheading';
-                    break;
-                case 'sh':
-                    useLeaf.type = 'mesh';
-                    useLeaf.recurse = false;
-                    break;
-                case 'nm':
-                    useLeaf.field = 'substance';
-                    break;
-                case 'pt':
-                    useLeaf.field = 'publicationType';
-                    break;
-                case 'kf':
-                case 'kw':
-                    useLeaf.field = 'keyword';
-                    break;
-                case 'xm':
-                    useLeaf.type = 'mesh';
-                    useLeaf.recurse = true;
-                    break;
-                case 'af':
-                    useLeaf.field = 'allFields';
-                    break;
-                case 'lg':
-                    useLeaf.field = 'language';
-                    break;
-            }
-            offset += match[0].length;
-            q = q.substr(match[0].length);
-            cropString = false;
-        } else if (match = /^\[(tiab|title\/abstract|ti|title|tw|ab|nm|sh|pt|all|all fields|la|language|ot)\]/i.exec(q)) { // Field specifier - PubMed syntax
+        }
+        // Match field codes 
+        else if (match = new RegExp(`^(${fieldCodes})`, "i").exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group {{{
             var useLeaf;
             if (lodash.isObject(leaf) && leaf.type == 'phrase') {
@@ -62088,42 +62037,8 @@ const parse$1 = (query, options) => {
             }
             // }}}
 
-            switch (match[1].toLowerCase()) {
-                case 'tiab':
-                case 'title/abstract':
-                    useLeaf.field = 'title+abstract';
-                    break;
-                case 'tw':
-                    useLeaf.field = 'title+abstract+other';
-                    break;
-                case 'ti':
-                case 'title':
-                    useLeaf.field = 'title';
-                    break;
-                case 'ab':
-                    useLeaf.field = 'abstract';
-                    break;
-                case 'nm':
-                    useLeaf.field = 'substance';
-                    break;
-                case 'sh':
-                    useLeaf.field = 'floatingSubheading';
-                    break;
-                case 'pt':
-                    useLeaf.field = 'publicationType';
-                    break;
-                case 'all':
-                case 'all fields':
-                    useLeaf.field = 'allFields';
-                    break;
-                case 'ot':
-                    useLeaf.field = 'keyword';
-                    break;
-                case 'la':
-                case 'language':
-                    useLeaf.field = 'language';
-                    break;
-            }
+            useLeaf.field = parseMap.get(match[1].toLowerCase());
+
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;

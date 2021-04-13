@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "name": "sra-polyglot",
   "version": "3.0.0",
   "description": "IEBH-SRA tool to convert between different medical database search formats",

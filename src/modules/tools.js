@@ -134,7 +134,6 @@ const tools = {
                 ? words[words.length -1] + '"</font>'
                 : words[words.length -1] + '"';
         }
-        console.log(words);
         return (foundMatch ? `(${words.join(" ")})` : words.join(" "));
     },
 
