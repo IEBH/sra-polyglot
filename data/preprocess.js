@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import xlsxToParseMap from "./modules/xlsxToParseMap.js"
+import xlsxToEngineObject from "./modules/xlsxToEngineObject.js"
 
 function mapToJson(map) {
 	return JSON.stringify([...map]);
@@ -25,3 +26,7 @@ var settings = {
 xlsxToParseMap(settings).then(parseMap => {
 	fs.writeFileSync('parseMap.json', mapToJson(parseMap));
 });
+
+xlsxToEngineObject(settings).then(engineObject => {
+	fs.writeFileSync('engineObject.json', JSON.stringify(engineObject));
+})
