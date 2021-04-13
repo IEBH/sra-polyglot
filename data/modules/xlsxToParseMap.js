@@ -37,7 +37,7 @@ export default settings => {
                         if (match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
-                            parseMap.set(match.groups.fieldCode, row[settings.rowHeader])
+                            parseMap.set(match.groups.fieldCode.toLowerCase(), row[settings.rowHeader])
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }
