@@ -17,7 +17,7 @@ var settings = {
 	sheet: 'fieldCodes',
 	omitCols: ['Searching type'],
 	rowHeader: 'Explanation',
-	dataRowStart: 1,
+	dataRowStart: 0,
 };
 
 xlsxToParseMap(settings).then(parseMap => {
