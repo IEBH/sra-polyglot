@@ -34,11 +34,14 @@ export default settings => {
                 engineObject[source.id] = {};
                 sheet.forEach((row, rowIndex) => {
                     if(row[source.id]) {
-                        var match = row[source.id].match(/Term(?<fieldCode>[^\s]*)/); // Only does basic match
-                        if (match.groups.fieldCode) {
+                        var match = row[source.id].match(/(?<prefix>[^*]*?)Term(?<postfix>[^\s]*)/); // Only does basic match
+                        if (match && (match.groups.prefix || match.groups.postfix)) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
-                            engineObject[source.id][row[settings.rowHeader]] = match.groups.fieldCode
+                            engineObject[source.id][row[settings.rowHeader]] = {
+                                prefix: match.groups.prefix ? match.groups.prefix : "",
+                                postfix: match.groups.postfix ? match.groups.postfix : ""
+                            };
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }

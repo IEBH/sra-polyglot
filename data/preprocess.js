@@ -16,6 +16,7 @@ function mapToJson(map) {
 var settings = {
 	sheet: 'fieldCodes',
 	omitCols: ['Searching type'],
+	includeCols: ['PubMed abbreviation', 'Ovid MEDLINE'],
 	rowHeader: 'Explanation',
 	dataRowStart: 0,
 };
@@ -25,5 +26,5 @@ xlsxToParseMap(settings).then(parseMap => {
 });
 
 xlsxToEngineObject(settings).then(engineObject => {
-	fs.writeFileSync('engineObject.json', JSON.stringify(engineObject));
+	fs.writeFileSync('engineObject.json', JSON.stringify(engineObject).replace(/\\/g, "\\\\")); // Replace \ with \\
 })

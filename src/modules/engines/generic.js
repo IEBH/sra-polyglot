@@ -77,12 +77,22 @@ export default {
                         case 'phrase':
                             if (branch.field) {
                                 let fieldCode = engineObject[engine][branch.field];
-                                buffer +=
-                                    tools.quotePhrase(branch, 'pubmed', settings.highlighting) +
+                                if (fieldCode) {
+                                    buffer +=
                                     (
-                                        settings.highlighting ? `<font color="LightSeaGreen">${fieldCode}</font>` : '[ti]'
-                                        // TODO: Unsupported field suffix for PubMed
-                                    );
+                                        fieldCode.prefix
+                                            ? (settings.highlighting ? `<font color="LightSeaGreen">${fieldCode.prefix}</font>` : fieldCode.prefix)
+                                            : ""
+                                    )
+                                    + (tools.quotePhrase(branch, 'pubmed', settings.highlighting))
+                                    + (
+                                        fieldCode.postfix
+                                            ? (settings.highlighting ? `<font color="LightSeaGreen">${fieldCode.postfix}</font>` : fieldCode.postfix)
+                                            : ""
+                                    )
+                                } else {
+                                    buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                }
                             } else {
                                 // If no field tag exists create popover with ability to replace field tag
                                 if (global.variables.no_field_tag.indexOf(branch.offset + branch.content.length) === -1) {

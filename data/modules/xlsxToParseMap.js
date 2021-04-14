@@ -19,6 +19,9 @@ export default settings => {
             // Calculate sources
             sources = Object.keys(sheet[0])
                 .filter(header =>
+                    [...settings.includeCols].includes(header) // Filter include cols
+                )
+                .filter(header =>
                     ![...settings.omitCols, settings.rowHeader].includes(header) // Skip omitted columns
                 )
                 .map(header => ({
