@@ -6,10 +6,6 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-function getCjsExportFromNamespace (n) {
-	return n && n.default || n;
-}
-
 var jquery = createCommonjsModule(function (module) {
 /*!
  * jQuery JavaScript Library v3.5.1
@@ -22798,7 +22794,7 @@ var lodash = createCommonjsModule(function (module, exports) {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.15';
+  var VERSION = '4.17.20';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -26505,8 +26501,21 @@ var lodash = createCommonjsModule(function (module, exports) {
      * @returns {Array} Returns the new sorted array.
      */
     function baseOrderBy(collection, iteratees, orders) {
+      if (iteratees.length) {
+        iteratees = arrayMap(iteratees, function(iteratee) {
+          if (isArray(iteratee)) {
+            return function(value) {
+              return baseGet(value, iteratee.length === 1 ? iteratee[0] : iteratee);
+            }
+          }
+          return iteratee;
+        });
+      } else {
+        iteratees = [identity];
+      }
+
       var index = -1;
-      iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
+      iteratees = arrayMap(iteratees, baseUnary(getIteratee()));
 
       var result = baseMap(collection, function(value, key, collection) {
         var criteria = arrayMap(iteratees, function(iteratee) {
@@ -26763,6 +26772,10 @@ var lodash = createCommonjsModule(function (module, exports) {
         var key = toKey(path[index]),
             newValue = value;
 
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return object;
+        }
+
         if (index != lastIndex) {
           var objValue = nested[key];
           newValue = customizer ? customizer(objValue, key, nested) : undefined;
@@ -26915,11 +26928,14 @@ var lodash = createCommonjsModule(function (module, exports) {
      *  into `array`.
      */
     function baseSortedIndexBy(array, value, iteratee, retHighest) {
-      value = iteratee(value);
-
       var low = 0,
-          high = array == null ? 0 : array.length,
-          valIsNaN = value !== value,
+          high = array == null ? 0 : array.length;
+      if (high === 0) {
+        return 0;
+      }
+
+      value = iteratee(value);
+      var valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
           valIsUndefined = value === undefined;
@@ -28404,10 +28420,11 @@ var lodash = createCommonjsModule(function (module, exports) {
       if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
         return false;
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(array);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var arrStacked = stack.get(array);
+      var othStacked = stack.get(other);
+      if (arrStacked && othStacked) {
+        return arrStacked == other && othStacked == array;
       }
       var index = -1,
           result = true,
@@ -28569,10 +28586,11 @@ var lodash = createCommonjsModule(function (module, exports) {
           return false;
         }
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var objStacked = stack.get(object);
+      var othStacked = stack.get(other);
+      if (objStacked && othStacked) {
+        return objStacked == other && othStacked == object;
       }
       var result = true;
       stack.set(object, other);
@@ -31953,6 +31971,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      * // The `_.property` iteratee shorthand.
      * _.filter(users, 'active');
      * // => objects for ['barney']
+     *
+     * // Combining several predicates using `_.overEvery` or `_.overSome`.
+     * _.filter(users, _.overSome([{ 'age': 36 }, ['age', 40]]));
+     * // => objects for ['fred', 'barney']
      */
     function filter(collection, predicate) {
       var func = isArray(collection) ? arrayFilter : baseFilter;
@@ -32702,15 +32724,15 @@ var lodash = createCommonjsModule(function (module, exports) {
      * var users = [
      *   { 'user': 'fred',   'age': 48 },
      *   { 'user': 'barney', 'age': 36 },
-     *   { 'user': 'fred',   'age': 40 },
+     *   { 'user': 'fred',   'age': 30 },
      *   { 'user': 'barney', 'age': 34 }
      * ];
      *
      * _.sortBy(users, [function(o) { return o.user; }]);
-     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
+     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 30]]
      *
      * _.sortBy(users, ['user', 'age']);
-     * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
+     * // => objects for [['barney', 34], ['barney', 36], ['fred', 30], ['fred', 48]]
      */
     var sortBy = baseRest(function(collection, iteratees) {
       if (collection == null) {
@@ -37585,11 +37607,11 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       // Use a sourceURL for easier debugging.
       // The sourceURL gets injected into the source that's eval-ed, so be careful
-      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
-      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
+      // to normalize all kinds of whitespace, so e.g. newlines (and unicode versions of it) can't sneak in
+      // and escape the comment, thus injecting code that gets evaled.
       var sourceURL = '//# sourceURL=' +
         (hasOwnProperty.call(options, 'sourceURL')
-          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
+          ? (options.sourceURL + '').replace(/\s/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -37622,8 +37644,6 @@ var lodash = createCommonjsModule(function (module, exports) {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      // Like with sourceURL, we take care to not check the option's prototype,
-      // as this configuration is a code injection vector.
       var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
@@ -38330,6 +38350,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      * values against any array or object value, respectively. See `_.isEqual`
      * for a list of supported value comparisons.
      *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
+     *
      * @static
      * @memberOf _
      * @since 3.0.0
@@ -38345,6 +38368,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      *
      * _.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
       return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
@@ -38358,6 +38385,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      * **Note:** Partial comparisons will match empty array and empty object
      * `srcValue` values against any array or object value, respectively. See
      * `_.isEqual` for a list of supported value comparisons.
+     *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
      *
      * @static
      * @memberOf _
@@ -38375,6 +38405,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      *
      * _.find(objects, _.matchesProperty('a', 4));
      * // => { 'a': 4, 'b': 5, 'c': 6 }
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
       return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
@@ -38598,6 +38632,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      * Creates a function that checks if **all** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -38624,6 +38662,10 @@ var lodash = createCommonjsModule(function (module, exports) {
      * Creates a function that checks if **any** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -38643,6 +38685,9 @@ var lodash = createCommonjsModule(function (module, exports) {
      *
      * func(NaN);
      * // => false
+     *
+     * var matchesFunc = _.overSome([{ 'a': 1 }, { 'a': 2 }])
+     * var matchesPropertyFunc = _.overSome([['a', 1], ['a', 2]])
      */
     var overSome = createOver(arraySome);
 
@@ -61224,12 +61269,6 @@ exports.setCore = function(e) {
                     ace.acequire(["ace/ext/emmet"], function() {});
                 })();
 
-var emmet = /*#__PURE__*/Object.freeze({
-
-});
-
-getCjsExportFromNamespace(emmet);
-
 var vue2AceEditor = {
     render: function (h) {
         var height = this.height ? this.px(this.height) : '100%';
@@ -64304,7 +64343,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = function (inject) {
     if (!inject) return
-    inject("data-v-98708df0_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/node_modules/vue-json-tree/src/json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
+    inject("data-v-77f67d02_0", { source: "\n.json-tree {\n  color: #394359;\n  display: flex;\n  flex-direction: column;\n  font-family: Menlo, Monaco, Consolas, monospace;\n  font-size: 12px;\n  line-height: 20px;\n}\n.json-tree-root {\n  background-color: #f7f8f9;\n  border-radius: 3px;\n  margin: 2px 0;\n  min-width: 560px;\n  padding: 10px;\n}\n.json-tree-ending,\n.json-tree-row {\n  border-radius: 2px;\n  display: flex;\n}\n.json-tree-paired,\n.json-tree-row:hover {\n  background-color: #bce2ff;\n}\n.json-tree-expando {\n  cursor: pointer;\n}\n.json-tree-sign {\n  font-weight: 700;\n}\n.json-tree-collapsed {\n  color: gray;\n  font-style: italic;\n}\n.json-tree-value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.json-tree-value-string {\n  color: #9aab3a;\n}\n.json-tree-value-boolean {\n  color: #ff0080;\n}\n.json-tree-value-number {\n  color: #4f7096;\n}\n.json-tree-value-null {\n  color: #c7444a;\n}\n", map: {"version":3,"sources":["D:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\node_modules\\vue-json-tree\\src\\json-tree.vue"],"names":[],"mappings":";AAyHA;EACA,cAAA;EACA,aAAA;EACA,sBAAA;EACA,+CAAA;EACA,eAAA;EACA,iBAAA;AACA;AAEA;EACA,yBAAA;EACA,kBAAA;EACA,aAAA;EACA,gBAAA;EACA,aAAA;AACA;AAEA;;EAEA,kBAAA;EACA,aAAA;AACA;AAEA;;EAEA,yBAAA;AACA;AAEA;EACA,eAAA;AACA;AAEA;EACA,gBAAA;AACA;AAEA;EACA,WAAA;EACA,kBAAA;AACA;AAEA;EACA,gBAAA;EACA,uBAAA;EACA,mBAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA;AAEA;EACA,cAAA;AACA","file":"json-tree.vue","sourcesContent":["<template>\n  <span class=\"json-tree\" :class=\"{'json-tree-root': parsed.depth === 0}\">\n    <span class=\"json-tree-row\" v-if=\"parsed.primitive\">\n      <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n      <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n      <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n      <span class=\"json-tree-value\" :class=\"'json-tree-value-' + parsed.type\" :title=\"`${parsed.value}`\">{{ `${parsed.value}` }}</span>\n      <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n      <span class=\"json-tree-indent\">&nbsp;</span>\n    </span>\n    <span class=\"json-tree-deep\" v-if=\"!parsed.primitive\">\n      <span class=\"json-tree-row json-tree-expando\" @click=\"expanded = !expanded\" @mouseover=\"hovered = true\" @mouseout=\"hovered = false\">\n        <span class=\"json-tree-indent\">&nbsp;</span>\n        <span class=\"json-tree-sign\">{{ expanded ? '-' : '+' }}</span>\n        <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 1)\" :key=\"n\">&nbsp;</span>\n        <span class=\"json-tree-key\" v-if=\"parsed.key\">{{ parsed.key }}</span>\n        <span class=\"json-tree-colon\" v-if=\"parsed.key\">:&nbsp;</span>\n        <span class=\"json-tree-open\">{{ parsed.type === 'array' ? '[' : '{' }}</span>\n        <span class=\"json-tree-collapsed\" v-show=\"!expanded\">&nbsp;/*&nbsp;{{ format(parsed.value.length) }}&nbsp;*/&nbsp;</span>\n        <span class=\"json-tree-close\" v-show=\"!expanded\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n        <span class=\"json-tree-comma\" v-show=\"!expanded && !parsed.last\">,</span>\n        <span class=\"json-tree-indent\">&nbsp;</span>\n      </span>\n      <span class=\"json-tree-deeper\" v-show=\"expanded\">\n        <json-tree v-for=\"(item, index) in parsed.value\" :key=\"index\" :kv=\"item\" :level=\"level\"></json-tree>\n      </span>\n      <span class=\"json-tree-row\" v-show=\"expanded\">\n        <span class=\"json-tree-ending\" :class=\"{'json-tree-paired': hovered}\">\n          <span class=\"json-tree-indent\" v-for=\"n in (parsed.depth * 2 + 3)\" :key=\"n\">&nbsp;</span>\n          <span class=\"json-tree-close\">{{ parsed.type === 'array' ? ']' : '}' }}</span>\n          <span class=\"json-tree-comma\" v-if=\"!parsed.last\">,</span>\n          <span class=\"json-tree-indent\">&nbsp;</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</template>\n\n<script>\n  function parse (data, depth = 0, last = true, key = undefined) {\n    let kv = { depth, last, primitive: true, key: JSON.stringify(key) }\n    if (typeof data !== 'object') {\n      return Object.assign(kv, { type: typeof data, value: JSON.stringify(data) })\n    } else if (data === null) {\n      return Object.assign(kv, { type: 'null', value: 'null' })\n    } else if (Array.isArray(data)) {\n      let value = data.map((item, index) => {\n        return parse(item, depth + 1, index === data.length - 1)\n      })\n      return Object.assign(kv, { primitive: false, type: 'array', value })\n    } else {\n      let keys = Object.keys(data)\n      let value = keys.map((key, index) => {\n        return parse(data[key], depth + 1, index === keys.length - 1, key)\n      })\n      return Object.assign(kv, { primitive: false, type: 'object', value })\n    }\n  }\n\n  export default {\n    name: 'json-tree',\n\n    props: {\n      level: {\n        type: Number,\n        default: Infinity\n      },\n      kv: {\n        type: Object\n      },\n      raw: {\n        type: String\n      },\n      data: {}\n    },\n\n    data () {\n      return {\n        expanded: true,\n        hovered: false\n      }\n    },\n\n    computed: {\n      parsed () {\n        if (this.kv) {\n          return this.kv\n        }\n        let result\n        try {\n          if (this.raw) {\n            result = JSON.parse(this.raw)\n          } else if (typeof this.data !== 'undefined') {\n            result = this.data\n          } else {\n            result = '[Vue JSON Tree] No data passed.'\n            console.warn(result)\n          }\n        } catch (e) {\n          result = '[Vue JSON Tree] Invalid raw JSON.'\n          console.warn(result)\n        } finally {\n          return parse(result)\n        }\n      }\n    },\n\n    methods: {\n      format (n) {\n        if (n > 1) return `${n} items`\n        return n ? '1 item' : 'no items'\n      }\n    },\n\n    created () {\n      this.expanded = this.parsed.depth < this.level\n    }\n  }\n</script>\n\n<style>\n  .json-tree {\n    color: #394359;\n    display: flex;\n    flex-direction: column;\n    font-family: Menlo, Monaco, Consolas, monospace;\n    font-size: 12px;\n    line-height: 20px;\n  }\n\n  .json-tree-root {\n    background-color: #f7f8f9;\n    border-radius: 3px;\n    margin: 2px 0;\n    min-width: 560px;\n    padding: 10px;\n  }\n\n  .json-tree-ending,\n  .json-tree-row {\n    border-radius: 2px;\n    display: flex;\n  }\n\n  .json-tree-paired,\n  .json-tree-row:hover {\n    background-color: #bce2ff;\n  }\n\n  .json-tree-expando {\n    cursor: pointer;\n  }\n\n  .json-tree-sign {\n    font-weight: 700;\n  }\n\n  .json-tree-collapsed {\n    color: gray;\n    font-style: italic;\n  }\n\n  .json-tree-value {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .json-tree-value-string {\n    color: #9aab3a;\n  }\n\n  .json-tree-value-boolean {\n    color: #ff0080;\n  }\n\n  .json-tree-value-number {\n    color: #4f7096;\n  }\n\n  .json-tree-value-null {\n    color: #c7444a;\n  }\n</style>\n"]}, media: undefined });
 
   };
   /* scoped */
@@ -64566,11 +64605,11 @@ const __vue_script__$1 = script$1;
   /* style */
   const __vue_inject_styles__$1 = function (inject) {
     if (!inject) return
-    inject("data-v-d06c99c2_0", { source: "\ndiv[data-v-d06c99c2] {\n   display: inline;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/components/TemplateRedner.vue"],"names":[],"mappings":";AAqEA;GACA,eAAA;AACA","file":"TemplateRedner.vue","sourcesContent":["<script>\nimport Vue from 'vue';\nimport global from '../../src/modules/global.js'\n\nexport default {\n    props: ['template', 'query'],\n\tdata() {\n\t\treturn {\n\t\t    global: global,\n\t\t\ttemplateRender: null,\n\t\t\t// Custom properties for field replacing\n\t\t\tcustomField: '',\n\t\t\treplaceAll: false,\n\t\t};\n\t},\n\trender(h) {\n\t\tif (!this.templateRender) {\n\t\t\treturn h('div', 'loading...');\n\t\t} else { // If template exists, display it\n\t\t\treturn this.templateRender();\n\t\t}\n\t},\n\twatch: {\n\t\t// Watch template component for changes\n\t\ttemplate:{\n\t\t\timmediate: true, // Fire watcher on first render\n\t\t\thandler() {\n\t\t\t\tvar res = Vue.compile(this.template);\n\t\t\t\tthis.templateRender = res.render;\n\t\t\t\t// staticRenderFns belong into $options, \n\t\t\t\tthis.$options.staticRenderFns = []\n\t\t\t\t// clean the cache of static elements\n\t\t\t\t// this is a cache with the results from the staticRenderFns\n\t\t\t\tthis._staticTrees = []\n\t\t\t\t// Fill it with the new staticRenderFns\n\t\t\t\tfor (var i in res.staticRenderFns) {\n\t\t\t\t\t//staticRenderFns.push(res.staticRenderFns[i]);\n\t\t\t\t\tthis.$options.staticRenderFns.push(res.staticRenderFns[i])\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t},\n\tmethods: {\n\t\t// Custom method to replace fields\n\t\treplaceFields(field, replace_all, offset) {\n            let newQuery = this.query\n\t\t\tif (replace_all) {\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\n\t\t\t\tfor (var x in itemsToReplace) {\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(newQuery[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\n\t\t\t\t\tif (/(\\W)/.test(newQuery[itemsToReplace[x]]) || typeof newQuery[itemsToReplace[x]] === \"undefined\") {\n\t\t\t\t\t\tnewQuery = newQuery.slice(0, itemsToReplace[x]) + field + newQuery.slice(itemsToReplace[x]);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\n\t\t\t\toffset = (/(\\W)/.test(newQuery[offset]))? offset : offset+2;\n\t\t\t\tif (/(\\W)/.test(newQuery[offset]) || typeof newQuery[offset] === \"undefined\") {\n\t\t\t\t\tnewQuery = newQuery.slice(0, offset) + field + newQuery.slice(offset);\n\t\t\t\t}\n            }\n            this.$emit('replaceFields', newQuery);\n\t\t},\n\t}  \n}\n</script>\n\n<style scoped>\ndiv {\n   display: inline; \n}\n</style>"]}, media: undefined });
+    inject("data-v-70465d92_0", { source: "\ndiv[data-v-70465d92] {\r\n   display: inline;\n}\r\n", map: {"version":3,"sources":["D:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\components\\TemplateRedner.vue"],"names":[],"mappings":";AAqEA;GACA,eAAA;AACA","file":"TemplateRedner.vue","sourcesContent":["<script>\r\nimport Vue from 'vue';\r\nimport global from '../../src/modules/global.js'\r\n\r\nexport default {\r\n    props: ['template', 'query'],\r\n\tdata() {\r\n\t\treturn {\r\n\t\t    global: global,\r\n\t\t\ttemplateRender: null,\r\n\t\t\t// Custom properties for field replacing\r\n\t\t\tcustomField: '',\r\n\t\t\treplaceAll: false,\r\n\t\t};\r\n\t},\r\n\trender(h) {\r\n\t\tif (!this.templateRender) {\r\n\t\t\treturn h('div', 'loading...');\r\n\t\t} else { // If template exists, display it\r\n\t\t\treturn this.templateRender();\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\t// Watch template component for changes\r\n\t\ttemplate:{\r\n\t\t\timmediate: true, // Fire watcher on first render\r\n\t\t\thandler() {\r\n\t\t\t\tvar res = Vue.compile(this.template);\r\n\t\t\t\tthis.templateRender = res.render;\r\n\t\t\t\t// staticRenderFns belong into $options, \r\n\t\t\t\tthis.$options.staticRenderFns = []\r\n\t\t\t\t// clean the cache of static elements\r\n\t\t\t\t// this is a cache with the results from the staticRenderFns\r\n\t\t\t\tthis._staticTrees = []\r\n\t\t\t\t// Fill it with the new staticRenderFns\r\n\t\t\t\tfor (var i in res.staticRenderFns) {\r\n\t\t\t\t\t//staticRenderFns.push(res.staticRenderFns[i]);\r\n\t\t\t\t\tthis.$options.staticRenderFns.push(res.staticRenderFns[i])\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t},\r\n\tmethods: {\r\n\t\t// Custom method to replace fields\r\n\t\treplaceFields(field, replace_all, offset) {\r\n            let newQuery = this.query\r\n\t\t\tif (replace_all) {\r\n\t\t\t\tvar itemsToReplace = global.variables.no_field_tag.slice(0).reverse(); // Work backwards through items\r\n\t\t\t\tfor (var x in itemsToReplace) {\r\n\t\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\t\titemsToReplace[x] = (/(\\W)/.test(newQuery[itemsToReplace[x]]))? itemsToReplace[x] : itemsToReplace[x]+2;\r\n\t\t\t\t\tif (/(\\W)/.test(newQuery[itemsToReplace[x]]) || typeof newQuery[itemsToReplace[x]] === \"undefined\") {\r\n\t\t\t\t\t\tnewQuery = newQuery.slice(0, itemsToReplace[x]) + field + newQuery.slice(itemsToReplace[x]);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\t// If original query is surrounded by quotation marks, 2 must be added to offset\r\n\t\t\t\toffset = (/(\\W)/.test(newQuery[offset]))? offset : offset+2;\r\n\t\t\t\tif (/(\\W)/.test(newQuery[offset]) || typeof newQuery[offset] === \"undefined\") {\r\n\t\t\t\t\tnewQuery = newQuery.slice(0, offset) + field + newQuery.slice(offset);\r\n\t\t\t\t}\r\n            }\r\n            this.$emit('replaceFields', newQuery);\r\n\t\t},\r\n\t}  \r\n}\r\n</script>\r\n\r\n<style scoped>\r\ndiv {\r\n   display: inline; \r\n}\r\n</style>"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-d06c99c2";
+  const __vue_scope_id__$1 = "data-v-70465d92";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -65117,11 +65156,11 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$2 = function (inject) {
     if (!inject) return
-    inject("data-v-254cc916_0", { source: "\n.text-reader[data-v-254cc916] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-254cc916] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-254cc916]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-254cc916] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/connor/Documents/GitHub/sra-polyglot/demo/editor.vue"],"names":[],"mappings":";AAqPA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\nimport _ from 'lodash';\nimport ace from 'vue2-ace-editor';\nimport polyglot from '../src';\nimport global from '../src/modules/global.js'\nimport JsonTree from 'vue-json-tree'\nimport VRuntimeTemplate from \"v-runtime-template\";\nimport 'brace/theme/chrome';\nimport { createToken, getQuery } from \"./api.js\";\n\nimport TemplateRender from \"./components/TemplateRedner.vue\"\n\nimport engineObject from \"../src/data/engineObject.js\"\n\nexport default {\n\tdata: ()=> ({\n\t\tglobal: global,\n\t\tquery: '',\n\t\tseeds: '[]',\n\t\teditorOptions: {\n\t\t\tshowPrintMargin: false,\n\t\t\twrap: true,\n\t\t},\n\t\tengines: [...Object.keys(engineObject), 'lexicalTreeJSON'],\n\t\tenginesExpanded: {},\n\t\tenginesQuery: {},\n\t\tpolyglotOptions: {\n\t\t\tgroupLines: false,\n\t\t\tgroupLinesAlways: true,\n\t\t\tremoveNumbering: false,\n\t\t\tpreserveNewLines: true,\n\t\t\treplaceWildcards: true,\n\t\t\ttransposeLines: false,\n\t\t\thighlighting: true,\n\t\t},\n\t\texampleLast: '',\n\t}),\n\tcomponents: {\n\t\teditor: ace,\n\t\tjsontree: JsonTree,\n\t\tVRuntimeTemplate,\n\t\tTemplateRender\n\t},\n\tmethods: {\n\t\tclear() {\n\t\t\tthis.query = '';\n\t\t},\n\t\tcopyQuery() {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = this.query;\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\tcopyContent(id) {\n\t\t\t// Create new element\n\t\t\tvar el = document.createElement('textarea');\n\t\t\t// Set value (string to be copied)\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\n\t\t\t// Set non-editable to avoid focus and move outside of view\n\t\t\tel.setAttribute('readonly', '');\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\n\t\t\tdocument.body.appendChild(el);\n\t\t\t// Select text inside element\n\t\t\tel.select();\n\t\t\t// Copy text to clipboard\n\t\t\tdocument.execCommand('copy');\n\t\t\t// Remove temporary element\n\t\t\tdocument.body.removeChild(el);\n\t\t},\n\t\topenLink(link) {\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tasync openSearchRefiner() {\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\n\t\t\ttry {\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\n\t\t\t\tlink = link.concat(token);\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t\twindow.open(link, '_blank')\n\t\t},\n\t\tshowExample() {\n\t\t\tvar chosenExample;\n\t\t\tdo {\n\t\t\t\tchosenExample = _.sample(global.examples);\n\t\t\t} while (this.exampleLast == chosenExample.title)\n\t\t\tthis.exampleLast = chosenExample;\n\t\t\tthis.query = chosenExample.query;\n\t\t},\n\t\tinsertTemplate(key) {\n\t\t\tlet editor = this.$refs.queryEditor.editor;\n\t\t\teditor.insert(\"<\" + key + \">\");\n\t\t},\n\t\ttoggleExpandEngine(engine) {\n\t\t\tthis.$set(this.enginesExpanded, engine, !this.enginesExpanded[engine]);\n\t\t},\n\t\teditorInit() { // Ace editor settings\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\n\t\t},\n\t\tloadTextFromFile(ev) {\n\t\t\tvar myFile = ev.target.files[0];\n\t\t\tvar reader = new FileReader();\n\t\t\tvar _this = this;\n\t\t\treader.onload = (function(f) {\n\t\t\t\treturn function(e) {\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\n\t\t\t\t};\n\t\t\t})(myFile);\n\t\t\treader.readAsText(myFile);\n\t\t},\n\t\ttranslateAll: _.debounce(function() {\n\t\t\tlocalStorage.query = this.query;\n\t\t\t_(polyglot.translateAllGeneric(this.query, this.polyglotOptions))\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\n\t\t}, 500),\n\t},\n\tasync mounted() {\n\t\tconst queryString = window.location.search;\n\t\tconst urlParams = new URLSearchParams(queryString);\n\t\tconst token = urlParams.get('token')\n\t\tif(token) {\n\t\t\ttry {\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\n\t\t\t} catch(e) {\n\t\t\t\tconsole.error(e);\n\t\t\t}\n\t\t}\n\t\telse if (localStorage.query) {\n\t\t\tthis.query = localStorage.query;\n\t\t}\n\t\tif (localStorage.transposeLines) {\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\n\t\t}\n\t},\n\twatch: {\n\t\tquery: function() {\n\t\t\tthis.translateAll();\n\t\t},\n\t\t'polyglotOptions.transposeLines': function() {\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\n\t\t\tthis.translateAll();\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div>\n\t\t<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\n\t\t\t<a class=\"navbar-brand\" href=\"#\">Polyglot</a>\n\t\t\t<div class=\"ml-auto\">\n\t\t\t\t<button class=\"btn btn-success\" @click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\">Cite</button>\n\t\t\t\t<button class=\"btn btn-info ml-2\" @click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\">Help</button>\n\t\t\t</div>\n\t\t</nav>\n\t\t<div class=\"container mt-3\">\n\t\t\t<div class=\"row-fluid\">\n\t\t\t\t<div class=\"card\">\n\t\t\t\t\t<div class=\"card-header\">\n\t\t\t\t\t\tYour query\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\n\t\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\n\t\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\n\t\t\t\t\t\t\t<span class=\"dropdown\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\n\t\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body p-0\">\n\t\t\t\t\t\t<editor\n\t\t\t\t\t\t\tref='queryEditor'\n\t\t\t\t\t\t\tv-model=\"query\"\n\t\t\t\t\t\t\tv-on:init=\"editorInit\"\n\t\t\t\t\t\t\tlang=\"polyglot\"\n\t\t\t\t\t\t\ttheme=\"chrome\"\n\t\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\t\theight=\"380\"\n\t\t\t\t\t\t\tv-bind:options=\"editorOptions\"\n\t\t\t\t\t\t></editor>\n\t\t\t\t\t</div>\n\t\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\n\t\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\n\t\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\n\t\t\t</label>\n\t\t\t<label class=\"text-reader\">\n\t\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\n\t\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\n\t\t\t</label>\n\t\t\t\n\t\t\t<hr/>\n\n\t\t\t<div class=\"accordion panel-group\">\n\t\t\t\t<div v-for=\"engine in engines\" :key=\"engine\" class=\"card\" id=\"customcard\">\n\t\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\n\t\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\n\t\t\t\t\t\t\t{{engine}}\n\t\t\t\t\t\t</a>\n\t\t\t\t\t\t<div class=\"pull-right\">\n\t\t\t\t\t\t\t<a v-if=\"engine != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine] && 'show'\">\n\t\t\t\t\t\t<TemplateRender \n\t\t\t\t\t\t\tv-if=\"enginesQuery[engine] && engine != 'lexicalTreeJSON' && engine != 'mongodb'\" \n\t\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine]}</div>`\"\n\t\t\t\t\t\t\t:query=\"query\"\n\t\t\t\t\t\t\t@replaceFields=\"query = $event\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine] && engine == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine]\"></jsontree>\n\t\t\t\t\t\t<hr>\n\t\t\t\t\t\t<!-- MongoDB not included at this stage -->\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style scoped>\n\t.text-reader {\n\t\tmargin: 20px 0px 0px 0px;\n\t}\n\t.text-reader > .select-button {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n\t}\n\n\t.text-reader > .select-button:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n\t}\n\n\t.text-reader > input[type=\"file\"] {\n\t\tdisplay: none;\n\t}\n</style>\n"]}, media: undefined });
+    inject("data-v-9a923508_0", { source: "\n.text-reader[data-v-9a923508] {\n\t\tmargin: 20px 0px 0px 0px;\n}\n.text-reader > .select-button[data-v-9a923508] {\n\t\tpadding: .5rem;\n\n\t\tcolor: #426E7B;\n\t\tbackground-color: #D3ECF1; \n\n\t\tborder-radius: .3rem;\n\n\t\ttext-align: center;\n\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\n  \t\ttransition-duration: 0.4s;\n}\n.text-reader > .select-button[data-v-9a923508]:hover {\n\t\tbackground-color: #426E7B;\n  \t\tcolor: #D3ECF1;\n}\n.text-reader > input[type=\"file\"][data-v-9a923508] {\n\t\tdisplay: none;\n}\n", map: {"version":3,"sources":["D:\\Users\\Connor\\Documents\\GitHub\\sra-polyglot\\demo\\editor.vue"],"names":[],"mappings":";AAqPA;EACA,wBAAA;AACA;AACA;EACA,cAAA;;EAEA,cAAA;EACA,yBAAA;;EAEA,oBAAA;;EAEA,kBAAA;;EAEA,iCAAA,EAAA,WAAA;IACA,yBAAA;AACA;AAEA;EACA,yBAAA;IACA,cAAA;AACA;AAEA;EACA,aAAA;AACA","file":"editor.vue","sourcesContent":["<script>\r\nimport _ from 'lodash';\r\nimport ace from 'vue2-ace-editor';\r\nimport polyglot from '../src';\r\nimport global from '../src/modules/global.js'\r\nimport JsonTree from 'vue-json-tree'\r\nimport VRuntimeTemplate from \"v-runtime-template\";\r\nimport 'brace/theme/chrome';\r\nimport { createToken, getQuery } from \"./api.js\";\r\n\r\nimport TemplateRender from \"./components/TemplateRedner.vue\"\r\n\r\nimport engineObject from \"../src/data/engineObject.js\"\r\n\r\nexport default {\r\n\tdata: ()=> ({\r\n\t\tglobal: global,\r\n\t\tquery: '',\r\n\t\tseeds: '[]',\r\n\t\teditorOptions: {\r\n\t\t\tshowPrintMargin: false,\r\n\t\t\twrap: true,\r\n\t\t},\r\n\t\tengines: [...Object.keys(engineObject), 'lexicalTreeJSON'],\r\n\t\tenginesExpanded: {},\r\n\t\tenginesQuery: {},\r\n\t\tpolyglotOptions: {\r\n\t\t\tgroupLines: false,\r\n\t\t\tgroupLinesAlways: true,\r\n\t\t\tremoveNumbering: false,\r\n\t\t\tpreserveNewLines: true,\r\n\t\t\treplaceWildcards: true,\r\n\t\t\ttransposeLines: false,\r\n\t\t\thighlighting: true,\r\n\t\t},\r\n\t\texampleLast: '',\r\n\t}),\r\n\tcomponents: {\r\n\t\teditor: ace,\r\n\t\tjsontree: JsonTree,\r\n\t\tVRuntimeTemplate,\r\n\t\tTemplateRender\r\n\t},\r\n\tmethods: {\r\n\t\tclear() {\r\n\t\t\tthis.query = '';\r\n\t\t},\r\n\t\tcopyQuery() {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = this.query;\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\tcopyContent(id) {\r\n\t\t\t// Create new element\r\n\t\t\tvar el = document.createElement('textarea');\r\n\t\t\t// Set value (string to be copied)\r\n\t\t\tel.value = polyglot.translate(this.query, id, {html: false});\r\n\t\t\t// Set non-editable to avoid focus and move outside of view\r\n\t\t\tel.setAttribute('readonly', '');\r\n\t\t\tel.style = {position: 'absolute', left: '-9999px'};\r\n\t\t\tdocument.body.appendChild(el);\r\n\t\t\t// Select text inside element\r\n\t\t\tel.select();\r\n\t\t\t// Copy text to clipboard\r\n\t\t\tdocument.execCommand('copy');\r\n\t\t\t// Remove temporary element\r\n\t\t\tdocument.body.removeChild(el);\r\n\t\t},\r\n\t\topenLink(link) {\r\n\t\t\twindow.open(link, '_blank')\r\n\t\t},\r\n\t\tasync openSearchRefiner() {\r\n\t\t\tvar link = \"https://ielab-sysrev2.uqcloud.net/plugin/queryvis?token=\"\r\n\t\t\ttry {\r\n\t\t\t\tvar token = await createToken(this.query, this.seeds); // TODO use pubmed translation maybe\r\n\t\t\t\tlink = link.concat(token);\r\n\t\t\t} catch(e) {\r\n\t\t\t\tconsole.error(e);\r\n\t\t\t}\r\n\t\t\twindow.open(link, '_blank')\r\n\t\t},\r\n\t\tshowExample() {\r\n\t\t\tvar chosenExample;\r\n\t\t\tdo {\r\n\t\t\t\tchosenExample = _.sample(global.examples);\r\n\t\t\t} while (this.exampleLast == chosenExample.title)\r\n\t\t\tthis.exampleLast = chosenExample;\r\n\t\t\tthis.query = chosenExample.query;\r\n\t\t},\r\n\t\tinsertTemplate(key) {\r\n\t\t\tlet editor = this.$refs.queryEditor.editor;\r\n\t\t\teditor.insert(\"<\" + key + \">\");\r\n\t\t},\r\n\t\ttoggleExpandEngine(engine) {\r\n\t\t\tthis.$set(this.enginesExpanded, engine, !this.enginesExpanded[engine]);\r\n\t\t},\r\n\t\teditorInit() { // Ace editor settings\r\n\t\t\twindow.ace.config.set('modePath', 'syntax/ace');\r\n\t\t},\r\n\t\tloadTextFromFile(ev) {\r\n\t\t\tvar myFile = ev.target.files[0];\r\n\t\t\tvar reader = new FileReader();\r\n\t\t\tvar _this = this;\r\n\t\t\treader.onload = (function(f) {\r\n\t\t\t\treturn function(e) {\r\n\t\t\t\t\t_this.query = reader.result.replace(/\\r/g, '')\r\n\t\t\t\t};\r\n\t\t\t})(myFile);\r\n\t\t\treader.readAsText(myFile);\r\n\t\t},\r\n\t\ttranslateAll: _.debounce(function() {\r\n\t\t\tlocalStorage.query = this.query;\r\n\t\t\t_(polyglot.translateAllGeneric(this.query, this.polyglotOptions))\r\n\t\t\t\t.forEach((query, key) => this.$set(this.enginesQuery, key, query))\r\n\t\t}, 500),\r\n\t},\r\n\tasync mounted() {\r\n\t\tconst queryString = window.location.search;\r\n\t\tconst urlParams = new URLSearchParams(queryString);\r\n\t\tconst token = urlParams.get('token')\r\n\t\tif(token) {\r\n\t\t\ttry {\r\n\t\t\t\t[this.query, this.seeds] = await getQuery(token)\r\n\t\t\t} catch(e) {\r\n\t\t\t\tconsole.error(e);\r\n\t\t\t}\r\n\t\t}\r\n\t\telse if (localStorage.query) {\r\n\t\t\tthis.query = localStorage.query;\r\n\t\t}\r\n\t\tif (localStorage.transposeLines) {\r\n\t\t\tthis.polyglotOptions.transposeLines = localStorage.transposeLines;\r\n\t\t}\r\n\t},\r\n\twatch: {\r\n\t\tquery: function() {\r\n\t\t\tthis.translateAll();\r\n\t\t},\r\n\t\t'polyglotOptions.transposeLines': function() {\r\n\t\t\tlocalStorage.transposeLines = this.polyglotOptions.transposeLines;\r\n\t\t\tthis.translateAll();\r\n\t\t},\r\n\t},\r\n};\r\n</script>\r\n\r\n<template>\r\n\t<div>\r\n\t\t<nav class=\"navbar navbar-expand-lg navbar-dark bg-dark\">\r\n\t\t\t<a class=\"navbar-brand\" href=\"#\">Polyglot</a>\r\n\t\t\t<div class=\"ml-auto\">\r\n\t\t\t\t<button class=\"btn btn-success\" @click=\"openLink('https://www.ncbi.nlm.nih.gov/pubmed/32256231')\">Cite</button>\r\n\t\t\t\t<button class=\"btn btn-info ml-2\" @click=\"openLink('http://sr-accelerator.com/#/help/polyglot')\">Help</button>\r\n\t\t\t</div>\r\n\t\t</nav>\r\n\t\t<div class=\"container mt-3\">\r\n\t\t\t<div class=\"row-fluid\">\r\n\t\t\t\t<div class=\"card\">\r\n\t\t\t\t\t<div class=\"card-header\">\r\n\t\t\t\t\t\tYour query\r\n\t\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t\t<input type=\"checkbox\" id=\"checkbox\" v-model=\"polyglotOptions.transposeLines\">\r\n\t\t\t\t\t\t\t<label for=\"checkbox\">Replace Line References</label>\r\n\t\t\t\t\t\t\t<a v-on:click=\"clear()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-eraser\" title=\"Clear search\"></i></a>\r\n\t\t\t\t\t\t\t<a v-on:click=\"copyQuery()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t\t<a v-on:click=\"showExample()\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-random\" title=\"Show a random example\"></i></a>\r\n\t\t\t\t\t\t\t<span class=\"dropdown\">\r\n\t\t\t\t\t\t\t\t<a class=\"btn btn-sm btn-default\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\r\n\t\t\t\t\t\t\t\t\t<i class=\"fa fa-caret-down\" title=\"Insert Template\"></i>\r\n\t\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t\t\t<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">\r\n\t\t\t\t\t\t\t\t\t<a v-for=\"(template, key) in global.templates\" :key=\"key\" class=\"dropdown-item\" href=\"#\" v-on:click=\"insertTemplate(key)\">{{template.name}}</a>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"card-body p-0\">\r\n\t\t\t\t\t\t<editor\r\n\t\t\t\t\t\t\tref='queryEditor'\r\n\t\t\t\t\t\t\tv-model=\"query\"\r\n\t\t\t\t\t\t\tv-on:init=\"editorInit\"\r\n\t\t\t\t\t\t\tlang=\"polyglot\"\r\n\t\t\t\t\t\t\ttheme=\"chrome\"\r\n\t\t\t\t\t\t\twidth=\"100%\"\r\n\t\t\t\t\t\t\theight=\"380\"\r\n\t\t\t\t\t\t\tv-bind:options=\"editorOptions\"\r\n\t\t\t\t\t\t></editor>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div v-if=\"!query\" v-on:click=\"showExample()\" class=\"card-footer text-center\">\r\n\t\t\t\t\t\tType a PubMed or Ovid MEDLINE query in the box above to see its translations\r\n\t\t\t\t\t\t<span class=\"text-muted\">(or click here to see an example)</span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t\t<label class=\"text-reader\">\r\n\t\t\t\t<span class=\"select-button\" @click=\"openSearchRefiner\">Open Query in SearchRefiner</span>\r\n\t\t\t</label>\r\n\t\t\t<label class=\"text-reader\">\r\n\t\t\t\t<span class=\"select-button\">Import Search From .txt File</span>\r\n\t\t\t\t<input type=\"file\" @change=\"loadTextFromFile\">\r\n\t\t\t</label>\r\n\t\t\t\r\n\t\t\t<hr/>\r\n\r\n\t\t\t<div class=\"accordion panel-group\">\r\n\t\t\t\t<div v-for=\"engine in engines\" :key=\"engine\" class=\"card\" id=\"customcard\">\r\n\t\t\t\t\t<div class=\"card-header\" v-on:click=\"toggleExpandEngine(engine)\" >\r\n\t\t\t\t\t\t<a class=\"accordion-toggle collapsed\">\r\n\t\t\t\t\t\t\t<i class=\"fa fa-fw\" :class=\"enginesExpanded[engine] ? 'fa-chevron-down' : 'fa-chevron-right'\"></i>\r\n\t\t\t\t\t\t\t{{engine}}\r\n\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t<div class=\"pull-right\">\r\n\t\t\t\t\t\t\t<a v-if=\"engine != 'lexicalTreeJSON'\" v-on:click.stop=\"copyContent(engine)\" class=\"btn btn-sm btn-default\"><i class=\"fa fa-clipboard\" title=\"Copy to clipboard\"></i></a>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div class=\"card-body collapse\" :class=\"enginesExpanded[engine] && 'show'\">\r\n\t\t\t\t\t\t<TemplateRender \r\n\t\t\t\t\t\t\tv-if=\"enginesQuery[engine] && engine != 'lexicalTreeJSON' && engine != 'mongodb'\" \r\n\t\t\t\t\t\t\t:template=\"`<div>${enginesQuery[engine]}</div>`\"\r\n\t\t\t\t\t\t\t:query=\"query\"\r\n\t\t\t\t\t\t\t@replaceFields=\"query = $event\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<jsontree v-if=\"enginesQuery[engine] && engine == 'lexicalTreeJSON'\" :data=\"enginesQuery[engine]\"></jsontree>\r\n\t\t\t\t\t\t<hr>\r\n\t\t\t\t\t\t<!-- MongoDB not included at this stage -->\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>\r\n</template>\r\n\r\n<style scoped>\r\n\t.text-reader {\r\n\t\tmargin: 20px 0px 0px 0px;\r\n\t}\r\n\t.text-reader > .select-button {\r\n\t\tpadding: .5rem;\r\n\r\n\t\tcolor: #426E7B;\r\n\t\tbackground-color: #D3ECF1; \r\n\r\n\t\tborder-radius: .3rem;\r\n\r\n\t\ttext-align: center;\r\n\r\n\t\t-webkit-transition-duration: 0.4s; /* Safari */\r\n  \t\ttransition-duration: 0.4s;\r\n\t}\r\n\r\n\t.text-reader > .select-button:hover {\r\n\t\tbackground-color: #426E7B;\r\n  \t\tcolor: #D3ECF1;\r\n\t}\r\n\r\n\t.text-reader > input[type=\"file\"] {\r\n\t\tdisplay: none;\r\n\t}\r\n</style>\r\n"]}, media: undefined });
 
   };
   /* scoped */
-  const __vue_scope_id__$2 = "data-v-254cc916";
+  const __vue_scope_id__$2 = "data-v-9a923508";
   /* module identifier */
   const __vue_module_identifier__$2 = undefined;
   /* functional template */
