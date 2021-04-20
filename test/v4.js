@@ -7,16 +7,14 @@ import xlsx from 'xlsx';
 * @property {string} sheet ID of the sheet to extract the syntax tests from
 * @property {array<string>} omitCols Column headings to ignore when processing the sheet (implies also `rowHeader` as an item)
 * @property {string} rowHeader Which column header should be used as the row description / header
-* @property {string} driverRow Which row to extract the polyglot drivers from (uses the `rowHeader` to match)
 * @property {string} polyglotSources Which columns (using `driverRow`) can be used as polyglot sources
 * @property {number} [dataRowStart] Row offset to start reading data from, if falsy is calculated as driverRow+1
 */
 var settings = {
-	sheet: 'Syntax',
+	sheet: 'fieldCodes',
 	omitCols: ['Searching type'],
 	rowHeader: 'Explanation',
-	driverRow: '(Polyglot Driver)',
-	polyglotSources: ['pubmed', 'medlineOvid'],
+	polyglotSources: ['PubMed abbreviation', 'Ovid MEDLINE'],
 	dataRowStart: 0,
 };
 
@@ -26,7 +24,6 @@ var settings = {
 * This is calculated from the input data
 * @type {array<Object>} Collection of sources extracted from the input data
 * @property {string} id The row ID to use to extract data per line
-* @property {string} driver The polyglot driver to use per line when testing data
 */
 var sources;
 
@@ -36,28 +33,8 @@ var sources;
 * This is calculated from the input data
 * @type {array<Object>} Collection of targets extracted from the input data
 * @property {string} id The row ID to use to extract data per line
-* @property {string} driver The polyglot driver to use per line when targetting data
 */
 var targets;
-
-
-/**
-* Function to translate data headers into polyglot drivers
-* @param {string} input The XLSX header text
-* @returns {string|null} Either a valid polyglot driver or null if none are found
-*/
-var getPolyglotDriver = input => {
-	var found;
-	if (found = /^(?<prefix>cinahl|cochrane|embase|psycinfo|pubmed|wos|scopus)/i.exec(input)) { // Use simple prefix
-		return found.groups.prefix.toLowerCase();
-	} else if (/^ovid/i.test(input)) {
-		return 'medlineOvid';
-	} else if (/^web of science/i.test(input)) {
-		return 'wos';
-	} else {
-		return null;
-	}
-};
 
 it('should parse data/v4.xlsx', ()=> Promise.resolve()
 	.then(()=> xlsx.readFile(`${__dirname}/../data/v4.xlsx`))
@@ -67,20 +44,14 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 	})
 	.then(sheet => { // Extract source / target rows to aim for from the data set
 
-		// Find the secondary driver row of the sheet
-		var driverRowIndex = sheet.findIndex(row => row[settings.rowHeader] == settings.driverRow); // Find secondary driver row
-		if (driverRowIndex < 0) throw new Error(`Unable to locate driver description row "${settings.driverRow}" in test data`);
-		var driverRow = sheet[driverRowIndex];
-
 		// Calculate sources
 		sources = Object.keys(sheet[0])
 			.filter(header =>
 				![...settings.omitCols, settings.rowHeader].includes(header) // Skip omitted columns
-				&& settings.polyglotSources.includes(driverRow[header]) // We can use this as source data
+				&& settings.polyglotSources.includes(header) // We can use this as source data
 			)
 			.map(header => ({
 				id: header,
-				driver: getPolyglotDriver(header),
 			}));
 
 		// Calculate targets
@@ -88,11 +59,10 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 			.filter(header => ![...settings.omitCols, settings.rowHeader].includes(header)) // Skip omitted columns
 			.map(header => ({
 				id: header,
-				driver: getPolyglotDriver(header),
 			}));
 
 		// Return sliced data - removing all header areas
-		if (!settings.dataRowStart) settings.dataRowStart = driverRowIndex + 1;
+		if (!settings.dataRowStart) settings.dataRowStart = 1;
 		return sheet.slice(settings.dataRowStart); // Remove
 	})
 	.then(sheet => { // Last sanity checks before starting the test cycle
@@ -115,7 +85,7 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 					)
 					.forEach(target =>
 						it(`${row[settings.rowHeader]}: ${source.id} -> ${target.id}`, ()=>
-							expect(polyglot.translate(row[source.id], target.driver))
+							expect(polyglot.translateGeneric(row[source.id], target.id))
 								.to.equal(row[target.id], `Row: ${rowIndex+settings.dataRowStart+1}`)
 						)
 					)

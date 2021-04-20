@@ -10,7 +10,7 @@ var sources;
 
 export default settings => {
     return Promise.resolve()
-        .then(()=> xlsx.readFile(`./polyglotV4.xlsx`))
+        .then(()=> xlsx.readFile(`./v4.xlsx`))
         .then(workbook => {
             return xlsx.utils.sheet_to_json(workbook.Sheets[settings.sheet]);
         })

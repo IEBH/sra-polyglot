@@ -49,6 +49,11 @@ export default polyglot = {
 		return output;
 	},
 
+	translateGeneric: (query, engine, options) => {
+		var tree = parse(query, options);
+		return polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
+	},
+
 	translateAllGeneric: (query, options) => {
 		var output = {};
 		var tree = parse(query, options);
