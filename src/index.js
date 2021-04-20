@@ -103,10 +103,9 @@ export default polyglot = {
 		if (settings.forceString && !_.isString(text)) text = JSON.stringify(text, null, '\t');
 
 		if (settings.highlighting) {
+			// Highlight logical operators purple
 			text = text
-				.replace(/\bOR\b/g, '<font color="purple">OR</font>')
-				.replace(/\bAND\b/g, '<font color="purple">AND</font>')
-				.replace(/\bNOT\b/g, '<font color="purple">NOT</font>')
+				.replace(/(\sOR\s|\sAND\s|\sNOT\s)/g, (a, b) => `<font color="purple">${b}</font>`)
 		}
 
 		if (settings.html) {
