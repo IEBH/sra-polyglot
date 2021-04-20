@@ -24,7 +24,7 @@ var settings = {
 xlsxToParseMap(settings).then(parseMap => {
 	fs.writeFileSync(
 		'../src/data/parseMap.js',
-		`export default new Map (JSON.Parse(\`${mapToJson(parseMap)}\`)`
+		`export default new Map (JSON.Parse(\`${mapToJson(parseMap)}\`))`
 	);
 });
 
