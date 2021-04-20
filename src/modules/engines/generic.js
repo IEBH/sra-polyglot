@@ -76,20 +76,17 @@ export default {
                                 break;
                         case 'phrase':
                             if (branch.field) {
-                                let fieldCode = engineObject[engine][branch.field];
-                                if (fieldCode) {
-                                    buffer +=
-                                    (
-                                        fieldCode.prefix
-                                            ? (settings.highlighting ? `<font color="LightSeaGreen">${fieldCode.prefix}</font>` : fieldCode.prefix)
-                                            : ""
-                                    )
-                                    + (tools.quotePhrase(branch, 'pubmed', settings.highlighting))
-                                    + (
-                                        fieldCode.postfix
-                                            ? (settings.highlighting ? `<font color="LightSeaGreen">${fieldCode.postfix}</font>` : fieldCode.postfix)
-                                            : ""
-                                    )
+                                let termArray = engineObject[engine][branch.field];
+                                if (termArray) {
+                                    buffer += termArray.map(el => {
+                                        if (el && el.toLowerCase() !== "term") {
+                                            return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
+                                        } else if (el && el.toLowerCase() === "term") {
+                                            return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                        } else {
+                                            return el;
+                                        }
+                                    }).join("");
                                 } else {
                                     buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
                                 }
