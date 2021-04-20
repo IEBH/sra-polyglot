@@ -79,16 +79,19 @@ export default {
                                 let termArray = engineObject[engine][branch.field];
                                 if (termArray) {
                                     buffer += termArray.map(el => {
-                                        if (el && el.toLowerCase() !== "term") {
+                                        if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
-                                        } else if (el && el.toLowerCase() === "term") {
+                                        } else if (el && el.toLowerCase() === "test") {
                                             return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
-                                        } else {
+                                        } else { // Empty string
                                             return el;
                                         }
                                     }).join("");
                                 } else {
-                                    buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                    buffer += tools.createTooltip(
+                                        '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                        "No field tag found for engine"
+                                    )
                                 }
                             } else {
                                 // If no field tag exists create popover with ability to replace field tag

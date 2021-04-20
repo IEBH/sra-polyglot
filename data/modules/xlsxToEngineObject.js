@@ -34,7 +34,7 @@ export default settings => {
                 engineObject[source.id] = {};
                 sheet.forEach((row, rowIndex) => {
                     if(row[source.id]) {
-                        let termArray = row[source.id].split(/(Term)/g)
+                        let termArray = row[source.id].split(/(Test)/g)
                         engineObject[source.id][row[settings.rowHeader]] = termArray;
                     } else {
                         console.error(`\n${source.id}'s "${row[settings.rowHeader]}" is undefined\n`)

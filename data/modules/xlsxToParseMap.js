@@ -36,7 +36,7 @@ export default settings => {
             sheet.forEach((row, rowIndex) => {
                 sources.forEach(source => {
                     if(row[source.id]) {
-                        var match = row[source.id].match(/Term(?<fieldCode>[^\s]*)/); // Only does basic match
+                        var match = row[source.id].match(/Test(?<fieldCode>[^\s]*)/); // Only does basic match
                         if (match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
