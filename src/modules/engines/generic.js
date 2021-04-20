@@ -4,9 +4,9 @@ import _ from 'lodash';
 import engineObject from "../../data/engineObject.js"
 
 export default {
-    id: 'pubmed',
-    title: 'PubMed',
-    aliases: ['pubmed', 'p', 'pm', 'pubm'],
+    id: 'generic',
+    title: 'generic',
+    aliases: ['generic', 'g'],
 
     /**
     * Compile a tree structure to PubMed output
