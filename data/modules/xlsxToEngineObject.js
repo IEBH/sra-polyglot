@@ -32,7 +32,7 @@ var sheetToArr = function(sheet){
         }
     }
     return result;
- };
+};
 
 export default settings => {
     return Promise.resolve()

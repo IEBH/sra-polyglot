@@ -36,11 +36,37 @@ var sources;
 */
 var targets;
 
+var sheetToArr = function(sheet){
+    var result = [];
+    var row;
+    var rowNum;
+    var colNum;
+    var range = xlsx.utils.decode_range(sheet['!ref']);
+    for(rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+        row = {};
+        for(colNum = range.s.c; colNum <= range.e.c; colNum++) {
+            var nextCell = sheet[
+                xlsx.utils.encode_cell({r: rowNum, c: colNum})
+            ];
+            var key = sheet[
+                xlsx.utils.encode_cell({r: range.s.r, c: colNum})
+            ].w;
+            if(key && nextCell) {
+                row[key] = nextCell
+            }
+        }
+        if(Object.keys(row).length > 0) {
+            result.push(row);
+        }
+    }
+    return result;
+};
+
 it('should parse data/v4.xlsx', ()=> Promise.resolve()
 	.then(()=> xlsx.readFile(`${__dirname}/../data/v4.xlsx`))
 	.then(workbook => {
 		expect(workbook).to.have.nested.property(`Sheets.${settings.sheet}`);
-		return xlsx.utils.sheet_to_json(workbook.Sheets[settings.sheet]);
+		return sheetToArr(workbook.Sheets[settings.sheet]);
 	})
 	.then(sheet => { // Extract source / target rows to aim for from the data set
 
@@ -75,7 +101,7 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 		return sheet;
 	})
 	.then(sheet => sheet.forEach((row, rowIndex) =>
-		describe(row[settings.rowHeader], ()=>
+		describe(row[settings.rowHeader].w, ()=>
 			sources.forEach(source =>
 				targets
 					.filter(target =>
@@ -83,12 +109,14 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 						&& row[source.id] // Has a source value
 						&& row[target.id] // Has a target value
 					)
-					.forEach(target =>
-						it(`${row[settings.rowHeader]}: ${source.id} -> ${target.id}`, ()=>
-							expect(polyglot.translateGeneric(row[source.id], target.id))
-								.to.equal(row[target.id], `Row: ${rowIndex+settings.dataRowStart+1}`)
-						)
-					)
+					.forEach(target => {
+						if(!row[source.id].c) { // If no comment on source translation (i.e. is not a duplicate key)
+							it(`${row[settings.rowHeader].w}: ${source.id} -> ${target.id}`, () => 
+								expect(polyglot.translateGeneric(row[source.id].w, target.id))
+									.to.equal(row[target.id].w, `Row: ${rowIndex+settings.dataRowStart+1}`)
+							)
+						}
+					})
 			)
 		)
 	))

@@ -37,7 +37,7 @@ export default settings => {
                 sources.forEach(source => {
                     if(row[source.id]) {
                         var match = row[source.id].match(/Test(?<fieldCode>[^\s]*)/); // Only does basic match
-                        if (match.groups.fieldCode) {
+                        if (match && match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
                             if (!parseMap.has(match.groups.fieldCode.toLowerCase())) {
