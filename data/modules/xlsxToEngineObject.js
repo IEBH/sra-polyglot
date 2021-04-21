@@ -8,11 +8,37 @@ import xlsx from 'xlsx';
 */
 var sources;
 
+var sheetToArr = function(sheet){
+    var result = [];
+    var row;
+    var rowNum;
+    var colNum;
+    var range = xlsx.utils.decode_range(sheet['!ref']);
+    for(rowNum = range.s.r; rowNum <= range.e.r; rowNum++) {
+        row = {};
+        for(colNum=range.s.c; colNum<=range.e.c; colNum++) {
+            var nextCell = sheet[
+                xlsx.utils.encode_cell({r: rowNum, c: colNum})
+            ];
+            var key = sheet[
+                xlsx.utils.encode_cell({r: range.s.r, c: colNum})
+            ].w;
+            if(key && nextCell) {
+                row[key] = nextCell
+            }
+        }
+        if(Object.keys(row).length > 0) {
+            result.push(row);
+        }
+    }
+    return result;
+ };
+
 export default settings => {
     return Promise.resolve()
         .then(()=> xlsx.readFile(`./v4.xlsx`))
         .then(workbook => {
-            return xlsx.utils.sheet_to_json(workbook.Sheets[settings.sheet]);
+            return sheetToArr(workbook.Sheets[settings.sheet]);
         })
         // Extract source rows to aim for from the data set
         .then(sheet => {
@@ -34,14 +60,14 @@ export default settings => {
                 engineObject[source.id] = {};
                 sheet.forEach((row, rowIndex) => {
                     if(row[source.id]) {
-                        let termArray = row[source.id].split(/(Test)/g)
-                        if (!engineObject[source.id][row[settings.rowHeader]]) {
-                            engineObject[source.id][row[settings.rowHeader]] = termArray;
+                        if (!engineObject[source.id][row[settings.rowHeader]]?.w) {
+                            let termArray = row[source.id].w.split(/(Test)/g)
+                            engineObject[source.id][row[settings.rowHeader].w] = { terms: termArray, comment: row[source.id].c?.t };
                         } else {
-                            console.log("Duplicate key:", row[settings.rowHeader]);
+                            console.log("Duplicate key:", row[settings.rowHeader].w);
                         }
                     } else {
-                        console.error(`\n${source.id}'s "${row[settings.rowHeader]}" is undefined\n`)
+                        console.error(`\n${source.id}'s "${row[settings.rowHeader].w}" is undefined\n`)
                     }
                 })
             })

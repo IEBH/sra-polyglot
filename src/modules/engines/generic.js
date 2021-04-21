@@ -76,8 +76,10 @@ export default {
                                 break;
                         case 'phrase':
                             if (branch.field) {
-                                let termArray = engineObject[engine][branch.field];
-                                if (termArray) {
+                                let fieldObject = engineObject[engine][branch.field];
+                                if (fieldObject) {
+                                    let termArray = fieldObject.terms;
+                                    let comment = fieldObject.comment;
                                     buffer += termArray.map(el => {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
