@@ -40,7 +40,18 @@ export default settings => {
                         if (match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
-                            parseMap.set(match.groups.fieldCode.toLowerCase(), row[settings.rowHeader])
+                            if (!parseMap.has(match.groups.fieldCode.toLowerCase())) {
+                                parseMap.set(match.groups.fieldCode.toLowerCase(), row[settings.rowHeader])
+                            } else {
+                                console.log(
+                                    `Duplicate key (${source.id})`,
+                                    `'${match.groups.fieldCode.toLowerCase()}'`,
+                                    "for",
+                                    `'${row[settings.rowHeader]}'`,
+                                    "already exists for",
+                                    `'${parseMap.get(match.groups.fieldCode.toLowerCase())}'`
+                                );
+                            }
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }

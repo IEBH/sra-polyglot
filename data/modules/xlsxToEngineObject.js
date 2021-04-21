@@ -35,7 +35,11 @@ export default settings => {
                 sheet.forEach((row, rowIndex) => {
                     if(row[source.id]) {
                         let termArray = row[source.id].split(/(Test)/g)
-                        engineObject[source.id][row[settings.rowHeader]] = termArray;
+                        if (!engineObject[source.id][row[settings.rowHeader]]) {
+                            engineObject[source.id][row[settings.rowHeader]] = termArray;
+                        } else {
+                            console.log("Duplicate key:", row[settings.rowHeader]);
+                        }
                     } else {
                         console.error(`\n${source.id}'s "${row[settings.rowHeader]}" is undefined\n`)
                     }
