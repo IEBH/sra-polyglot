@@ -14,9 +14,9 @@ var sheetToArr = function(sheet){
     var rowNum;
     var colNum;
     var range = xlsx.utils.decode_range(sheet['!ref']);
-    for(rowNum = range.s.r; rowNum <= range.e.r; rowNum++) {
+    for(rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
         row = {};
-        for(colNum=range.s.c; colNum<=range.e.c; colNum++) {
+        for(colNum = range.s.c; colNum <= range.e.c; colNum++) {
             var nextCell = sheet[
                 xlsx.utils.encode_cell({r: rowNum, c: colNum})
             ];
