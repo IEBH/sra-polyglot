@@ -238,9 +238,9 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(majr|mesh major topic)\]/i.exec(q)) { // Major Mesh term - PubMed syntax
+        } else if (match = /^\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
             leaf.type = 'phrase';
-            leaf.field = 'MeSH Major Topic search';
+            leaf.field = match[2] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -272,7 +272,7 @@ export const parse = (query, options) => {
         } else if ((match = /^(exp \*"([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp \*([^*]*?)\/)\s*/i.exec(q))) { // Major Mesh term - Ovid syntax
             branch.nodes.push({
                 type: 'phrase',
-                field: 'MeSH Major Topic search',
+                field: 'MeSH Major Topic search (exploded)',
                 content: match[2]
             });
             offset += match[1].length;
@@ -284,7 +284,7 @@ export const parse = (query, options) => {
             // Major Mesh
             if(leaf.content[0] == "*") {
                 leaf.content = leaf.content.substr(1)
-                leaf.field = 'Mesh search (Not exploded)'
+                leaf.field = 'MeSH Major Topic search (Not exploded)'
             }
             else leaf.field = 'Mesh search (Not exploded)';
         } 
