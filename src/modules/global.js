@@ -30,6 +30,7 @@ export default {
 	* @example
 	* {rct: {engines: {default: 'foo', ovid: 'bar'}}} // `<rct>` => 'foo' in most databases and 'bar' in Ovid MEDLINE
 	*/
+	// TODO: Update templates to match new engines
 	templates: {
 		// Meta `<engine>` template will output the current engine (useful for tests)
 		'engine': {
