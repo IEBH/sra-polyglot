@@ -1,13 +1,5 @@
 import xlsx from 'xlsx';
 
-/**
-* Collection of row sources to use when running a test
-* This is calculated from the input data
-* @type {array<Object>} Collection of sources extracted from the input data
-* @property {string} id The row ID to use to extract data per line
-*/
-var sources;
-
 var sheetToArr = function(sheet){
     var result = [];
     var row;
@@ -35,6 +27,13 @@ var sheetToArr = function(sheet){
 };
 
 export default settings => {
+    /**
+    * Collection of row sources to use when running a test
+    * This is calculated from the input data
+    * @type {array<Object>} Collection of sources extracted from the input data
+    * @property {string} id The row ID to use to extract data per line
+    */
+    var sources;
     return Promise.resolve()
         .then(()=> xlsx.readFile(`./v4.xlsx`))
         .then(workbook => {
@@ -50,6 +49,7 @@ export default settings => {
                 .map(header => ({
                     id: header
                 }));
+            console.log(sources);
             // Return sliced data - removing all header areas
             return sheet.slice(settings.dataRowStart); // Remove first row
         })

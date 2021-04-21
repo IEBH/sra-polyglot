@@ -11,7 +11,7 @@ import xlsx from 'xlsx';
 * @property {number} [dataRowStart] Row offset to start reading data from, if falsy is calculated as driverRow+1
 */
 var settings = {
-	sheet: 'fieldCodes',
+	sheets: ['fieldCodes', 'mesh'],
 	omitCols: ['Searching type'],
 	rowHeader: 'Explanation',
 	polyglotSources: ['PubMed abbreviation', 'Ovid MEDLINE'],
@@ -65,8 +65,10 @@ var sheetToArr = function(sheet){
 it('should parse data/v4.xlsx', ()=> Promise.resolve()
 	.then(()=> xlsx.readFile(`${__dirname}/../data/v4.xlsx`))
 	.then(workbook => {
-		expect(workbook).to.have.nested.property(`Sheets.${settings.sheet}`);
-		return sheetToArr(workbook.Sheets[settings.sheet]);
+		return settings.sheets.map(sheet => {
+			expect(workbook).to.have.nested.property(`Sheets.${sheet}`);
+			return sheetToArr(workbook.Sheets[sheet]);
+		}).flat()
 	})
 	.then(sheet => { // Extract source / target rows to aim for from the data set
 

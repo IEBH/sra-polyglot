@@ -232,28 +232,28 @@ export const parse = (query, options) => {
         } 
         // MESH {{{
         else if (match = /^\[(mesh terms|mesh|mh)(:NoExp|:no exp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
-            leaf.type = 'phrase';
+            leaf.type = 'mesh';
             leaf.field = match[2] ? 'Mesh search (Not exploded)' : 'Mesh search (exploded)';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
-            leaf.type = 'phrase';
+            leaf.type = 'mesh';
             leaf.field = match[2] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
-            leaf.type = 'phrase';
+            leaf.type = 'mesh';
             leaf.field = 'MeSH subheading search';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^\.(fs)\./i.exec(q)) { // Mesh subheading search - Ovid syntax
-            leaf.type = 'phrase';
+            leaf.type = 'mesh';
             leaf.field = 'MeSH subheading search';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
@@ -261,7 +261,7 @@ export const parse = (query, options) => {
             cropString = false;
         } else if ((match = /^(exp "([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp ([^*]*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
             branch.nodes.push({
-                type: 'phrase',
+                type: 'mesh',
                 field: 'Mesh search (exploded)',
                 content: match[2]
             });
@@ -271,7 +271,7 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         } else if ((match = /^(exp \*"([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp \*([^*]*?)\/)\s*/i.exec(q))) { // Major Mesh term - Ovid syntax
             branch.nodes.push({
-                type: 'phrase',
+                type: 'mesh',
                 field: 'MeSH Major Topic search (exploded)',
                 content: match[2]
             });
@@ -280,7 +280,7 @@ export const parse = (query, options) => {
             cropString = false;
             afterWhitespace = true;
         } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
-            leaf.type = 'phrase'
+            leaf.type = 'mesh'
             // Major Mesh
             if(leaf.content[0] == "*") {
                 leaf.content = leaf.content.substr(1)

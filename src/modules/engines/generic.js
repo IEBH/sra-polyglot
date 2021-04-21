@@ -2,6 +2,7 @@ import tools from '../tools.js'
 import global from '../global.js'
 import _ from 'lodash';
 import engineObject from "../../data/engineObject.js"
+import meshObject from "../../data/meshObject.js"
 
 export default {
     id: 'generic',
@@ -76,10 +77,10 @@ export default {
                                 break;
                         case 'phrase':
                             if (branch.field) {
-                                let fieldObject = engineObject[engine][branch.field];
-                                if (fieldObject) {
-                                    let termArray = fieldObject.terms;
-                                    let comment = fieldObject.comment;
+                                let translateObject = engineObject[engine] ? engineObject[engine][branch.field] : null;
+                                if (translateObject) {
+                                    let termArray = translateObject.terms;
+                                    let comment = translateObject.comment;
                                     buffer += termArray.map(el => {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
@@ -107,6 +108,27 @@ export default {
                                 }
                             }
                             break;
+                        case 'mesh':
+                            let translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
+                            if (translateObject) {
+                                let termArray = translateObject.terms;
+                                let comment = translateObject.comment;
+                                buffer += termArray.map(el => {
+                                    if (el && el.toLowerCase() !== "test") {
+                                        return settings.highlighting ? `<font color="blue">${el}</font>` : el;
+                                    } else if (el && el.toLowerCase() === "test") {
+                                        return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                    } else { // Empty string
+                                        return el;
+                                    }
+                                }).join("");
+                            } else {
+                                buffer += tools.createTooltip(
+                                    '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                    "No mesh tag found for engine"
+                                )
+                            }
+                            break;
                         case 'joinNear':
                         case 'joinNext':
                         case 'joinAnd':
@@ -117,22 +139,6 @@ export default {
                             break;
                         case 'joinNot':
                             buffer += 'NOT';
-                            break;
-                        case 'mesh':
-                            if (settings.highlighting) {
-                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
-                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
-                            } else {
-                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Mesh' + (branch.recurse ? '' : ':NoExp') + ']';
-                            }
-                            break;
-                        case 'meshMajor':
-                            if (settings.highlighting) {
-                                buffer += tools.createTooltip('<font color="blue">' + tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']</font>', 
-                                                                        "Polyglot does not translate subject terms (e.g Emtree to MeSH), this needs to be done manually")
-                            } else {
-                                buffer += tools.quotePhrase(branch, 'pubmed') + '[Majr' + (branch.recurse ? '' : ':NoExp') + ']';
-                            }
                             break;
                         case 'raw':
                             buffer += branch.content;

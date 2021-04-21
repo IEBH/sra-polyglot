@@ -33,5 +33,11 @@ xlsxToEngineObject(settings).then(engineObject => {
 		'../src/data/engineObject.js',
 		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
 	) 
- 
+})
+
+xlsxToEngineObject({ ...settings, sheet: 'mesh' }).then(engineObject => {
+	fs.writeFileSync(
+		'../src/data/meshObject.js',
+		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
+	) 
 })
