@@ -235,7 +235,7 @@ export const parse = (query, options) => {
             cropString = false;
         } 
         // MESHTRANSLATIONS {{{
-        else if (match = new RegExp(`^(${meshTranslations})`, "i").exec(q)) {
+        else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q))) {
             branch.nodes.push({
                 type: 'meshTranslation',
                 field: meshTranslationsParse[match[1].toLowerCase()]
