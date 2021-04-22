@@ -1,8 +1,11 @@
 import tools from '../tools.js'
 import global from '../global.js'
 import _ from 'lodash';
+
+// Translation Objects
 import fieldCodesObject from "../../data/fieldCodesObject.js"
 import meshObject from "../../data/meshObject.js"
+import meshTranslationsObject from "../../data/meshTranslationsObject.js"
 
 export default {
     id: 'generic',
@@ -77,10 +80,10 @@ export default {
                                 break;
                         case 'phrase':
                             if (branch.field) {
-                                let translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
+                                var translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
                                 if (translateObject) {
-                                    let termArray = translateObject.terms;
-                                    let comment = translateObject.comment;
+                                    var termArray = translateObject.terms;
+                                    var comment = translateObject.comment;
                                     buffer += termArray.map(el => {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
@@ -109,15 +112,34 @@ export default {
                             }
                             break;
                         case 'mesh':
-                            let translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
+                            var translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
                             if (translateObject) {
-                                let termArray = translateObject.terms;
-                                let comment = translateObject.comment;
+                                var termArray = translateObject.terms;
+                                var comment = translateObject.comment;
                                 buffer += termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
                                         return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                    } else { // Empty string
+                                        return el;
+                                    }
+                                }).join("");
+                            } else {
+                                buffer += tools.createTooltip(
+                                    '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                    "No mesh tag found for engine"
+                                )
+                            }
+                            break;
+                        case 'meshTranslation':
+                            var translateObject = meshTranslationsObject[engine] ? meshTranslationsObject[engine][branch.field] : null;
+                            if (translateObject) {
+                                var termArray = translateObject.terms;
+                                var comment = translateObject.comment;
+                                buffer += termArray.map(el => {
+                                    if (el && el.toLowerCase() !== "test") {
+                                        return settings.highlighting ? `<font color="purple">${el}</font>` : el;
                                     } else { // Empty string
                                         return el;
                                     }

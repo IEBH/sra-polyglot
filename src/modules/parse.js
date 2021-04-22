@@ -1,7 +1,10 @@
 import global from './global.js';
 import tools from './tools.js';
 import _ from 'lodash';
+
+// Parsing Objects
 import fieldCodesParse from "../data/fieldCodesParse.js"
+import meshTranslationsParse from "../data/meshTranslationsParse.js"
 
 // Escape all regular expression chars except for pipe
 function escapeRegExp(string) {
@@ -110,6 +113,7 @@ export const parse = (query, options) => {
 
     // Create string of field codes seperated by pipe operator
     var fieldCodes = escapeRegExp(Object.keys(fieldCodesParse).join("|"));
+    var meshTranslations = escapeRegExp(Object.keys(meshTranslationsParse).join("|"));
 
     while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -230,6 +234,17 @@ export const parse = (query, options) => {
             q = q.substr(match[0].length);
             cropString = false;
         } 
+        // MESHTRANSLATIONS {{{
+        else if (match = new RegExp(`^(${meshTranslations})`, "i").exec(q)) {
+            branch.nodes.push({
+                type: 'meshTranslation',
+                field: meshTranslationsParse[match[1].toLowerCase()]
+            });
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        }
+        /// }}}
         // MESH {{{
         else if (match = /^\[(mesh terms|mesh|mh)(:NoExp|:no exp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
             leaf.type = 'mesh';

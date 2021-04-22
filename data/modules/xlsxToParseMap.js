@@ -35,7 +35,8 @@ export default settings => {
             let parseObject = {};
             sheet.forEach((row, rowIndex) => {
                 sources.forEach(source => {
-                    if(row[source.id]) {
+                    // Match based on field code
+                    if(row[source.id] && settings.matchFieldCode) {
                         var match = row[source.id].match(/Test(?<fieldCode>[^\s]*)/); // Only does basic match
                         if (match && match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
@@ -54,6 +55,21 @@ export default settings => {
                             }
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
+                        }
+                    }
+                    // Match based on entire string
+                    else if (row[source.id]) {
+                        if (!parseObject[row[source.id].toLowerCase()]) {
+                            parseObject[row[source.id].toLowerCase()] = row[settings.rowHeader];
+                        } else {
+                            console.log(
+                                `Duplicate key (${source.id})`,
+                                `'${row[source.id].toLowerCase()}'`,
+                                "for",
+                                `'${row[settings.rowHeader]}'`,
+                                "already exists for",
+                                `'${parseObject[row[source.id].toLowerCase()]}'`
+                            );
                         }
                     } else {
                         console.error(`\n${source.id}'s "${row[settings.rowHeader]}" is undefined\n`)

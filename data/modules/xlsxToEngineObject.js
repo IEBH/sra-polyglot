@@ -49,7 +49,6 @@ export default settings => {
                 .map(header => ({
                     id: header
                 }));
-            console.log(sources);
             // Return sliced data - removing all header areas
             return sheet.slice(settings.dataRowStart); // Remove first row
         })
