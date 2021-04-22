@@ -24,7 +24,7 @@ var settings = {
 xlsxToParseMap(settings).then(parseMap => {
 	fs.writeFileSync(
 		'../src/data/fieldCodesParse.js',
-		`export default new Map (JSON.parse(\`${mapToJson(parseMap)}\`))`
+		`export default JSON.parse(\`${JSON.stringify(parseMap).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \}\`)`
 	);
 });
 

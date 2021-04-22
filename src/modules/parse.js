@@ -109,7 +109,7 @@ export const parse = (query, options) => {
     var offset = 0;
 
     // Create string of field codes seperated by pipe operator
-    var fieldCodes = escapeRegExp(Array.from(fieldCodesParse.keys()).join("|"));
+    var fieldCodes = escapeRegExp(Object.keys(fieldCodesParse).join("|"));
 
     while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -325,7 +325,7 @@ export const parse = (query, options) => {
             }
             // }}}
 
-            useLeaf.field = fieldCodesParse.get(match[1].toLowerCase())
+            useLeaf.field = fieldCodesParse[match[1].toLowerCase()]
 
             offset += match[0].length;
             q = q.substr(match[0].length);

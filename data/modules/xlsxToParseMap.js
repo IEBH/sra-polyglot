@@ -32,7 +32,7 @@ export default settings => {
         })
         // Create lookup map 
         .then(sheet => {
-            let parseMap = new Map();
+            let parseObject = {};
             sheet.forEach((row, rowIndex) => {
                 sources.forEach(source => {
                     if(row[source.id]) {
@@ -40,8 +40,8 @@ export default settings => {
                         if (match && match.groups.fieldCode) {
                             // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
                             // Push fieldCode and explanation to Map
-                            if (!parseMap.has(match.groups.fieldCode.toLowerCase())) {
-                                parseMap.set(match.groups.fieldCode.toLowerCase(), row[settings.rowHeader])
+                            if (!parseObject[match.groups.fieldCode.toLowerCase()]) {
+                                parseObject[match.groups.fieldCode.toLowerCase()] = row[settings.rowHeader];
                             } else {
                                 console.log(
                                     `Duplicate key (${source.id})`,
@@ -49,7 +49,7 @@ export default settings => {
                                     "for",
                                     `'${row[settings.rowHeader]}'`,
                                     "already exists for",
-                                    `'${parseMap.get(match.groups.fieldCode.toLowerCase())}'`
+                                    `'${parseObject[match.groups.fieldCode.toLowerCase()]}'`
                                 );
                             }
                         } else {
@@ -60,6 +60,6 @@ export default settings => {
                     }
                 })
             })
-            return parseMap;
+            return parseObject;
         })
 }
