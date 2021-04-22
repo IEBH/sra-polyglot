@@ -329,30 +329,33 @@ export const parse = (query, options) => {
             cropString = false;
             afterWhitespace = true;
         }
-        // Match field codes 
+        // Match field codes {{{
         else if (match = new RegExp(`^(${fieldCodes})`, "i").exec(q)) { // Field specifier - PubMed syntax
-            // Figure out the leaf to use (usually the last one) or the previously used group {{{
+            // Figure out the leaf to use (usually the last one) or the previously used group
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
                 useLeaf = leaf;
             } else if (_.isArray(leaf) && lastGroup) {
                 useLeaf = lastGroup;
             }
-            // }}}
 
             useLeaf.field = fieldCodesParse[match[1].toLowerCase()]
 
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^#([^\)\n]+)/.exec(q)) {
+        } 
+        // }}}
+        /// Comment {{{
+        else if (match = /^#([^\)\n]+)/.exec(q)) {
             trimLastLeaf();
             branch.nodes.push({type: 'comment', content: match[1]});
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } 
+        }
+        // }}}
         else {
             var nextChar = q.substr(0, 1);
             if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
