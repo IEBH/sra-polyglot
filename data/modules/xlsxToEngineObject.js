@@ -61,7 +61,10 @@ export default settings => {
                     if(row[source.id]) {
                         if (!engineObject[source.id][row[settings.rowHeader]]?.w) {
                             let termArray = row[source.id].w.split(/(Test)/g)
-                            engineObject[source.id][row[settings.rowHeader].w] = { terms: termArray, comment: row[source.id].c?.t };
+                            engineObject[source.id][row[settings.rowHeader].w] = { 
+                                terms: termArray,
+                                comment: row[source.id].c ? row[source.id].c[0]?.t : undefined
+                            };
                         } else {
                             console.log("Duplicate key:", row[settings.rowHeader].w);
                         }

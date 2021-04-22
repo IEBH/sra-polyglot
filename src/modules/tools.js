@@ -313,7 +313,7 @@ const tools = {
     */
     createTooltip(content, message, css) {
         css = typeof css !== 'undefined' ? css : "black-underline";
-        return `<span class="`+ css + `" v-tooltip="'` + message + `'">`
+        return `<span class="`+ css + '" v-tooltip="`' + message + '`">'
                 + content 
                 + '</span>'
     },

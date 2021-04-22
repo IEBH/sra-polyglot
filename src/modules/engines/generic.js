@@ -84,7 +84,7 @@ export default {
                                 if (translateObject) {
                                     var termArray = translateObject.terms;
                                     var comment = translateObject.comment;
-                                    buffer += termArray.map(el => {
+                                    const content = termArray.map(el => {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
                                         } else if (el && el.toLowerCase() === "test") {
@@ -93,6 +93,9 @@ export default {
                                             return el;
                                         }
                                     }).join("");
+                                    buffer += (comment && settings.highlighting)
+                                        ? tools.createTooltip(content, comment)
+                                        : content;
                                 } else {
                                     buffer += tools.createTooltip(
                                         '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
