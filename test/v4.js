@@ -11,7 +11,7 @@ import xlsx from 'xlsx';
 * @property {number} [dataRowStart] Row offset to start reading data from, if falsy is calculated as driverRow+1
 */
 var settings = {
-	sheets: ['fieldCodes', 'mesh'],
+	sheets: ['fieldCodes', 'mesh', 'meshTranslations'],
 	omitCols: ['Searching type'],
 	rowHeader: 'Explanation',
 	polyglotSources: ['PubMed abbreviation', 'Ovid MEDLINE'],
