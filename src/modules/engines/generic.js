@@ -82,8 +82,8 @@ export default {
                             if (branch.field) {
                                 var translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
                                 if (translateObject) {
-                                    var termArray = translateObject.terms;
-                                    var comment = translateObject.comment;
+                                    const termArray = translateObject.terms;
+                                    const comment = translateObject.comment;
                                     const content = termArray.map(el => {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
@@ -117,9 +117,9 @@ export default {
                         case 'mesh':
                             var translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
                             if (translateObject) {
-                                var termArray = translateObject.terms;
-                                var comment = translateObject.comment;
-                                buffer += termArray.map(el => {
+                                const termArray = translateObject.terms;
+                                const comment = translateObject.comment;
+                                const content = termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
@@ -128,6 +128,9 @@ export default {
                                         return el;
                                     }
                                 }).join("");
+                                buffer += (comment && settings.highlighting)
+                                    ? tools.createTooltip(content, comment)
+                                    : content;
                             } else {
                                 buffer += tools.createTooltip(
                                     '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
@@ -138,15 +141,18 @@ export default {
                         case 'meshTranslation':
                             var translateObject = meshTranslationsObject[engine] ? meshTranslationsObject[engine][branch.field] : null;
                             if (translateObject) {
-                                var termArray = translateObject.terms;
-                                var comment = translateObject.comment;
-                                buffer += termArray.map(el => {
+                                const termArray = translateObject.terms;
+                                const comment = translateObject.comment;
+                                const content = termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="purple">${el}</font>` : el;
                                     } else { // Empty string
                                         return el;
                                     }
                                 }).join("");
+                                buffer += (comment && settings.highlighting)
+                                    ? tools.createTooltip(content, comment)
+                                    : content;
                             } else {
                                 buffer += tools.createTooltip(
                                     '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
