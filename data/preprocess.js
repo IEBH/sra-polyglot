@@ -2,10 +2,6 @@ import * as fs from 'fs';
 import xlsxToParseMap from "./modules/xlsxToParseMap.js"
 import xlsxToEngineObject from "./modules/xlsxToEngineObject.js"
 
-function mapToJson(map) {
-	return JSON.stringify([...map]);
-}
-
 /**
 * Testkit settings
 * @property {string} sheet ID of the sheet to extract the syntax tests from
