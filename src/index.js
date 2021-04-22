@@ -2,7 +2,7 @@ import { parse } from './modules/parse.js';
 import enginesImport from './modules/engines.js';
 import _ from 'lodash';
 import generic from './modules/engines/generic.js'
-import engineObject from "./data/engineObject.js"
+import fieldCodesObject from "./data/fieldCodesObject.js"
 
 let polyglot;
 export default polyglot = {
@@ -57,7 +57,7 @@ export default polyglot = {
 	translateAllGeneric: (query, options) => {
 		var output = {};
 		var tree = parse(query, options);
-		const engines = Object.keys(engineObject);
+		const engines = Object.keys(fieldCodesObject);
 		engines.forEach(engine => {
 			output[engine] = polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
 		})

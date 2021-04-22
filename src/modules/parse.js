@@ -1,7 +1,7 @@
 import global from './global.js';
 import tools from './tools.js';
 import _ from 'lodash';
-import parseMap from "../data/parseMap.js"
+import fieldCodesParse from "../data/fieldCodesParse.js"
 
 // Escape all regular expression chars except for pipe
 function escapeRegExp(string) {
@@ -109,7 +109,7 @@ export const parse = (query, options) => {
     var offset = 0;
 
     // Create string of field codes seperated by pipe operator
-    var fieldCodes = escapeRegExp(Array.from(parseMap.keys()).join("|"));
+    var fieldCodes = escapeRegExp(Array.from(fieldCodesParse.keys()).join("|"));
 
     while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
@@ -325,7 +325,7 @@ export const parse = (query, options) => {
             }
             // }}}
 
-            useLeaf.field = parseMap.get(match[1].toLowerCase())
+            useLeaf.field = fieldCodesParse.get(match[1].toLowerCase())
 
             offset += match[0].length;
             q = q.substr(match[0].length);

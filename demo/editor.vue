@@ -10,7 +10,7 @@ import { createToken, getQuery } from "./api.js";
 
 import TemplateRender from "./components/TemplateRedner.vue"
 
-import engineObject from "../src/data/engineObject.js"
+import fieldCodesObject from "../src/data/fieldCodesObject.js"
 
 export default {
 	data: ()=> ({
@@ -21,7 +21,7 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		engines: [...Object.keys(engineObject), 'lexicalTreeJSON'],
+		engines: [...Object.keys(fieldCodesObject), 'lexicalTreeJSON'],
 		enginesExpanded: {},
 		enginesQuery: {},
 		polyglotOptions: {

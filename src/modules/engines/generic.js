@@ -1,7 +1,7 @@
 import tools from '../tools.js'
 import global from '../global.js'
 import _ from 'lodash';
-import engineObject from "../../data/engineObject.js"
+import fieldCodesObject from "../../data/fieldCodesObject.js"
 import meshObject from "../../data/meshObject.js"
 
 export default {
@@ -77,7 +77,7 @@ export default {
                                 break;
                         case 'phrase':
                             if (branch.field) {
-                                let translateObject = engineObject[engine] ? engineObject[engine][branch.field] : null;
+                                let translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
                                 if (translateObject) {
                                     let termArray = translateObject.terms;
                                     let comment = translateObject.comment;

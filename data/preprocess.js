@@ -23,14 +23,14 @@ var settings = {
 
 xlsxToParseMap(settings).then(parseMap => {
 	fs.writeFileSync(
-		'../src/data/parseMap.js',
+		'../src/data/fieldCodesParse.js',
 		`export default new Map (JSON.parse(\`${mapToJson(parseMap)}\`))`
 	);
 });
 
 xlsxToEngineObject(settings).then(engineObject => {
 	fs.writeFileSync(
-		'../src/data/engineObject.js',
+		'../src/data/fieldCodesObject.js',
 		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
 	) 
 })
