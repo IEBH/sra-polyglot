@@ -161,6 +161,39 @@ export default {
                             }
                             break;
                         case 'joinNear':
+                            switch(engine) {
+                                case 'PubMed full':
+                                case 'PubMed abbreviation':
+                                    buffer += 'AND';
+                                    break;
+                                case 'Ovid MEDLINE':
+                                case 'PsycInfo (Ovid)':
+                                    buffer += `ADJ${branch.proximity}`;
+                                    break;
+                                case 'Cochrane Library':
+                                    buffer += `NEAR${branch.proximity}`;
+                                    break;
+                                case 'Embase (Elsevier)':
+                                case 'Web of Science':
+                                case 'WoS Advanced':
+                                case 'ProQuest Health and Medical':
+                                    buffer += `NEAR/${branch.proximity}`;
+                                    break;
+                                case 'CINAHL (Ebsco)':
+                                    buffer += `N${branch.proximity}`;
+                                    break;
+                                case 'Scopus (basic search)':
+                                case 'Scopus (advanced search)':
+                                    buffer += `W/${branch.proximity}`;
+                                    break;
+                                case 'SPORTDiscus':
+                                    buffer += `N/${branch.proximity}`;
+                                    break;
+                                case 'Informit Health Collection':
+                                    buffer += '%';
+                                    break;
+                            }
+                            break;
                         case 'joinNext':
                         case 'joinAnd':
                             buffer += 'AND';
