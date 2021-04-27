@@ -195,6 +195,39 @@ export default {
                             }
                             break;
                         case 'joinNext':
+                            switch(engine) {
+                                case 'PubMed full':
+                                case 'PubMed abbreviation':
+                                    buffer += 'AND';
+                                    break;
+                                case 'Ovid MEDLINE':
+                                case 'PsycInfo (Ovid)':
+                                    buffer += 'ADJ';
+                                    break;
+                                case 'Cochrane Library':
+                                    buffer += 'NEXT';
+                                    break;
+                                case 'Embase (Elsevier)':
+                                    buffer += 'NEXT/1';
+                                    break;
+                                case 'Web of Science':
+                                case 'WoS Advanced':
+                                case 'ProQuest Health and Medical':
+                                    buffer += 'NEAR/0';
+                                    break;
+                                case 'CINAHL (Ebsco)':
+                                    buffer += 'W1';
+                                    break;
+                                case 'Scopus (basic search)':
+                                case 'Scopus (advanced search)':
+                                case 'SPORTDiscus':
+                                    buffer += 'W/1';
+                                    break;
+                                case 'Informit Health Collection':
+                                    buffer += '!';
+                                    break;
+                            }
+                            break;
                         case 'joinAnd':
                             buffer += 'AND';
                             break;
