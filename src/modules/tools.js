@@ -65,11 +65,20 @@ const tools = {
         return tree;
     },
 
-    multiReplace: (text, replacements) => {
-        replacements.forEach(replacement => {
-            text = text.replace(replacement.subject, replacement.value)
-        })
-        return text;
+    // Escape all regular expression chars except for pipe
+    escapeRegExp: (string) => {
+        return string.replace(/[.*+?^${}()[\]\\]/g, '\\$&'); // $& means the whole matched string
+    },
+
+    // Replace multiple terms at once
+    multiReplace: (text, replaceObj) => {
+        var template = tools.escapeRegExp(Object.keys(replaceObj).join("|"));
+        if (template.length > 0) {
+            var regex = new RegExp(template, "g");
+            return text.replace(regex, match => replaceObj[match]);
+        } else {
+            return text;
+        }
     },
 
 
@@ -144,81 +153,93 @@ const tools = {
     * @param {boolean} highlighting Optional bool to determine if html color styling is added
     * @return {string} The phrase enclosed as needed
     */
-    quotePhrase: (branch, engine, highlighting = false) => {
+    quotePhrase: (branch, engine, settings) => {
         var text = _.trimEnd(branch.content);
         var space = /\s/.test(text)
 
-        // if(settings.replaceWildcards)
-        switch(engine) {
-            case "cinahl":
-                text = tools.multiReplace(text, [
-                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Cinahl", "highlight")},
-                    {subject: /\?/g, value: '#'},
-                    {subject: /\$/g, value: '*'},
-                ])
-                break;
-            case "cochrane":
-                if (space) {
-                    text = tools.wildCardCochrane(text, highlighting);
-                }
-                text = tools.multiReplace(text,[
-                    {subject: /\$/g, value: tools.createTooltip("?", "No Single Character Wildcard for Cochrane", "highlight")},
-                    // # is a comment and will therefore never be parsed
-                    // {subject: /#/g, value: tools.createTooltip("?", "No Single Character Wildcard for Cochrane", "highlight")},
-                ])
-                // Return text to prevent duplicate quotation marks
-                return text;
-            case "embase":
-                text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Embase", "highlight")},
-                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Embase", "highlight")},
-                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Embase", "highlight")},
-                ])
-                break;
-            case "mongodb":
-                text = tools.multiReplace(text,[
-                    
-                ])
-                break;
-            case "ovid":
-                text = tools.multiReplace(text,[
-                    
-                ])
-                break;
-            case "psycinfo":
-                text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: '?'},
-                    {subject: /\$/g, value: '*'},
-                ])
-                break;
-            case "pubmed":
-                text = tools.multiReplace(text, [
-                    {subject: /\?/g, value: '?'},
-                    {subject: /\$/g, value: '*'},
-                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
-                ])
-                break;
-            case "scopus":
-                text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: tools.createTooltip("?", "No Optional Wildcard for Scopus", "highlight")},
-                    {subject: /\$/g, value: tools.createTooltip("*", "No Optional Wildcard for Scopus", "highlight")},
-                    {subject: /#/g, value: tools.createTooltip("?", "Single Wildcard for Scopus is ?", "highlight")},
-                ])
-                space = true; //Always include quotes with scopus to make phrase a "loose phrase"
-                break;
-            case "wos":
-                text = tools.multiReplace(text,[
-                    {subject: /\?/g, value: '$'},
-                    {subject: /\$/g, value: '*'},
-                    {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for WoS", "highlight")},
-                ])
-                break;
+        // Apply wildcard replacements
+        if (settings.replaceWildcards) {
+            var replaceObj = {};
+            switch (engine) {
+                case 'PubMed full':
+                case 'PubMed abbreviation':
+                    replaceObj = {
+                        '$': settings.highlighting
+                            ? tools.createTooltip("*", "As PubMed does not support single character truncation a wildcard is used here", "highlight")
+                            : '*',
+                        '?': settings.highlighting
+                            ? tools.createTooltip("*", "As PubMed does not 0 or 1 character truncation a wildcard is used here", "highlight")
+                            : '*'
+                    }
+                    break;
+                case 'Ovid MEDLINE':
+                    break; // Nothing needed
+                case 'Cochrane Library':
+                    if (space) {
+                        text = tools.wildCardCochrane(text, settings.highlighting);
+                    }
+                    replaceObj = {
+                        '$': settings.highlighting
+                            ? tools.createTooltip("?", "As Cochrane does not support single character truncation, the 0 or 1 character truncation is used here.", "highlight")
+                            : '?'
+                    }
+                    return tools.multiReplace(text, replaceObj); // Return here to prevent duplicate quotes
+                case 'Embase (Elsevier)':
+                case 'Web of Science':
+                case 'WoS Advanced':
+                    replaceObj = {
+                        '$': '?',
+                        '?': '$' 
+                    }
+                    break;
+                case 'CINAHL (Ebsco)':
+                    replaceObj = {
+                        '$': '?',
+                        '?': '#'
+                    }
+                    break;
+                case 'Scopus (basic search)':
+                case 'Scopus (advanced search)':
+                    // space = true; //Always include quotes with scopus to make phrase a "loose phrase"
+                    replaceObj = {
+                        '$': '?',
+                        '?': settings.highlighting 
+                            ? tools.createTooltip("*", "0 or 1 character truncation is not available. The multiple character wildcard symbol has been substituted.", "highlight")
+                            : '*'
+                    }
+                    break;
+                case 'PsycInfo (Ovid)':
+                    replaceObj = {
+                        '$': '#'
+                    }
+                    break;
+                case 'ProQuest Health and Medical':
+                    replaceObj = {
+                        '$': '?'
+                    }
+                    break;
+                case 'SPORTDiscus':
+                    replaceObj = {
+                        '$': '#?',
+                        '?': '#'
+                    }
+                    break;
+                case 'Informit Health Collection':
+                    replaceObj = {
+                        '$': '?',
+                        '?': '*1'
+                    }
+                    break;
+            }
+            text = tools.multiReplace(text, replaceObj);
         }
 
         return (
-            space?
-                highlighting ? '<font color="DarkBlue">"' + text  + '"</font>' : '"' + text + '"'
-            : text
+            space
+                ? settings.highlighting
+                    ? '<font color="DarkBlue">"' + text  + '"</font>'
+                    : '"' + text + '"'
+                : text
         );
     },
 

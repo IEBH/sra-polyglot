@@ -24,13 +24,6 @@ export default {
             replaceWildcards: true,
         });
 
-        // Apply wildcard replacements
-        // if (settings.replaceWildcards) tools.replaceContent(tree, ['phrase'], [
-        //     {subject: /\?/g, value: '?'},
-        //     {subject: /\$/g, value: '*'},
-        //     {subject: /#/g, value: tools.createTooltip("*", "No Single Wildcard for Pubmed", "highlight")},
-        // ]);
-
         var compileWalker = tree =>
             tree
                 .map((branch, branchIndex) => {
@@ -88,7 +81,7 @@ export default {
                                         if (el && el.toLowerCase() !== "test") {
                                             return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
                                         } else if (el && el.toLowerCase() === "test") {
-                                            return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                            return tools.quotePhrase(branch, engine, settings);
                                         } else { // Empty string
                                             return el;
                                         }
@@ -98,7 +91,7 @@ export default {
                                         : content;
                                 } else {
                                     buffer += tools.createTooltip(
-                                        '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                        '<font color="#ff6161">' + tools.quotePhrase(branch, engine, { ...settings, highlighting: false }) + '</font>',
                                         "No field tag found for engine"
                                     )
                                 }
@@ -108,9 +101,9 @@ export default {
                                     global.variables.no_field_tag.push(branch.offset + branch.content.length);
                                 }
                                 if (settings.highlighting) {
-                                    buffer += tools.createPopover(tools.quotePhrase(branch, 'pubmed', settings.highlighting), branch.offset + branch.content.length);
+                                    buffer += tools.createPopover(tools.quotePhrase(branch, engine, settings), branch.offset + branch.content.length);
                                 } else {
-                                    buffer += tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                    buffer += tools.quotePhrase(branch, engine, settings);
                                 }
                             }
                             break;
@@ -123,7 +116,7 @@ export default {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
-                                        return tools.quotePhrase(branch, 'pubmed', settings.highlighting);
+                                        return tools.quotePhrase(branch, engine, settings);
                                     } else { // Empty string
                                         return el;
                                     }
@@ -133,7 +126,7 @@ export default {
                                     : content;
                             } else {
                                 buffer += tools.createTooltip(
-                                    '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                    '<font color="#ff6161">' + tools.quotePhrase(branch, engine, { ...settings, highlighting: false }) + '</font>',
                                     "No mesh tag found for engine"
                                 )
                             }
@@ -155,7 +148,7 @@ export default {
                                     : content;
                             } else {
                                 buffer += tools.createTooltip(
-                                    '<font color="#ff6161">' + tools.quotePhrase(branch, 'pubmed', false) + '</font>',
+                                    '<font color="#ff6161">' + tools.quotePhrase(branch, engine, { ...settings, highlighting: false }) + '</font>',
                                     "No mesh tag found for engine"
                                 )
                             }
@@ -241,7 +234,7 @@ export default {
                             buffer += branch.content;
                             break;
                         case 'template':
-                            buffer += tools.resolveTemplate(branch.content, 'pubmed');
+                            buffer += tools.resolveTemplate(branch.content, engine);
                             break;
                         case 'comment':
                             // Do nothing
