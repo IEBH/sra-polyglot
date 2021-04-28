@@ -21,7 +21,7 @@ export default {
 			showPrintMargin: false,
 			wrap: true,
 		},
-		engines: [...Object.keys(fieldCodesObject), 'lexicalTreeJSON'],
+		engines: [...Object.keys(fieldCodesObject), 'lexicalTreeJSON'].filter(engine => !['PubMed abbreviation 2', 'Ovid MEDLINE 2'].includes(engine)),
 		enginesExpanded: {},
 		enginesQuery: {},
 		polyglotOptions: {
