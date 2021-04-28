@@ -3,35 +3,35 @@ import polyglot from '../src';
 describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 
 	it('translate `term*` -> PM `term*`', ()=> {
-		expect(polyglot.translate('term*', 'pubmed')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'PubMed abbreviation')).to.equal('term*');
 	});
 
 	it('translate `term*` -> OV `term*`', ()=> {
-		expect(polyglot.translate('term*', 'medlineOvid')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'Ovid MEDLINE')).to.equal('term*');
 	});
 
 	it('translate `term*` -> CO `term*`', ()=> {
-		expect(polyglot.translate('term*', 'cochrane')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'Cochrane Library')).to.equal('term*');
 	});
 
 	it('translate `term*` -> EM `term*`', ()=> {
-		expect(polyglot.translate('term*', 'embase')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'Embase (Elsevier)')).to.equal('term*');
 	});
 
 	it('translate `term*` -> CI `term*`', ()=> {
-		expect(polyglot.translate('term*', 'cinahl')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'CINAHL (Ebsco)')).to.equal('term*');
 	});
 
 	it('translate `term*` -> PY `term*`', ()=> {
-		expect(polyglot.translate('term*', 'psycinfo')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'PsycInfo (Ovid)')).to.equal('term*');
 	});
 
 	it('translate `term*` -> SC `term*`', ()=> {
-		expect(polyglot.translate('term*', 'scopus')).to.equal('"term*"');
+		expect(polyglot.translateGeneric('term*', 'Scopus (advanced search)')).to.equal('"term*"');
 	});
 
 	it('translate `term*` -> WS `term*`', ()=> {
-		expect(polyglot.translate('term*', 'wos')).to.equal('term*');
+		expect(polyglot.translateGeneric('term*', 'Web of Science')).to.equal('term*');
 	});
 
 });
@@ -39,35 +39,35 @@ describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 describe('Translate wildcards searches (single character "#" style)', ()=> {
 
 	it('translate `term#` -> PM `term*`', ()=> {
-		expect(polyglot.translate('term#', 'pubmed')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for Pubmed\'">*</span>');
+		expect(polyglot.translateGeneric('term#', 'PubMed abbreviation')).to.equal('term*');
 	});
 
 	it('translate `term#` -> OV `term#`', ()=> {
-		expect(polyglot.translate('term#', 'medlineOvid')).to.equal('term#');
+		expect(polyglot.translateGeneric('term#', 'Ovid MEDLINE')).to.equal('term#');
 	});
 
 	it('translate `term#` -> CO `term#`', ()=> {
-		expect(polyglot.translate('term#', 'cochrane')).to.equal('term#');
+		expect(polyglot.translateGeneric('term#', 'Cochrane Library')).to.equal('term#');
 	});
 
 	it('translate `term#` -> EM `term*`', ()=> {
-		expect(polyglot.translate('term#', 'embase')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for Embase\'">*</span>');
+		expect(polyglot.translateGeneric('term#', 'Embase (Elsevier)')).to.equal('term*');
 	});
 
 	it('translate `term#` -> CI `term*`', ()=> {
-		expect(polyglot.translate('term#', 'cinahl')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for Cinahl\'">*</span>');
+		expect(polyglot.translateGeneric('term#', 'CINAHL (Ebsco)')).to.equal('term*');
 	});
 
 	it('translate `term#` -> PY `term#`', ()=> {
-		expect(polyglot.translate('term#', 'psycinfo')).to.equal('term#');
+		expect(polyglot.translateGeneric('term#', 'PsycInfo (Ovid)')).to.equal('term#');
 	});
 
 	it('translate `term#` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term#', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'Single Wildcard for Scopus is ?\'">?</span>"');
+		expect(polyglot.translateGeneric('term#', 'Scopus (advanced search)')).to.equal('"term?"');
 	});
 
 	it('translate `term#` -> WS `term*`', ()=> {
-		expect(polyglot.translate('term#', 'wos')).to.equal('term<span class="highlight" v-tooltip="\'No Single Wildcard for WoS\'">*</span>');
+		expect(polyglot.translateGeneric('term#', 'Web of Science')).to.equal('term*');
 	});
 
 });
@@ -75,71 +75,71 @@ describe('Translate wildcards searches (single character "#" style)', ()=> {
 describe('Translate wildcards searches (single character PubMed "?" style)', ()=> {
 
 	it('translate `term?` -> PM `term?`', ()=> {
-		expect(polyglot.translate('term?', 'pubmed')).to.equal('term?');
+		expect(polyglot.translateGeneric('term?', 'PubMed abbreviation')).to.equal('term?');
 	});
 
 	it('translate `term?` -> OV `term?`', ()=> {
-		expect(polyglot.translate('term?', 'medlineOvid')).to.equal('term?');
+		expect(polyglot.translateGeneric('term?', 'Ovid MEDLINE')).to.equal('term?');
 	});
 
 	it('translate `term?` -> CO `term?`', ()=> {
-		expect(polyglot.translate('term?', 'cochrane')).to.equal('term?');
+		expect(polyglot.translateGeneric('term?', 'Cochrane Library')).to.equal('term?');
 	});
 
 	it('translate `term?` -> EM `term?`', ()=> {
-		expect(polyglot.translate('term?', 'embase')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Embase\'">?</span>');
+		expect(polyglot.translateGeneric('term?', 'Embase (Elsevier)')).to.equal('term?');
 	});
 
 	it('translate `term?` -> CI `term#`', ()=> {
-		expect(polyglot.translate('term?', 'cinahl')).to.equal('term#');
+		expect(polyglot.translateGeneric('term?', 'CINAHL (Ebsco)')).to.equal('term#');
 	});
 
 	it('translate `term?` -> PY `term?`', ()=> {
-		expect(polyglot.translate('term?', 'psycinfo')).to.equal('term?');
+		expect(polyglot.translateGeneric('term?', 'PsycInfo (Ovid)')).to.equal('term?');
 	});
 
 	it('translate `term?` -> SC `term?`', ()=> {
-		expect(polyglot.translate('term?', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">?</span>"');
+		expect(polyglot.translateGeneric('term?', 'Scopus (advanced search)')).to.equal('"term?"');
 	});
 
 	it('translate `term?` -> WS `term*`', ()=> {
-		expect(polyglot.translate('term?', 'wos')).to.equal('term*');
+		expect(polyglot.translateGeneric('term?', 'Web of Science')).to.equal('term*');
 	});
 
 });
 
-describe('Translate wildcards searches (single character medlineOvid "$" style)', ()=> {
+describe('Translate wildcards searches (single character Ovid MEDLINE "$" style)', ()=> {
 
 	it('translate `term$` -> PM `term*`', ()=> {
-		expect(polyglot.translate('term$', 'pubmed')).to.equal('term*');
+		expect(polyglot.translateGeneric('term$', 'PubMed abbreviation')).to.equal('term*');
 	});
 
 	it('translate `term$` -> OV `term$`', ()=> {
-		expect(polyglot.translate('term$', 'medlineOvid')).to.equal('term$');
+		expect(polyglot.translateGeneric('term$', 'Ovid MEDLINE')).to.equal('term$');
 	});
 
 	it('translate `term$` -> CO `term?`', ()=> {
-		expect(polyglot.translate('term$', 'cochrane')).to.equal('term<span class="highlight" v-tooltip="\'No Single Character Wildcard for Cochrane\'">?</span>');
+		expect(polyglot.translateGeneric('term$', 'Cochrane Library')).to.equal('term>?');
 	});
 
 	it('translate `term$` -> EM `term*`', ()=> {
-		expect(polyglot.translate('term$', 'embase')).to.equal('term<span class="highlight" v-tooltip="\'No Optional Wildcard for Embase\'">*</span>');
+		expect(polyglot.translateGeneric('term$', 'Embase (Elsevier)')).to.equal('term*');
 	});
 
 	it('translate `term$` -> CI `term*`', ()=> {
-		expect(polyglot.translate('term$', 'cinahl')).to.equal('term*');
+		expect(polyglot.translateGeneric('term$', 'CINAHL (Ebsco)')).to.equal('term*');
 	});
 
 	it('translate `term$` -> PY `term*`', ()=> {
-		expect(polyglot.translate('term$', 'psycinfo')).to.equal('term*');
+		expect(polyglot.translateGeneric('term$', 'PsycInfo (Ovid)')).to.equal('term*');
 	});
 
 	it('translate `term$` -> SC `term*`', ()=> {
-		expect(polyglot.translate('term$', 'scopus')).to.equal('"term<span class="highlight" v-tooltip="\'No Optional Wildcard for Scopus\'">*</span>"');
+		expect(polyglot.translateGeneric('term$', 'Scopus (advanced search)')).to.equal('"term*"');
 	});
 
 	it('translate `term$` -> WS `term*`', ()=> {
-		expect(polyglot.translate('term$', 'wos')).to.equal('term*');
+		expect(polyglot.translateGeneric('term$', 'Web of Science')).to.equal('term*');
 	});
 
 });

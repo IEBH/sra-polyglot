@@ -139,7 +139,7 @@ describe('Parse', ()=> {
 		]);
 	});
 
-	it('should parse Mesh terms (medlineOvid syntax)', ()=> {
+	it('should parse Mesh terms (Ovid MEDLINE syntax)', ()=> {
 		expect(parse('exp foo/ and exp bar baz/ and quz/ and quz quuz/')).to.deep.equal([
 			{
 				type: 'line',
@@ -226,7 +226,7 @@ describe('Parse', ()=> {
 		]);
 	});
 
-	it('should identify field specific phrase objects (medlineOvid syntax)', ()=> {
+	it('should identify field specific phrase objects (Ovid MEDLINE syntax)', ()=> {
 		expect(parse('foo.tw. and bar baz.pt. and quz.ab. and (thud and waldo).fs.')).to.deep.equal([
 			{
 				type: 'line',
