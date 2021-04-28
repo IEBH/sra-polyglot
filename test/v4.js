@@ -14,7 +14,7 @@ var settings = {
 	sheets: ['fieldCodes', 'mesh', 'meshTranslations', 'searchCommands', 'testCases'],
 	omitCols: ['PubMed abbreviation 2', 'Ovid MEDLINE 2'],
 	rowHeader: 'Explanation',
-	polyglotSources: ['PubMed full', 'PubMed abbreviation', 'Ovid MEDLINE'],
+	polyglotSources: ['PubMed full', 'PubMed abbreviation', 'PubMed abbreviation 2', 'Ovid MEDLINE', 'Ovid MEDLINE 2'],
 	dataRowStart: 0,
 };
 
@@ -75,7 +75,7 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 		// Calculate sources
 		sources = Object.keys(sheet[0])
 			.filter(header =>
-				![...settings.omitCols, settings.rowHeader].includes(header) // Skip omitted columns
+				![settings.rowHeader].includes(header) // Skip omitted columns
 				&& settings.polyglotSources.includes(header) // We can use this as source data
 			)
 			.map(header => ({
