@@ -76,6 +76,14 @@ export default settings => {
                     }
                 })
             })
-            return parseObject;
+            // Sort keys descending to ensure longest is matched first
+            const ordered = Object.keys(parseObject).sort().reverse().reduce(
+                (obj, key) => { 
+                    obj[key] = parseObject[key]; 
+                    return obj;
+                }, 
+                {}
+            );
+            return ordered;
         })
 }
