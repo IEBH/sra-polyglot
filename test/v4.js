@@ -14,7 +14,7 @@ var settings = {
 	sheets: ['fieldCodes', 'mesh', 'meshTranslations', 'searchCommands', 'testCases'],
 	omitCols: ['PubMed abbreviation 2', 'Ovid MEDLINE 2'],
 	rowHeader: 'Explanation',
-	polyglotSources: ['PubMed abbreviation', 'Ovid MEDLINE'],
+	polyglotSources: ['PubMed full', 'PubMed abbreviation', 'Ovid MEDLINE'],
 	dataRowStart: 0,
 };
 

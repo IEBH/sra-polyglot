@@ -15,7 +15,7 @@ var settings = {
 	sheet: 'fieldCodes',
 	matchFieldCode: true,
 	omitCols: ['Searching type'],
-	includeCols: ['PubMed abbreviation', 'Ovid MEDLINE'],
+	includeCols: ['PubMed full', 'PubMed abbreviation', 'Ovid MEDLINE'],
 	rowHeader: 'Explanation',
 	dataRowStart: 0,
 };
