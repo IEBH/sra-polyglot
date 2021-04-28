@@ -26,8 +26,8 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[pt]', 'PsycInfo (Ovid)')).to.equal('term.pt');
 	});
 
-	it('translate `term[pt]` -> SC `DOCTYPE("term")`', ()=> {
-		expect(polyglot.translateGeneric('term[pt]', 'Scopus (advanced search)')).to.equal('DOCTYPE("term")');
+	it('translate `term[pt]` -> SC `DOCTYPE(term)`', ()=> {
+		expect(polyglot.translateGeneric('term[pt]', 'Scopus (advanced search)')).to.equal('DOCTYPE(term)');
 	});
 
 	it('translate `term[pt]` -> WS `term`', ()=> {
@@ -62,8 +62,8 @@ describe('Translate publication type searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translateGeneric('term:pt', 'PsycInfo (Ovid)')).to.equal('term.pt');
 	});
 
-	it('translate `term:pt` -> SC `DOCTYPE("term")`', ()=> {
-		expect(polyglot.translateGeneric('term:pt', 'Scopus (advanced search)')).to.equal('DOCTYPE("term")');
+	it('translate `term:pt` -> SC `DOCTYPE(term)`', ()=> {
+		expect(polyglot.translateGeneric('term:pt', 'Scopus (advanced search)')).to.equal('DOCTYPE(term)');
 	});
 
 	it('translate `term:pt` -> WS `term`', ()=> {

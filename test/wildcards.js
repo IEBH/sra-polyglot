@@ -139,7 +139,7 @@ describe('Translate wildcards searches (single character Ovid MEDLINE "$" style)
 	});
 
 	it('translate `term$` -> WS `term*`', ()=> {
-		expect(polyglot.translateGeneric('term$', 'Web of Science')).to.equal('term*');
+		expect(polyglot.translateGeneric('term$', 'Web of Science')).to.equal('term?');
 	});
 
 });

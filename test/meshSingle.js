@@ -27,7 +27,7 @@ describe('Translate single MESH terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Mesh]` -> SC `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+		expect(polyglot.translateGeneric('term[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[Mesh]` -> WS `term`', ()=> {
@@ -63,7 +63,7 @@ describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 	});
 
 	it('translate `term[mh]` -> SC `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+		expect(polyglot.translateGeneric('term[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[mh]` -> WS `term`', ()=> {
@@ -99,7 +99,7 @@ describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `term[MeSH Terms]` -> SC `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+		expect(polyglot.translateGeneric('term[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[MeSH Terms]` -> WS `term`', ()=> {
@@ -135,7 +135,7 @@ describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `exp term/` -> SC `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('exp term/', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+		expect(polyglot.translateGeneric('exp term/', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `exp term/` -> WS `term`', ()=> {

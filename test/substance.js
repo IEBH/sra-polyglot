@@ -27,7 +27,7 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[ab]` -> SC `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term[nm]', 'Scopus (advanced search)')).to.equal('CHEM("term")');
+		expect(polyglot.translateGeneric('term[nm]', 'Scopus (advanced search)')).to.equal('CHEM(term)');
 	});
 
 	it('translate `term[nm]` -> WS `term`', ()=> {
@@ -63,7 +63,7 @@ describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `term.nm` -> SC `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term.nm', 'Scopus (advanced search)')).to.equal('CHEM("term")');
+		expect(polyglot.translateGeneric('term.nm', 'Scopus (advanced search)')).to.equal('CHEM(term)');
 	});
 
 	it('translate `term.nm` -> WS `term`', ()=> {

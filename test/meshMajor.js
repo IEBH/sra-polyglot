@@ -26,8 +26,8 @@ describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[Majr]', 'PsycInfo (Ovid)')).to.equal('exp *term/');
 	});
 
-	it('translate `term[Majr]` -> SC `((INDEXTERMS("term"))`', ()=> {
-		expect(polyglot.translateGeneric('term[Majr]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+	it('translate `term[Majr]` -> SC `((INDEXTERMS(term))`', ()=> {
+		expect(polyglot.translateGeneric('term[Majr]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[Majr]` -> WS `term`', ()=> {
@@ -62,8 +62,8 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'PsycInfo (Ovid)')).to.equal('exp *term/');
 	});
 
-	it('translate `term[MeSH Major Topic]` -> SC `((INDEXTERMS("term"))`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+	it('translate `term[MeSH Major Topic]` -> SC `((INDEXTERMS(term))`', ()=> {
+		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[MeSH Major Topic]` -> WS `term`', ()=> {
@@ -98,8 +98,8 @@ describe('Translate Translate MeSH major terms (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translateGeneric('exp *term/', 'PsycInfo (Ovid)')).to.equal('exp *term/');
 	});
 
-	it('translate `exp *term/` -> SC `((INDEXTERMS("term"))`', ()=> {
-		expect(polyglot.translateGeneric('exp *term/', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+	it('translate `exp *term/` -> SC `((INDEXTERMS(term))`', ()=> {
+		expect(polyglot.translateGeneric('exp *term/', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `exp *term/` -> WS `term`', ()=> {

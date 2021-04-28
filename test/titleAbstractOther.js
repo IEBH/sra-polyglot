@@ -99,7 +99,7 @@ describe('Translate title + abstract + other searches, with automated gunk (Ovid
 	});
 
 	it('translate `term.mp. [...]` -> SC `TITLE-ABS-KEY(term)`', ()=> {
-		expect(polyglot.translateGeneric('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Scopus (advanced search)')).to.equal('TITLE-ABS-KEY("term")');
+		expect(polyglot.translateGeneric('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Scopus (advanced search)')).to.equal('TITLE-ABS-KEY(term)');
 	});
 
 	it('translate `term.mp. [...]` -> WS `term`', ()=> {

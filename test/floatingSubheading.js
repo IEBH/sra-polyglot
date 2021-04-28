@@ -26,8 +26,8 @@ describe('Translate floating subheading searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[sh]', 'PsycInfo (Ovid)')).to.equal('term.hw');
 	});
 
-	it('translate `term[sh]` -> SC `INDEXTERMS("term")`', ()=> {
-		expect(polyglot.translateGeneric('term[sh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+	it('translate `term[sh]` -> SC `INDEXTERMS(term)`', ()=> {
+		expect(polyglot.translateGeneric('term[sh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term[sh]` -> WS `term`', ()=> {
@@ -62,8 +62,8 @@ describe('Translate floating subheading searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translateGeneric('term:fs', 'PsycInfo (Ovid)')).to.equal('term.hw');
 	});
 
-	it('translate `term:fs` -> SC `INDEXTERMS("term")`', ()=> {
-		expect(polyglot.translateGeneric('term:fs', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term")');
+	it('translate `term:fs` -> SC `INDEXTERMS(term)`', ()=> {
+		expect(polyglot.translateGeneric('term:fs', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term)');
 	});
 
 	it('translate `term:fs` -> WS `term`', ()=> {

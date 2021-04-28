@@ -27,7 +27,7 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[tiab]` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term[tiab]', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term[tiab]', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term[tiab]` -> WS `term`', ()=> {
@@ -63,7 +63,7 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Title/Abstract]` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term[Title/Abstract]', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term[Title/Abstract]', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term[Title/Abstract]` -> WS `term`', ()=> {
@@ -99,7 +99,7 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term:ti,ab` format)
 	});
 
 	it('translate `term:ti,ab` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term:ti,ab', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term:ti,ab` -> WS `term`', ()=> {
@@ -135,7 +135,7 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format)
 	});
 
 	it('translate `term.ti,ab` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term.ti,ab', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term.ti,ab', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term.ti,ab` -> WS `term`', ()=> {
@@ -171,7 +171,7 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) ->
 	});
 
 	it('translate `term.tw.` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term.tw.', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term.tw.', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term.tw.` -> WS `term`', ()=> {
@@ -207,7 +207,7 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 	});
 
 	it('translate `term.ab,ti` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term.ab,ti', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term.ab,ti` -> WS `term`', ()=> {
@@ -243,7 +243,7 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 	});
 
 	it('translate `term.ab,ti.` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti.', 'Scopus (advanced search)')).to.equal('TITLE-ABS("term")');
+		expect(polyglot.translateGeneric('term.ab,ti.', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
 	});
 
 	it('translate `term.ab,ti.` -> WS `term`', ()=> {

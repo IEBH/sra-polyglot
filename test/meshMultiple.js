@@ -33,8 +33,8 @@ describe('Translate multiple MESH terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[Mesh]` -> SC `INDEXTERMS(term1 term2)`', ()=> {
-		expect(polyglot.translateGeneric('"term1 term2"[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 term2")');
-		expect(polyglot.translateGeneric('"term1 and term2"[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 and term2")');
+		expect(polyglot.translateGeneric('"term1 term2"[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 term2")');
+		expect(polyglot.translateGeneric('"term1 and term2"[Mesh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 and term2)');
 	});
 
 	it('translate `"term1 term2"[Mesh]` -> WS `"term1 term2"`', ()=> {
@@ -77,8 +77,8 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[mh]` -> SC `INDEXTERMS(term1 term2)`', ()=> {
-		expect(polyglot.translateGeneric('"term1 term2"[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 term2")');
-		expect(polyglot.translateGeneric('"term1 and term2"[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 and term2")');
+		expect(polyglot.translateGeneric('"term1 term2"[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 term2)');
+		expect(polyglot.translateGeneric('"term1 and term2"[mh]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 and term2)');
 	});
 
 	it('translate `"term1 term2"[mh]` -> WS `"term1 term2"`', ()=> {
@@ -121,8 +121,8 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[MeSH Terms]` -> SC `INDEXTERMS(term1 term2)`', ()=> {
-		expect(polyglot.translateGeneric('"term1 term2"[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 term2")');
-		expect(polyglot.translateGeneric('"term1 and term2"[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 and term2")');
+		expect(polyglot.translateGeneric('"term1 term2"[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 term2)');
+		expect(polyglot.translateGeneric('"term1 and term2"[MeSH Terms]', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 and term2)');
 	});
 
 	it('translate `"term1 term2"[MeSH Terms]` -> WS `"term1 term2"`', ()=> {
@@ -171,9 +171,9 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `exp term1 term2/` -> SC `INDEXTERMS(term1 term2)`', ()=> {
-		expect(polyglot.translateGeneric('exp term1 term2/', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 term2")');
-		expect(polyglot.translateGeneric('exp term1 and term2/', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 and term2")');
-		expect(polyglot.translateGeneric('exp "term1 and term2"/', 'Scopus (advanced search)')).to.equal('INDEXTERMS("term1 and term2")');
+		expect(polyglot.translateGeneric('exp term1 term2/', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 term2)');
+		expect(polyglot.translateGeneric('exp term1 and term2/', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 and term2)');
+		expect(polyglot.translateGeneric('exp "term1 and term2"/', 'Scopus (advanced search)')).to.equal('INDEXTERMS(term1 and term2)');
 	});
 
 	it('translate `exp term1 term2/` -> WS `"term1 term2"`', ()=> {
