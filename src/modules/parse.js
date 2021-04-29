@@ -330,7 +330,7 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         }
         // Match field codes {{{
-        else if (match = new RegExp(`^(${fieldCodes})\\s*(\\[mp=[^\\]\\n]*\\])?`, "i").exec(q)) { // Field specifier - PubMed syntax
+        else if (match = new RegExp(`^(${fieldCodes}) *(\\[mp=[^\\]\\n]*\\])?`, "i").exec(q)) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
