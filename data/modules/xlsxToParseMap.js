@@ -8,6 +8,22 @@ import xlsx from 'xlsx';
 */
 var sources;
 
+function permute(input, permArr = [], usedChars = []) {
+    var i, ch;
+    for (i = 0; i < input.length; i++) {
+        ch = input.splice(i, 1)[0];
+        usedChars.push(ch);
+        if (input.length == 0) {
+            permArr.push(usedChars.slice());
+        }
+        permute(input, permArr, usedChars);
+        input.splice(i, 0, ch);
+        usedChars.pop();
+    }
+    return permArr
+};
+
+
 export default settings => {
     return Promise.resolve()
         .then(()=> xlsx.readFile(`./v4.xlsx`))
@@ -39,20 +55,42 @@ export default settings => {
                     if(row[source.id] && settings.matchFieldCode) {
                         var match = row[source.id].match(/Test(?<fieldCode>[^\n]*)/); // Only does basic match
                         if (match && match.groups.fieldCode) {
-                            // TODO: Add logic if the field code could have different variations (e.g. .ti,ab,kf.)
-                            // Push fieldCode and explanation to Map
-                            if (!parseObject[match.groups.fieldCode.toLowerCase()]) {
-                                parseObject[match.groups.fieldCode.toLowerCase()] = row[settings.rowHeader];
-                            } else {
-                                console.log(
-                                    `Duplicate key (${source.id})`,
-                                    `'${match.groups.fieldCode.toLowerCase()}'`,
-                                    "for",
-                                    `'${row[settings.rowHeader]}'`,
-                                    "already exists for",
-                                    `'${parseObject[match.groups.fieldCode.toLowerCase()]}'`
-                                );
+                            var fieldCode = match.groups.fieldCode;
+                            // Permute field code if it could have different variations (e.g. .ti,ab. or .ab,ti.)
+                            var variations = [ fieldCode ];
+                            if (fieldCode.includes(",")) {
+                                variations = []; // Clear variations array to prevent duplicate field code
+                                var periodSplit;
+                                var permutations;
+                                periodSplit = (fieldCode.split(/(\.)/g)); // Split by period
+                                periodSplit = periodSplit.filter(el => el.length > 0); // Filter out empty strings
+                                const index = periodSplit.findIndex(el => el.includes(",")) // Find index that has comma
+                                permutations = permute(periodSplit[index].split(",")); // Calculate permutations for index
+                                permutations = permutations.map(el => el.join(",")); // Join permuatations by comma
+                                permutations.forEach(el => { // For each permutation reconstruct string and push to array
+                                    var fieldCodePermutation = [
+                                        ...periodSplit.slice(0, index),
+                                        el,
+                                        ...periodSplit.slice(index + 1)
+                                    ].join("");
+                                    variations.push(fieldCodePermutation);
+                                })
                             }
+                            // Push fieldCode and explanation to Map
+                            variations.forEach(fieldCodeVariation => {
+                                if (!parseObject[fieldCodeVariation.toLowerCase()]) {
+                                    parseObject[fieldCodeVariation.toLowerCase()] = row[settings.rowHeader];
+                                } else {
+                                    console.log(
+                                        `Duplicate key (${source.id})`,
+                                        `'${fieldCodeVariation.toLowerCase()}'`,
+                                        "for",
+                                        `'${row[settings.rowHeader]}'`,
+                                        "already exists for",
+                                        `'${parseObject[fieldCodeVariation.toLowerCase()]}'`
+                                    );
+                                }
+                            })
                         } else {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }
