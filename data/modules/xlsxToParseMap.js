@@ -114,6 +114,14 @@ export default settings => {
                     }
                 })
             })
+            // For any key that ends in '.', remove it (for optional end period on ovid tranlsations)
+            // e.g. .ti. === .ti
+            Object.keys(parseObject).forEach(key => {
+                if (key.slice(-1) === ".") {
+                    const newKey = key.slice(0, -1);
+                    parseObject[newKey] = parseObject[key];
+                }
+            })
             // Sort keys descending to ensure longest is matched first
             const ordered = Object.keys(parseObject).sort().reverse().reduce(
                 (obj, key) => { 
