@@ -4,6 +4,9 @@ import _ from 'lodash';
 import generic from './modules/engines/generic.js'
 import fieldCodesObject from "./data/fieldCodesObject.js"
 
+import global from "./modules/global.js";
+export { fieldCodesObject, global };
+
 let polyglot;
 export default polyglot = {
 
