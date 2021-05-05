@@ -340,9 +340,13 @@ export const parse = (query, options) => {
             }
 
             useLeaf.field = fieldCodesParse[match[1].toLowerCase()]
-
-            offset += match[0].length;
-            q = q.substr(match[0].length);
+            if (match[2]) {
+                offset += match[0].length;
+                q = q.substr(match[0].length);
+            } else {
+                offset += match[1].length;
+                q = q.substr(match[1].length)
+            }
             cropString = false;
         } 
         // }}}
