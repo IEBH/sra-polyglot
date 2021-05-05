@@ -1,9 +1,9 @@
-import global from '../src/modules/global.js'
-import { parse } from '../src/modules/parse.js'
+const global = require( '../lib/modules/global.js').default;
+const parse = require('../lib/modules/parse.js').parse;
 
 var _ = require('lodash');
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe('Example test "Failure of antibiotic prescribing for bacterial infections"', ()=> {
 	var example = _.find(global.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
 	expect(example).to.be.an.instanceOf(Object);

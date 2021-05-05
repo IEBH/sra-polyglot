@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe('Translate adjacency searches (ADJ format)', ()=> {
 
 	it('translate `term1 ADJ3 term2` -> PM `term1 AND term2`', ()=> {

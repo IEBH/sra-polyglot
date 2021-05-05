@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 // FIXME: Not currently supported
 describe.skip('Line numbers', ()=> {
 

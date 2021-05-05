@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 
 	it('translate `term*` -> PM `term*`', ()=> {

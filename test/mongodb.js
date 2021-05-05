@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe.skip('Translate searches (PubMed -> Mongo)', ()=> {
 
 	var o = {

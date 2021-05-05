@@ -1,4 +1,4 @@
-import { parse } from '../src/modules/parse.js';
+const parse = require('../lib/modules/parse.js').parse;
 
 var expect = require('chai').expect;
 

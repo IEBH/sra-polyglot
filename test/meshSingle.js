@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe('Translate single MESH terms (PubMed -> *)', ()=> {
 
 	it('translate `term[Mesh]` -> PM `term[Mesh]`', ()=> {

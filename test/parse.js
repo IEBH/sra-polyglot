@@ -1,5 +1,5 @@
-import { parse } from '../src/modules/parse.js';
-import polyglot from '../src'
+const parse = require('../lib/modules/parse.js').parse;
+const polyglot = require('../lib').default;
 
 var _ = require('lodash');
 var expect = require('chai').expect;

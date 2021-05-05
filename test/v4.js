@@ -1,7 +1,6 @@
-import {expect} from 'chai';
-import polyglot from '../src';
-import xlsx from 'xlsx';
-
+var expect = require('chai').expect;
+const polyglot = require('../lib').default;
+const xlsx = require('xlsx');
 /**
 * Testkit settings
 * @property {string} sheet ID of the sheet to extract the syntax tests from

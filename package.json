@@ -1,12 +1,12 @@
 {
   "name": "sra-polyglot",
-  "version": "4.0.0-beta.1",
+  "version": "4.0.0",
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha -r esm test/v4",
-    "test:old": "mocha -r esm './test/**/!(v4).js'",
-    "test:all": "mocha -r esm",
+    "test": "npm run prepare && mocha test/v4",
+    "test:old": "npm run prepare && mocha './test/**/!(v4).js'",
+    "test:all": "npm run prepare && mocha",
     "prepare": "babel src --out-dir lib"
   },
   "babel": {
@@ -41,7 +41,6 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.0.0",
     "chai": "^4.2.0",
-    "esm": "^3.2.25",
     "mocha": "^8.2.1",
     "xlsx": "^0.16.9"
   },

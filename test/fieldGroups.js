@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-import polyglot from '../src';
+const polyglot = require('../lib').default;
 describe('Translate field groups (Ovid MEDLINE -> CINAHL)', ()=> {
 
 	it('translate `(term1).tw.` -> CI `(TI term1 OR AB term1)`', ()=> {
