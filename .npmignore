@@ -1,2 +1,5 @@
-demo/
+data/
+gh-pages/
+node_modules/
+src/
 test/
