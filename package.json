@@ -1,5 +1,5 @@
 {
-  "name": "sra-polyglot",
+  "name": "@iebh/polyglot",
   "version": "4.0.0",
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "medical",
     "research"
   ],
-  "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang), Connor Forbes (https://github.com/connorf25)",
+  "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang), Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/IEBH/sra-polyglot/issues"
