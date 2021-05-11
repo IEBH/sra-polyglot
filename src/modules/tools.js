@@ -93,6 +93,7 @@ const tools = {
         if (!global.templates[template]) return 'UNKNOWN-TEMPLATE:' + template;
         if (global.templates[template].engines[engine]) return global.templates[template].engines[engine];
         if (global.templates[template].engines.default) return polyglot.translate(global.templates[template].engines.default, engine);
+        if (!global.templates[template].engines[engine]) return `Template: ${template} not found for engine: ${engine}`;
         return '';
     },
     
