@@ -112,7 +112,7 @@ export default {
                             if (translateObject) {
                                 const termArray = translateObject.terms;
                                 const comment = translateObject.comment;
-                                const content = termArray.map(el => {
+                                var content = termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
@@ -121,6 +121,10 @@ export default {
                                         return el;
                                     }
                                 }).join("");
+                                // Fix to move + back one space when quoting
+                                if (engine === "CINAHL (Ebsco)") {
+                                    content = content.replace(/"\+/, '+"');
+                                }
                                 buffer += (comment && settings.highlighting)
                                     ? tools.createTooltip(content, comment)
                                     : content;
