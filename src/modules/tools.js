@@ -148,6 +148,40 @@ const tools = {
     },
 
     /**
+     * Print number in format defined by engine
+     * @param {string} engine Engine to use
+     * @param {string} ref Branch ref (e.g. 1)
+     * @return {string} Formatted number
+     */
+    printNumber(engine, ref) {
+        // Get line number format for engine
+        var number = ref;
+        switch(engine) {
+            case 'PubMed full':
+            case 'PubMed abbreviation':
+            case 'Cochrane Library':
+            case 'Embase (Elsevier)':
+            case 'Web of Science':
+            case 'WoS Advanced':
+            case 'Scopus (basic search)':
+            case 'Scopus (advanced search)':
+                number = "#" + ref;
+                break;
+            case 'Ovid MEDLINE':
+            case 'PsycInfo (Ovid)':
+            case 'ProQuest Health and Medical':
+                number = ref;
+                break;
+            case 'CINAHL (Ebsco)':
+            case 'SPORTDiscus':
+                number = "S" + ref;
+                break;
+            default:
+        }
+        return number;
+    },
+
+    /**
     * Determine if a phrase needs to be enclosed within speachmarks and return the result
     * @param {Object} branch Phrase branch to examine
     * @param {string} engine Optional engine ID to examine for other enclose methods

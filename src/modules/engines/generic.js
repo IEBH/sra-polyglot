@@ -56,41 +56,18 @@ export default {
                                         }	
                                     }
                                 } else {
-                                    // Get line number format for engine
-                                    var number = "Engine Does Not Suport Numbering";
-                                    switch(engine) {
-                                        case 'PubMed full':
-                                        case 'PubMed abbreviation':
-                                        case 'Cochrane Library':
-                                        case 'Embase (Elsevier)':
-                                        case 'WoS Advanced':
-                                        case 'Scopus (basic search)':
-                                        case 'Scopus (advanced search)':
-                                            number = "#" + branch.ref;
-                                            break;
-                                        case 'Ovid MEDLINE':
-                                        case 'PsycInfo (Ovid)':
-                                        case 'ProQuest Health and Medical':
-                                            number = branch.ref;
-                                            break;
-                                        case 'CINAHL (Ebsco)':
-                                        case 'SPORTDiscus':
-                                            number = "S" + branch.ref;
-                                            break;
-                                    }
-
                                     // Only print each line number in format defined by engine 
                                     // If branch.ref is array then user specified OR/1-4
                                     if(Array.isArray(branch.ref)) {
                                         for (node in branch.ref) {
                                             if (node == 0) {
-                                                buffer += number;
+                                                buffer += tools.printNumber(engine, branch.ref[node]);
                                             } else {
-                                                buffer += ' ' + branch.cond + ' ' + number;
+                                                buffer += ' ' + branch.cond + ' ' + tools.printNumber(engine, branch.ref[node]);
                                             }
                                         }
                                     } else {
-                                        buffer += number;
+                                        buffer += tools.printNumber(engine, branch.ref);
                                     }
                                 }
                                 break;
