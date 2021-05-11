@@ -119,7 +119,7 @@ describe('Translate wildcards searches (single character Ovid MEDLINE "$" style)
 	});
 
 	it('translate `term$` -> CO `term?`', ()=> {
-		expect(polyglot.translateGeneric('term$', 'Cochrane Library')).to.equal('term>?');
+		expect(polyglot.translateGeneric('term$', 'Cochrane Library')).to.equal('term?');
 	});
 
 	it('translate `term$` -> EM `term*`', ()=> {
