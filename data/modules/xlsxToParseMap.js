@@ -122,6 +122,11 @@ export default settings => {
                     parseObject[newKey] = parseObject[key];
                 }
             })
+            // Create alternative keys with & or and
+            Object.keys(parseObject).forEach(key => {
+                const newKey = key.replaceAll("&", "and");
+                parseObject[newKey] = parseObject[key];
+            })
             // Sort keys descending to ensure longest is matched first
             const ordered = Object.keys(parseObject).sort().reverse().reduce(
                 (obj, key) => { 
