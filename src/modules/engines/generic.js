@@ -168,8 +168,6 @@ export default {
                                     buffer += `ADJ${branch.proximity}`;
                                     break;
                                 case 'Cochrane Library':
-                                    buffer += `NEAR${branch.proximity}`;
-                                    break;
                                 case 'Embase (Elsevier)':
                                 case 'Web of Science':
                                 case 'WoS Advanced':
@@ -185,9 +183,6 @@ export default {
                                     break;
                                 case 'SPORTDiscus':
                                     buffer += `N/${branch.proximity}`;
-                                    break;
-                                case 'Informit Health Collection':
-                                    buffer += '%';
                                     break;
                             }
                             break;
@@ -209,7 +204,6 @@ export default {
                                     break;
                                 case 'Web of Science':
                                 case 'WoS Advanced':
-                                case 'ProQuest Health and Medical':
                                     buffer += 'NEAR/0';
                                     break;
                                 case 'CINAHL (Ebsco)':
@@ -220,9 +214,8 @@ export default {
                                 case 'SPORTDiscus':
                                     buffer += 'W/1';
                                     break;
-                                case 'Informit Health Collection':
-                                    buffer += '!';
-                                    break;
+                                case 'ProQuest Health and Medical':
+                                    buffer += 'PRE/0'
                             }
                             break;
                         case 'joinAnd':

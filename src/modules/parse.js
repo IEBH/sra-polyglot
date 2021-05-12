@@ -154,17 +154,17 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^([0-9]+) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
+        } else if (match = /^(#?([0-9]+)) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             branch.nodes.push({
                 type: 'ref', 
-                ref: [match[1]],
+                ref: [match[2]],
                 cond: '',
                 nodes: []
             }); 
             offset += match[1].length;
             q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
             cropString = false;
-        } else if (match = /^((AND|OR|NOT) +([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
+        } else if (match = /^((AND|OR|NOT) +#?([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
             switch(match[2].toLowerCase()) {
                 case "and":
@@ -274,6 +274,13 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
+        } else if (match = /^\.(xm|sh)\./i.exec(q)) { // Mesh search (field codes) - Ovid syntax
+            leaf.type = 'mesh';
+            leaf.field = match[1] === "xm" ? 'Mesh search (exploded)' : 'Mesh search (Not exploded)';
+            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
         } else if ((match = /^(exp "([^*]*?)"\/)\s*/i.exec(q)) || (match = /^(exp ([^*]*?)\/)\s*/i.exec(q))) { // Mesh term - Ovid syntax (exploded)
             branch.nodes.push({
                 type: 'mesh',
@@ -351,7 +358,7 @@ export const parse = (query, options) => {
         } 
         // }}}
         /// Comment {{{
-        else if (match = /^#([^\)\n]+)/.exec(q)) {
+        else if (match = /^#([^\)\d\n]+)/.exec(q)) {
             trimLastLeaf();
             branch.nodes.push({type: 'comment', content: match[1]});
             leaf = undefined;

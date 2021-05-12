@@ -204,6 +204,9 @@ const tools = {
                             : '*',
                         '?': settings.highlighting
                             ? tools.createTooltip("*", "As PubMed does not 0 or 1 character truncation a wildcard is used here", "highlight")
+                            : '*',
+                        '#': settings.highlighting
+                            ? tools.createTooltip("*", "As PubMed does not single character wildcards a wildcard is used here", "highlight")
                             : '*'
                     }
                     break;
@@ -216,7 +219,8 @@ const tools = {
                     replaceObj = {
                         '$': settings.highlighting
                             ? tools.createTooltip("?", "As Cochrane does not support single character truncation, the 0 or 1 character truncation is used here.", "highlight")
-                            : '?'
+                            : '?',
+                        '#': '?'
                     }
                     return tools.multiReplace(text, replaceObj); // Return here to prevent duplicate quotes
                 case 'Embase (Elsevier)':
@@ -224,13 +228,15 @@ const tools = {
                 case 'WoS Advanced':
                     replaceObj = {
                         '$': '?',
-                        '?': '$' 
+                        '?': '$',
+                        '#': '?',
                     }
                     break;
                 case 'CINAHL (Ebsco)':
                     replaceObj = {
                         '$': '?',
-                        '?': '#'
+                        '?': '#',
+                        '#': '?'
                     }
                     break;
                 case 'Scopus (basic search)':
@@ -240,7 +246,8 @@ const tools = {
                         '$': '?',
                         '?': settings.highlighting 
                             ? tools.createTooltip("*", "0 or 1 character truncation is not available. The multiple character wildcard symbol has been substituted.", "highlight")
-                            : '*'
+                            : '*',
+                        '#': '?'
                     }
                     break;
                 case 'PsycInfo (Ovid)':
@@ -250,7 +257,8 @@ const tools = {
                     break;
                 case 'ProQuest Health and Medical':
                     replaceObj = {
-                        '$': '?'
+                        '$': '?',
+                        '#': '?'
                     }
                     break;
                 case 'SPORTDiscus':
