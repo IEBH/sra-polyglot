@@ -15,15 +15,15 @@ describe('Translate single MESH terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Mesh]` -> EM `term/exp`', ()=> {
-		expect(polyglot.translateGeneric('term[Mesh]', 'Embase (Elsevier)')).to.equal("'term'/exp");
+		expect(polyglot.translateGeneric('term[Mesh]', 'Embase (Elsevier)')).to.equal("term/exp");
 	});
 
 	it('translate `term[Mesh]` -> CI `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[Mesh]', 'CINAHL (Ebsco)')).to.equal('(MH "term+")');
+		expect(polyglot.translateGeneric('term[Mesh]', 'CINAHL (Ebsco)')).to.equal('(MH term+)');
 	});
 
 	it('translate `term[Mesh]` -> PY `term`', ()=> {
-		expect(polyglot.translateGeneric('term[Mesh]', 'PsycInfo (Ovid)')).to.equal('term');
+		expect(polyglot.translateGeneric('term[Mesh]', 'PsycInfo (Ovid)')).to.equal('exp term/');
 	});
 
 	it('translate `term[Mesh]` -> SC `(MH term+)`', ()=> {
@@ -51,15 +51,15 @@ describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 	});
 
 	it('translate `term[mh]` -> EM `term/exp`', ()=> {
-		expect(polyglot.translateGeneric('term[mh]', 'Embase (Elsevier)')).to.equal("'term'/exp");
+		expect(polyglot.translateGeneric('term[mh]', 'Embase (Elsevier)')).to.equal("term/exp");
 	});
 
 	it('translate `term[mh]` -> CI `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[mh]', 'CINAHL (Ebsco)')).to.equal('(MH "term+")');
+		expect(polyglot.translateGeneric('term[mh]', 'CINAHL (Ebsco)')).to.equal('(MH term+)');
 	});
 
 	it('translate `term[mh]` -> PY `term`', ()=> {
-		expect(polyglot.translateGeneric('term[mh]', 'PsycInfo (Ovid)')).to.equal('term');
+		expect(polyglot.translateGeneric('term[mh]', 'PsycInfo (Ovid)')).to.equal('exp term/');
 	});
 
 	it('translate `term[mh]` -> SC `(MH term+)`', ()=> {
@@ -87,15 +87,15 @@ describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `term[MeSH Terms]` -> EM `term/exp`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Terms]', 'Embase (Elsevier)')).to.equal("'term'/exp");
+		expect(polyglot.translateGeneric('term[MeSH Terms]', 'Embase (Elsevier)')).to.equal("term/exp");
 	});
 
 	it('translate `term[MeSH Terms]` -> CI `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Terms]', 'CINAHL (Ebsco)')).to.equal('(MH "term+")');
+		expect(polyglot.translateGeneric('term[MeSH Terms]', 'CINAHL (Ebsco)')).to.equal('(MH term+)');
 	});
 
 	it('translate `term[MeSH Terms]` -> PY `term`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Terms]', 'PsycInfo (Ovid)')).to.equal('term');
+		expect(polyglot.translateGeneric('term[MeSH Terms]', 'PsycInfo (Ovid)')).to.equal('exp term/');
 	});
 
 	it('translate `term[MeSH Terms]` -> SC `(MH term+)`', ()=> {
@@ -123,15 +123,15 @@ describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `exp term/` -> EM `term/exp`', ()=> {
-		expect(polyglot.translateGeneric('exp term/', 'Embase (Elsevier)')).to.equal("'term'/exp");
+		expect(polyglot.translateGeneric('exp term/', 'Embase (Elsevier)')).to.equal("term/exp");
 	});
 
 	it('translate `exp term/` -> CI `(MH term+)`', ()=> {
-		expect(polyglot.translateGeneric('exp term/', 'CINAHL (Ebsco)')).to.equal('(MH "term+")');
+		expect(polyglot.translateGeneric('exp term/', 'CINAHL (Ebsco)')).to.equal('(MH term+)');
 	});
 
 	it('translate `exp term/` -> PY `term`', ()=> {
-		expect(polyglot.translateGeneric('exp term/', 'PsycInfo (Ovid)')).to.equal('term');
+		expect(polyglot.translateGeneric('exp term/', 'PsycInfo (Ovid)')).to.equal('exp term/');
 	});
 
 	it('translate `exp term/` -> SC `(MH term+)`', ()=> {

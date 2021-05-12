@@ -90,16 +90,16 @@ describe('Line expression expansion', ()=> {
 			'Bar AND<br/>' +
 			'Baz OR<br/>' +
 			'Quz<br/>' +
-			'#1 OR #2 OR #3 OR #4'
+			'1 OR 2 OR 3 OR 4'
 		);
 	});
 
 	it('translate line expansion format -> SC', ()=> {
 		expect(polyglot.translateGeneric(input, 'Scopus (advanced search)')).to.equal(
-			'"Foo" AND<br/>' +
-			'"Bar" AND<br/>' +
-			'"Baz" OR<br/>' +
-			'"Quz"<br/>' +
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
 			'#1 OR #2 OR #3 OR #4'
 		);
 	});

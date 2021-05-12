@@ -18,15 +18,15 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[nm]', 'Embase (Elsevier)')).to.equal('term:tn');
 	});
 
-	it('translate `term[nm]` -> CI `TI term`', ()=> {
+	it('translate `term[nm]` -> CI `MW term`', ()=> {
 		expect(polyglot.translateGeneric('term[nm]', 'CINAHL (Ebsco)')).to.equal('MW term');
 	});
 
-	it('translate `term[ab]` -> PY `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term[nm]', 'PsycInfo (Ovid)')).to.equal('term.hw');
+	it('translate `term[nm]` -> PY `term.hw.`', ()=> {
+		expect(polyglot.translateGeneric('term[nm]', 'PsycInfo (Ovid)')).to.equal('term.hw.');
 	});
 
-	it('translate `term[ab]` -> SC `AB term`', ()=> {
+	it('translate `term[nm]` -> SC `CHEM(term)`', ()=> {
 		expect(polyglot.translateGeneric('term[nm]', 'Scopus (advanced search)')).to.equal('CHEM(term)');
 	});
 
@@ -58,8 +58,8 @@ describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translateGeneric('term.nm', 'CINAHL (Ebsco)')).to.equal('MW term');
 	});
 
-	it('translate `term.nm` -> PY `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term.nm', 'PsycInfo (Ovid)')).to.equal('term.hw');
+	it('translate `term.hw.` -> PY `AB term`', ()=> {
+		expect(polyglot.translateGeneric('term.nm', 'PsycInfo (Ovid)')).to.equal('term.hw.');
 	});
 
 	it('translate `term.nm` -> SC `AB term`', ()=> {

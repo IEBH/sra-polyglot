@@ -22,8 +22,8 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[ti]', 'CINAHL (Ebsco)')).to.equal('TI term');
 	});
 
-	it('translate `term[ab]` -> PY `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term[ti]', 'PsycInfo (Ovid)')).to.equal('term.ti');
+	it('translate `term[ab]` -> PY `term.ti.`', ()=> {
+		expect(polyglot.translateGeneric('term[ti]', 'PsycInfo (Ovid)')).to.equal('term.ti.');
 	});
 
 	it('translate `term[ab]` -> SC `AB term`', ()=> {
@@ -58,8 +58,8 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[Title]', 'CINAHL (Ebsco)')).to.equal('TI term');
 	});
 
-	it('translate `term[Title]` -> PY `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term[Title]', 'PsycInfo (Ovid)')).to.equal('term.ti');
+	it('translate `term[Title]` -> PY `term.ti.`', ()=> {
+		expect(polyglot.translateGeneric('term[Title]', 'PsycInfo (Ovid)')).to.equal('term.ti.');
 	});
 
 	it('translate `term[Title]` -> SC `AB term`', ()=> {
@@ -94,8 +94,8 @@ describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translateGeneric('term.ti', 'CINAHL (Ebsco)')).to.equal('TI term');
 	});
 
-	it('translate `term.ti` -> PY `AB term`', ()=> {
-		expect(polyglot.translateGeneric('term.ti', 'PsycInfo (Ovid)')).to.equal('term.ti');
+	it('translate `term.ti.` -> PY `AB term`', ()=> {
+		expect(polyglot.translateGeneric('term.ti', 'PsycInfo (Ovid)')).to.equal('term.ti.');
 	});
 
 	it('translate `term.ti` -> SC `AB term`', ()=> {

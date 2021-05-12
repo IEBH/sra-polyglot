@@ -7,7 +7,7 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> OV `term1 term2`', ()=> {
-		expect(polyglot.translateGeneric('"term1 term2"', 'Ovid MEDLINE')).to.equal('term1 term2');
+		expect(polyglot.translateGeneric('"term1 term2"', 'Ovid MEDLINE')).to.equal('"term1 term2"');
 	});
 
 	it('translate `"term1 term2"` -> CO `"term1 term2"`', ()=> {
@@ -43,7 +43,7 @@ describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> OV `term1 term2`', ()=> {
-		expect(polyglot.translateGeneric('"term1 term2"', 'Ovid MEDLINE')).to.equal('term1 term2');
+		expect(polyglot.translateGeneric('"term1 term2"', 'Ovid MEDLINE')).to.equal('"term1 term2"');
 	});
 
 	it('translate `"term1 term2"` -> CO `"term1 term2"`', ()=> {

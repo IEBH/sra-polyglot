@@ -28,7 +28,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Primary Health Care',
 						offset: 0,
 					},
@@ -81,7 +81,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Treatment Failure',
 						offset: 111,
 					},
@@ -122,7 +122,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Bacterial Infections',
 						offset: 186,
 					},
@@ -163,7 +163,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Anti-Bacterial Agents',
 						offset: 246,
 					},
@@ -212,13 +212,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 
 	it('should translate the example into Ovid MEDLINE format', ()=> {
 		expect(polyglot.translateGeneric(example.query, 'Ovid MEDLINE', {groupLines: true, html: false})).to.equal(
-			'(exp Primary Health Care/ OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\n' +
+			'(exp "Primary Health Care"/ OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
-			'(exp Treatment Failure/ OR Treatment failure OR Treatment failures)\n\n' +
+			'(exp "Treatment Failure"/ OR "Treatment failure" OR "Treatment failures")\n\n' +
 			'AND\n\n' +
-			'(exp Bacterial Infections/ OR Bacteria OR Bacterial)\n\n' +
+			'(exp "Bacterial Infections"/ OR Bacteria OR Bacterial)\n\n' +
 			'AND\n\n' +
-			'(exp Anti-Bacterial Agents/ OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)'
+			'(exp "Anti-Bacterial Agents"/ OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
@@ -236,13 +236,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 
 	it('should translate the example into Embase format', ()=> {
 		expect(polyglot.translateGeneric(example.query, 'Embase (Elsevier)', {groupLines: true, html: false})).to.equal(
-			'(\'Primary Health Care\'/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+			'("Primary Health Care"/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
-			'(\'Treatment Failure\'/exp OR "Treatment failure" OR "Treatment failures")\n\n' +
+			'("Treatment Failure"/exp OR "Treatment failure" OR "Treatment failures")\n\n' +
 			'AND\n\n' +
-			'(\'Bacterial Infections\'/exp OR Bacteria OR Bacterial)\n\n' +
+			'("Bacterial Infections"/exp OR Bacteria OR Bacterial)\n\n' +
 			'AND\n\n' +
-			'(\'Anti-Bacterial Agents\'/exp OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+			'("Anti-Bacterial Agents"/exp OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 

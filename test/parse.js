@@ -117,21 +117,21 @@ describe('Parse', ()=> {
 					{
 						type: 'mesh',
 						content: 'foo',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'bar baz',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						offset: 14,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'quz quuz',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						offset: 40,
 					},
 				]
@@ -149,26 +149,26 @@ describe('Parse', ()=> {
 					{
 						type: 'mesh',
 						content: 'foo',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'bar baz',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'quz',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						offset: 30,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'mesh',
 						content: 'quz quuz',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						offset: 39,
 					},
 				]
@@ -185,28 +185,28 @@ describe('Parse', ()=> {
 				nodes: [
 					{
 						type: 'phrase',
-						field: 'title+abstract',
+						field: 'Title/abstract search',
 						content: 'foo',
 						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
-						field: 'title',
+						field: 'Title search',
 						content: 'bar baz',
 						offset: 14,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
-						field: 'abstract',
+						field: 'Abstract',
 						content: 'quz',
 						offset: 30,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'group',
-						field: 'title+abstract',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -235,21 +235,21 @@ describe('Parse', ()=> {
 				nodes: [
 					{
 						type: 'phrase',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						content: 'foo',
 						offset: 0,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
-						field: 'publicationType',
+						field: 'Type of material the article represents, e.g. clinical trial',
 						content: 'bar baz',
 						offset: 12,
 					},
 					{type: 'joinAnd'},
 					{
 						type: 'phrase',
-						field: 'abstract',
+						field: 'Abstract',
 						content: 'quz',
 						offset: 28,
 					},

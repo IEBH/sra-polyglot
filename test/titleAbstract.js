@@ -6,8 +6,8 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[tiab]', 'PubMed abbreviation')).to.equal('term[tiab]');
 	});
 
-	it('translate `term[tiab]` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term[tiab]', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
+	it('translate `term[tiab]` -> OV `term.tw.`', ()=> {
+		expect(polyglot.translateGeneric('term[tiab]', 'Ovid MEDLINE')).to.equal('term.tw.');
 	});
 
 	it('translate `term[tiab]` -> CO `term:ti,ab`', ()=> {
@@ -22,8 +22,8 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[tiab]', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term[tiab]` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term[tiab]', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term[tiab]` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term[tiab]', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term[tiab]` -> SC `TITLE-ABS(term)`', ()=> {
@@ -42,8 +42,8 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[Title/Abstract]', 'PubMed abbreviation')).to.equal('term[tiab]');
 	});
 
-	it('translate `term[Title/Abstract]` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term[Title/Abstract]', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
+	it('translate `term[Title/Abstract]` -> OV `term.tw`', ()=> {
+		expect(polyglot.translateGeneric('term[Title/Abstract]', 'Ovid MEDLINE')).to.equal('term.tw.');
 	});
 
 	it('translate `term[Title/Abstract]` -> CO `term:ti,ab`', ()=> {
@@ -58,8 +58,8 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[Title/Abstract]', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term[Title/Abstract]` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term[Title/Abstract]', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term[Title/Abstract]` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term[Title/Abstract]', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term[Title/Abstract]` -> SC `TITLE-ABS(term)`', ()=> {
@@ -72,50 +72,14 @@ describe('Translate title + abstract searches (PubMed -> *)', ()=> {
 
 });
 
-describe('Translate title + abstract searches (Ovid MEDLINE `term:ti,ab` format) -> *)', ()=> {
-
-	it('translate `term:ti,ab` -> PM `term[tiab]`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'PubMed abbreviation')).to.equal('term[tiab]');
-	});
-
-	it('translate `term:ti,ab` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
-	});
-
-	it('translate `term:ti,ab` -> CO `term:ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Cochrane Library')).to.equal('term:ti,ab');
-	});
-
-	it('translate `term:ti,ab` -> EM `term:ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Embase (Elsevier)')).to.equal('term:ti,ab');
-	});
-
-	it('translate `term:ti,ab` -> CI `TI term OR AB term`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
-	});
-
-	it('translate `term:ti,ab` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
-	});
-
-	it('translate `term:ti,ab` -> SC `TITLE-ABS(term)`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Scopus (advanced search)')).to.equal('TITLE-ABS(term)');
-	});
-
-	it('translate `term:ti,ab` -> WS `term`', ()=> {
-		expect(polyglot.translateGeneric('term:ti,ab', 'Web of Science')).to.equal('term');
-	});
-
-});
-
 describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format) -> *)', ()=> {
 
 	it('translate `term.ti,ab` -> PM `term[tiab]`', ()=> {
 		expect(polyglot.translateGeneric('term.ti,ab', 'PubMed abbreviation')).to.equal('term[tiab]');
 	});
 
-	it('translate `term.ti,ab` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.ti,ab', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
+	it('translate `term.tw` -> OV `term.ti,ab`', ()=> {
+		expect(polyglot.translateGeneric('term.ti,ab', 'Ovid MEDLINE')).to.equal('term.tw.');
 	});
 
 	it('translate `term.ti,ab` -> CO `term.ti,ab`', ()=> {
@@ -130,8 +94,8 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format)
 		expect(polyglot.translateGeneric('term.ti,ab', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term.ti,ab` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.ti,ab', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term.ti,ab` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term.ti,ab', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ti,ab` -> SC `TITLE-ABS(term)`', ()=> {
@@ -166,8 +130,8 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) ->
 		expect(polyglot.translateGeneric('term.tw.', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term.tw.` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.tw.', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term.tw.` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term.tw.', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.tw.` -> SC `TITLE-ABS(term)`', ()=> {
@@ -186,8 +150,8 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 		expect(polyglot.translateGeneric('term.ab,ti', 'PubMed abbreviation')).to.equal('term[tiab]');
 	});
 
-	it('translate `term.ab,ti` -> OV `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
+	it('translate `term.ab,ti` -> OV `term.tw`', ()=> {
+		expect(polyglot.translateGeneric('term.ab,ti', 'Ovid MEDLINE')).to.equal('term.tw.');
 	});
 
 	it('translate `term.ab,ti` -> CO `term.tw.`', ()=> {
@@ -202,8 +166,8 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 		expect(polyglot.translateGeneric('term.ab,ti', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term.ab,ti` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term.ab,ti` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term.ab,ti', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ab,ti` -> SC `TITLE-ABS(term)`', ()=> {
@@ -222,8 +186,8 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 		expect(polyglot.translateGeneric('term.ab,ti.', 'PubMed abbreviation')).to.equal('term[tiab]');
 	});
 
-	it('translate `term.ab,ti.` -> OV `term.ab,ti`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti.', 'Ovid MEDLINE')).to.equal('term.ti,ab.');
+	it('translate `term.ab,ti.` -> OV `term.tw`', ()=> {
+		expect(polyglot.translateGeneric('term.ab,ti.', 'Ovid MEDLINE')).to.equal('term.tw.');
 	});
 
 	it('translate `term.ab,ti.` -> CO `term.tw.`', ()=> {
@@ -238,8 +202,8 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 		expect(polyglot.translateGeneric('term.ab,ti.', 'CINAHL (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 
-	it('translate `term.ab,ti.` -> PY `term.ti,ab`', ()=> {
-		expect(polyglot.translateGeneric('term.ab,ti.', 'PsycInfo (Ovid)')).to.equal('term.ti,ab');
+	it('translate `term.ab,ti.` -> PY `term.ti,ab.`', ()=> {
+		expect(polyglot.translateGeneric('term.ab,ti.', 'PsycInfo (Ovid)')).to.equal('term.ti,ab.');
 	});
 
 	it('translate `term.ab,ti.` -> SC `TITLE-ABS(term)`', ()=> {

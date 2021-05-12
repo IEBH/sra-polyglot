@@ -1,42 +1,6 @@
 var _ = require('lodash');
 var expect = require('chai').expect;
 const polyglot = require('../lib').default;
-describe('Translate the meta template `<engine>`', ()=> {
-
-	it('translate `<engine>` -> PM `PubMed abbreviation`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'PubMed abbreviation')).to.equal('PubMed abbreviation');
-	});
-
-	it('translate `<engine>` -> OV `Ovid MEDLINE`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'Ovid MEDLINE')).to.equal('ovid');
-	});
-
-	it('translate `<engine>` -> CO `Cochrane Library`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'Cochrane Library')).to.equal('Cochrane Library');
-	});
-
-	it('translate `<engine>` -> EM `Embase (Elsevier)`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'Embase (Elsevier)')).to.equal('Embase (Elsevier)');
-	});
-
-	it('translate `<engine>` -> CI `CINAHL (Ebsco)`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'CINAHL (Ebsco)')).to.equal('CINAHL (Ebsco)');
-	});
-
-	it('translate `<engine>` -> PY `PsycInfo (Ovid)`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'PsycInfo (Ovid)')).to.equal('PsycInfo (Ovid)');
-	});
-
-	it('translate `<engine>` -> SC `Scopus (advanced search)`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'Scopus (advanced search)')).to.equal('Scopus (advanced search)');
-	});
-
-	it('translate `<engine>` -> WS `Web of Science`', ()=> {
-		expect(polyglot.translateGeneric('<engine>', 'Web of Science')).to.equal('Web of Science');
-	});
-
-});
-
 
 describe('Translate the meta template `<rct filter>`', ()=> {
 
@@ -49,7 +13,7 @@ describe('Translate the meta template `<rct filter>`', ()=> {
 	});
 
 	it('translate `<RCT Filter>` -> CO', ()=> {
-		expect(polyglot.translateGeneric('<RCT Filter>', 'Cochrane Library')).to.equal('');
+		expect(polyglot.translateGeneric('<RCT Filter>', 'Cochrane Library')).to.equal('Template: "rct filter" not found for engine: "Cochrane Library"');
 	});
 
 	it('translate `<RCT Filter>` -> EM', ()=> {
@@ -86,7 +50,7 @@ describe('Translate the meta template `<sr filter>`', ()=> {
 	});
 
 	it('translate `<SR Filter>` -> CO', ()=> {
-		expect(polyglot.translateGeneric('<SR Filter>', 'Cochrane Library')).to.equal('');
+		expect(polyglot.translateGeneric('<SR Filter>', 'Cochrane Library')).to.equal('Template: "sr filter" not found for engine: "Cochrane Library"');
 	});
 
 	it('translate `<SR Filter>` -> EM', ()=> {

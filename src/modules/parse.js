@@ -358,7 +358,7 @@ export const parse = (query, options) => {
         } 
         // }}}
         /// Comment {{{
-        else if (match = /^#([^\)\d\n]+)/.exec(q)) {
+        else if (match = /^#([^\)\d\n][^\)\n]+)/.exec(q)) {
             trimLastLeaf();
             branch.nodes.push({type: 'comment', content: match[1]});
             leaf = undefined;

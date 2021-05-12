@@ -14,8 +14,8 @@ describe('Translate title + abstract + other searches (PubMed -> *)', ()=> {
 		expect(polyglot.translateGeneric('term[tw]', 'Cochrane Library')).to.equal('term:ti,ab,kw');
 	});
 
-	it('translate `term[tw]` -> EM `term:ti,ab,de,tn`', ()=> {
-		expect(polyglot.translateGeneric('term[tw]', 'Embase (Elsevier)')).to.equal('term:ti,ab,de,tn');
+	it('translate `term[tw]` -> EM `term`', ()=> {
+		expect(polyglot.translateGeneric('term[tw]', 'Embase (Elsevier)')).to.equal('term');
 	});
 
 	it('translate `term[tw]` -> CI `term`', ()=> {
@@ -50,8 +50,8 @@ describe('Translate title + abstract + other searches (Ovid MEDLINE -> *)', ()=>
 		expect(polyglot.translateGeneric('term.mp.', 'Cochrane Library')).to.equal('term:ti,ab,kw');
 	});
 
-	it('translate `term.mp.` -> EM `term:ti,ab,de,tn`', ()=> {
-		expect(polyglot.translateGeneric('term.mp.', 'Embase (Elsevier)')).to.equal('term:ti,ab,de,tn');
+	it('translate `term.mp.` -> EM `term`', ()=> {
+		expect(polyglot.translateGeneric('term.mp.', 'Embase (Elsevier)')).to.equal('term');
 	});
 
 	it('translate `term.mp.` -> CI `term`', ()=> {
@@ -86,8 +86,8 @@ describe('Translate title + abstract + other searches, with automated gunk (Ovid
 		expect(polyglot.translateGeneric('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Cochrane Library')).to.equal('term:ti,ab,kw');
 	});
 
-	it('translate `term.mp. [...]` -> EM `term:ti,ab,de,tn`', ()=> {
-		expect(polyglot.translateGeneric('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Embase (Elsevier)')).to.equal('term:ti,ab,de,tn');
+	it('translate `term.mp. [...]` -> EM `term`', ()=> {
+		expect(polyglot.translateGeneric('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Embase (Elsevier)')).to.equal('term');
 	});
 
 	it('translate `term.mp. [...]` -> CI `term`', ()=> {

@@ -48,31 +48,31 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Lung Diseases',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Bronchial Diseases',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Respiratory Tract Infections',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Respiratory Insufficiency',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'group',
@@ -121,7 +121,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -139,7 +139,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -157,7 +157,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -178,7 +178,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -196,7 +196,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -214,7 +214,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'group',
@@ -269,21 +269,21 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						content: 'hyaline membrane diseas*',
 						offset: 483,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						content: 'bronchopulmonary dysplasia',
 						offset: 515,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -319,7 +319,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -340,7 +340,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -398,28 +398,28 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						content: 'respiratory syncytial viruses',
 						offset: 765,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						content: 'respiratory syncytial virus, human',
 						offset: 799,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'mesh',
-						recurse: false,
+						field: 'Mesh search (Not exploded)',
 						content: 'Respiratory Syncytial Virus Infections',
 						offset: 838,
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -476,13 +476,13 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 				nodes: [
 					{
 						type: 'mesh',
-						recurse: true,
+						field: 'Mesh search (exploded)',
 						content: 'Posture',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -500,7 +500,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -524,7 +524,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'group',
@@ -556,7 +556,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -614,19 +614,19 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 						type: 'phrase',
 						content: 'lateral',
 						offset: 1129,
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'phrase',
 						content: 'upright',
 						offset: 1144,
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 					},
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -668,7 +668,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'group',
@@ -729,7 +729,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',
@@ -750,7 +750,7 @@ describe('Example test "Positioning for acute respiratory distress in hospitalis
 					{type: 'joinOr'},
 					{
 						type: 'group',
-						field: 'title+abstract+tw',
+						field: 'Title/abstract search',
 						nodes: [
 							{
 								type: 'phrase',

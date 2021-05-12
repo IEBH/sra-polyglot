@@ -15,11 +15,11 @@ describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Majr]` -> EM `term/exp/mj`', ()=> {
-		expect(polyglot.translateGeneric('term[Majr]', 'Embase (Elsevier)')).to.equal("'term'/exp/mj");
+		expect(polyglot.translateGeneric('term[Majr]', 'Embase (Elsevier)')).to.equal("term/exp/mj");
 	});
 
 	it('translate `term[Majr]` -> CI `(MM term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[Majr]', 'CINAHL (Ebsco)')).to.equal('(MM "term+")');
+		expect(polyglot.translateGeneric('term[Majr]', 'CINAHL (Ebsco)')).to.equal('(MM term+)');
 	});
 
 	it('translate `term[Majr]` -> PY `exp *term/`', ()=> {
@@ -51,11 +51,11 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `term[MeSH Major Topic]` -> EM `term/exp/mj`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'Embase (Elsevier)')).to.equal("'term'/exp/mj");
+		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'Embase (Elsevier)')).to.equal("term/exp/mj");
 	});
 
 	it('translate `term[MeSH Major Topic]` -> CI `(MM term+)`', ()=> {
-		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'CINAHL (Ebsco)')).to.equal('(MM "term+")');
+		expect(polyglot.translateGeneric('term[MeSH Major Topic]', 'CINAHL (Ebsco)')).to.equal('(MM term+)');
 	});
 
 	it('translate `term[MeSH Major Topic]` -> PY `exp *term/`', ()=> {
@@ -87,11 +87,11 @@ describe('Translate Translate MeSH major terms (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `exp *term/` -> EM `term/exp/mj`', ()=> {
-		expect(polyglot.translateGeneric('exp *term/', 'Embase (Elsevier)')).to.equal("'term'/exp/mj");
+		expect(polyglot.translateGeneric('exp *term/', 'Embase (Elsevier)')).to.equal("term/exp/mj");
 	});
 
 	it('translate `exp *term/` -> CI `(MM term+)`', ()=> {
-		expect(polyglot.translateGeneric('exp *term/', 'CINAHL (Ebsco)')).to.equal('(MM "term+")');
+		expect(polyglot.translateGeneric('exp *term/', 'CINAHL (Ebsco)')).to.equal('(MM term+)');
 	});
 
 	it('translate `exp *term/` -> PY `exp *term/`', ()=> {
