@@ -256,7 +256,7 @@ describe('Parse', ()=> {
 					{type: 'joinAnd'},
 					{
 						type: 'group',
-						field: 'floatingSubheading',
+						field: 'MeSH subheading search',
 						nodes: [
 							{
 								type: 'phrase',

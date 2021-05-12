@@ -268,15 +268,27 @@ export const parse = (query, options) => {
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^\.(fs)\./i.exec(q)) { // Mesh subheading search - Ovid syntax
+            var useLeaf;
+            if (_.isObject(leaf) && leaf.type == 'phrase') {
+                useLeaf = leaf;
+            } else if (_.isArray(leaf) && lastGroup) {
+                useLeaf = lastGroup;
+            }
             leaf.type = 'mesh';
-            leaf.field = 'MeSH subheading search';
+            useLeaf.field = 'MeSH subheading search';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^\.(xm|sh)\./i.exec(q)) { // Mesh search (field codes) - Ovid syntax
+            var useLeaf;
+            if (_.isObject(leaf) && leaf.type == 'phrase') {
+                useLeaf = leaf;
+            } else if (_.isArray(leaf) && lastGroup) {
+                useLeaf = lastGroup;
+            }
             leaf.type = 'mesh';
-            leaf.field = match[1] === "xm" ? 'Mesh search (exploded)' : 'Mesh search (Not exploded)';
+            useLeaf.field = match[1] === "xm" ? 'Mesh search (exploded)' : 'Mesh search (Not exploded)';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
             offset += match[0].length;
             q = q.substr(match[0].length);
