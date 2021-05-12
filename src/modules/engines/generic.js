@@ -36,7 +36,13 @@ export default {
                             if (branch.field) {
                                 // If the group has a filter decorate all its children with that field
                                 // This mutates the tree for the other engine compile functions
-                                branch.nodes = tools.visit(branch.nodes, ['phrase'], b => b.field = branch.field);
+                                    const isMesh = branch.field.match(/mesh/i);
+                                    branch.nodes = tools.visit(branch.nodes, ['phrase'], b => {
+                                    if (isMesh) {
+                                        b.type = 'mesh';
+                                    }
+                                    b.field = branch.field
+                                });
                                 branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
                             } 
                             buffer += '(' + compileWalker(branch.nodes) + ')';					
