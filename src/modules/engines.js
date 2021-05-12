@@ -1,13 +1,3 @@
-import pubmedImport from './engines/pubmed.js'
-import ovidImport from './engines/ovid.js'
-import cochraneImport from './engines/cochrane.js'
-import embaseImport from './engines/embase.js'
-import wosImport from './engines/wos.js'
-import cinahlImport from './engines/cinahl.js'
-import psycinfoImport from './engines/psycinfo.js'
-import scopusImport from './engines/scopus.js'
-// import mongodbImport from './engines/mongodb.js'
-
 /**
 * Collection of supported engines
 * Each engine should specify:
@@ -20,42 +10,6 @@ import scopusImport from './engines/scopus.js'
 * @var {array}
 */
 export default {
-    // PubMed {{{
-    pubmed: pubmedImport,
-    // }}}
-
-    // Ovid Medline {{{
-    medlineOvid: { ...ovidImport, title: "Medline (via Ovid)", id: "medlineOvid" },
-    // }}}
-
-    // Ovid Embase {{{
-    embaseOvid: { ...ovidImport, title: "Embase (via Ovid)", id: "embaseOvid" },
-    // }}}
-    
-    // Embase {{{
-    embase: embaseImport,
-    // }}}
-
-    // Cochrane Library {{{
-    cochrane: cochraneImport,
-    // }}}
-
-    // Web of Science {{{
-    wos: wosImport,
-    // }}}
-    
-    // CINAHL {{{
-    cinahl: cinahlImport,
-    // }}}
-
-    // PsycInfo {{{
-    psycinfo: psycinfoImport,
-    // }}}
-
-    // Scopus {{{
-    scopus: scopusImport,
-    // }}} 
-
     // Lexical tree (JSON) {{{
     lexicalTreeJSON: {
         id: 'lexicalTreeJSON',
