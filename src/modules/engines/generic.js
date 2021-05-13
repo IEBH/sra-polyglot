@@ -34,18 +34,67 @@ export default {
                             break;
                         case 'group':
                             if (branch.field) {
-                                // If the group has a filter decorate all its children with that field
-                                // This mutates the tree for the other engine compile functions
+                                if (engine === "Ovid MEDLINE" || engine === "Scopus (advanced search)") {
+                                    // Put field code outside brackets
+                                    if (branch.field.match(/mesh/i)) {
+                                        var translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
+                                        const termArray = translateObject.terms;
+                                        const comment = translateObject.comment;
+                                        var content = termArray.map(el => {
+                                            if (el && el.toLowerCase() !== "test") {
+                                                return settings.highlighting ? `<font color="blue">${el}</font>` : el;
+                                            } else if (el && el.toLowerCase() === "test") {
+                                                return tools.quotePhrase(branch, engine, settings);
+                                            } else { // Empty string
+                                                return el;
+                                            }
+                                        }).join("");
+                                        // Fix to move '+' back one space when quoting
+                                        if (engine === "CINAHL (Ebsco)") {
+                                            content = content.replace(/"\+/, '+"');
+                                        }
+                                        buffer += (comment && settings.highlighting)
+                                            ? tools.createTooltip(content, comment)
+                                            : content;
+                                    } else {
+                                        var translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
+                                        if (translateObject) {
+                                            const termArray = translateObject.terms;
+                                            const comment = translateObject.comment;
+                                            const content = termArray.map(el => {
+                                                if (el && el.toLowerCase() !== "test") {
+                                                    return settings.highlighting ? `<font color="LightSeaGreen">${el}</font>` : el;
+                                                } else if (el && el.toLowerCase() === "test") {
+                                                    return engine === "Scopus (advanced search)"
+                                                        ? compileWalker(branch.nodes)
+                                                        : '(' + compileWalker(branch.nodes) + ')';
+                                                } else { // Empty string
+                                                    return el;
+                                                }
+                                            }).join("");
+                                            buffer += (comment && settings.highlighting)
+                                                ? tools.createTooltip(content, comment)
+                                                : content;
+                                        }
+                                    }
+                                } else {
+                                    // Expand field code inside brackets for other engines
+                                    // If the group has a filter decorate all its children with that field
+                                    // This mutates the tree for the other engine compile functions
                                     const isMesh = branch.field.match(/mesh/i);
                                     branch.nodes = tools.visit(branch.nodes, ['phrase'], b => {
-                                    if (isMesh) {
-                                        b.type = 'mesh';
-                                    }
-                                    b.field = branch.field
-                                });
-                                branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
-                            } 
-                            buffer += '(' + compileWalker(branch.nodes) + ')';					
+                                        if (isMesh) {
+                                            b.type = 'mesh';
+                                        }
+                                        b.field = branch.field
+                                    });
+                                    branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
+                                    buffer += '(' + compileWalker(branch.nodes) + ')';					
+
+                                }
+                            } else {
+                                buffer += '(' + compileWalker(branch.nodes) + ')';
+                            }					
                             break;
                             case 'ref':
                                 if (settings.transposeLines) {
@@ -127,7 +176,7 @@ export default {
                                         return el;
                                     }
                                 }).join("");
-                                // Fix to move + back one space when quoting
+                                // Fix to move '+' back one space when quoting
                                 if (engine === "CINAHL (Ebsco)") {
                                     content = content.replace(/"\+/, '+"');
                                 }
