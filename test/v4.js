@@ -113,7 +113,7 @@ it('should parse data/v4.xlsx', ()=> Promise.resolve()
 					.forEach(target => {
 						if(!row[source.id].c) { // If no comment on source translation (i.e. is not a duplicate key)
 							it(`${row[settings.rowHeader].w}: ${source.id} -> ${target.id}`, () => 
-								expect(polyglot.translateGeneric(row[source.id].w, target.id))
+								expect(polyglot.translateGeneric(row[source.id].w, target.id, { testing: true, transposeLines: false }))
 									.to.equal(row[target.id].w, `Row: ${rowIndex+settings.dataRowStart+1}`)
 							)
 						}

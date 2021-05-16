@@ -262,6 +262,9 @@ const tools = {
                     }
                     break;
                 case 'SPORTDiscus':
+                    if (!settings.testing) {
+                        space = true; //Always include quotes with SPORTDiscus
+                    }
                     replaceObj = {
                         '$': '#?',
                         '?': '#'

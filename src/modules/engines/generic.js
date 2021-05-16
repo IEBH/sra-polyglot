@@ -22,6 +22,7 @@ export default {
     compile: (tree, options, engine) => {
         var settings = _.defaults(options, {
             replaceWildcards: true,
+            testing: false
         });
 
         var compileWalker = tree =>
