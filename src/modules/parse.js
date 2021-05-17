@@ -189,12 +189,18 @@ export const parse = (query, options) => {
             offset += match[1].length; 
             q = q.substr(match[1].length); 
         } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
-            lineNumber = parseInt(match[1], 10)
-            branch.number = lineNumber
-            branch.isNumbered = true
-            userLineNumber = true
-            offset += match[0].length-1;
-            q = q.substr(match[0].length-1);
+            if (leaf.type != "phrase") {
+                lineNumber = parseInt(match[1], 10)
+                branch.number = lineNumber
+                branch.isNumbered = true
+                userLineNumber = true
+                offset += match[0].length-1;
+                q = q.substr(match[0].length-1);
+            } else {
+                leaf.content += match[1];
+                offset += match[1].length-1;
+                q = q.substr(match[1].length-1);
+            }
         } 
         else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
             trimLastLeaf();
