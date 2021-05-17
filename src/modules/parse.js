@@ -155,15 +155,21 @@ export const parse = (query, options) => {
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^(#?([0-9]+)) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
-            branch.nodes.push({
-                type: 'ref', 
-                ref: [match[2]],
-                cond: '',
-                nodes: []
-            }); 
-            offset += match[1].length;
-            q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
-            cropString = false;
+            if (leaf.type != "phrase") {
+                branch.nodes.push({
+                    type: 'ref', 
+                    ref: [match[2]],
+                    cond: '',
+                    nodes: []
+                }); 
+                offset += match[1].length;
+                q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
+                cropString = false;
+            } else {
+                leaf.content += match[1];
+                offset += match[1].length-1;
+                q = q.substr(match[1].length-1);
+            }
         } else if (match = /^((AND|OR|NOT) +#?([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
             trimLastLeaf();
             switch(match[2].toLowerCase()) {

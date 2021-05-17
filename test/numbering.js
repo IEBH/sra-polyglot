@@ -38,6 +38,7 @@ describe('Avoid False Positives', ()=> {
 
 	it('type 1 diabetes', ()=> {
 		expect(polyglot.translateGeneric('type 1 diabetes', 'PubMed abbreviation', {html: false})).to.equal('"type 1 diabetes"');
+		expect(polyglot.translateGeneric('type 1 or type', 'PubMed abbreviation', {html: false})).to.equal('"type 1" OR type');
 	})
 
 });
