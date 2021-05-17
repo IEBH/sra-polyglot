@@ -101,7 +101,7 @@ const tools = {
      * Structure the wild cards correctly for cochrane to ensure no wildcards appear inside quotation marks
      * @param {string} text The text to parse
      * @param {Boolean} highlighting Whether to assign custom fonts
-     * @return {string} The parsed string seperated by NEAR/2
+     * @return {string} The parsed string seperated by NEXT
      */
     wildCardCochrane: (text, highlighting) => {
         const wildcards = ["?", "$", "*"]
@@ -124,14 +124,14 @@ const tools = {
                 // Check that there is a word before and it is not a wildcard word
                 if (i > 0 && !wildcards.some(wildcard => words[i - 1].includes(wildcard))) {                    
                     words[i] = highlighting
-                        ? '<font color="purple">NEAR/2</font> ' + words[i]
-                        : 'NEAR/2 ' + words[i];
+                        ? '<font color="purple">NEXT</font> ' + words[i]
+                        : 'NEXT ' + words[i];
                 }
                 // Check that there is a word after
                 if (i < words.length -1) {
                     words[i] = highlighting
-                        ? words[i] + ' <font color="purple">NEAR/2</font>'
-                        : words[i] + " NEAR/2";
+                        ? words[i] + ' <font color="purple">NEXT</font>'
+                        : words[i] + " NEXT";
                 }
             }
         }
