@@ -35,7 +35,7 @@ export default {
                             break;
                         case 'group':
                             if (branch.field) {
-                                if (engine === "Ovid MEDLINE" || engine === "Scopus (advanced search)") {
+                                if (engine === "Ovid MEDLINE" || engine === "Scopus (advanced search)" || engine === "Embase (Elsevier)") {
                                     // Put field code outside brackets
                                     if (branch.field.match(/mesh/i)) {
                                         var translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
