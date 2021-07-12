@@ -199,7 +199,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into PubMed format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'PubMed abbreviation', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'PubMed abbreviation', {groupLines: true, html: false})).to.equal(
 			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -211,7 +211,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into Ovid MEDLINE format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'Ovid MEDLINE', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'Ovid MEDLINE', {groupLines: true, html: false})).to.equal(
 			'(exp "Primary Health Care"/ OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'(exp "Treatment Failure"/ OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -223,7 +223,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into Cochrane format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'Cochrane Library', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'Cochrane Library', {groupLines: true, html: false})).to.equal(
 			'([mh "Primary Health Care"] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'([mh "Treatment Failure"] OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -235,7 +235,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into Embase format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'Embase (Elsevier)', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'Embase (Elsevier)', {groupLines: true, html: false})).to.equal(
 			'("Primary Health Care"/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'("Treatment Failure"/exp OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -247,7 +247,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into CINAHL format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'CINAHL (Ebsco)', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'CINAHL (Ebsco)', {groupLines: true, html: false})).to.equal(
 			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -259,7 +259,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	it('should translate the example into WoS format', ()=> {
-		expect(polyglot.translateGeneric(example.query, 'Web of Science', {groupLines: true, html: false})).to.equal(
+		expect(polyglot.translate(example.query, 'Web of Science', {groupLines: true, html: false})).to.equal(
 			'("Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'("Treatment Failure" OR "Treatment failure" OR "Treatment failures")\n\n' +

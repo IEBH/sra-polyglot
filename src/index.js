@@ -20,14 +20,8 @@ export default polyglot = {
 	* @return {string} The translated search query
 	*/
 	translate: (query, engine, options) => {
-		if (!engines[engine]) throw new Error('Engine not found: ' + engine);
 		var tree = parse(query, options);
-		tree = polyglot.preProcess(tree, options);
-		if (engine.id == "lexicalTreeJSON") {
-			return engines[engine].compile(tree, options);
-		} else {
-			return polyglot.postProcess(engines[engine].compile(tree, options), options);
-		}
+		return polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
 	},
 
 	/**
@@ -41,25 +35,6 @@ export default polyglot = {
 	translateAll: (query, options) => {
 		var output = {};
 		var tree = parse(query, options);
-		tree = polyglot.preProcess(tree, options);
-		_.forEach(engines, (engine, id) => {
-			if (id == "lexicalTreeJSON") { // Dont run postprocess for lexicalTreeJSON
-				output[id] = engine.compile(tree, options), options
-			} else { 
-				output[id] = polyglot.postProcess(engine.compile(_.cloneDeep(tree), options), options)
-			}
-		});
-		return output;
-	},
-
-	translateGeneric: (query, engine, options) => {
-		var tree = parse(query, options);
-		return polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
-	},
-
-	translateAllGeneric: (query, options) => {
-		var output = {};
-		var tree = parse(query, options);
 		const engines = Object.keys(fieldCodesObject);
 		engines.forEach(engine => {
 			output[engine] = polyglot.postProcess(generic.compile(_.cloneDeep(tree), options, engine), options);
@@ -67,7 +42,6 @@ export default polyglot = {
 		output['lexicalTreeJSON'] = enginesImport.lexicalTreeJSON.compile(tree, options), options
 		return output;
 	},
-
 
 	/**
 	* Pre-proess the compile tree before it gets handed to each engines compile function
