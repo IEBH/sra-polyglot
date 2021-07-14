@@ -1,13 +1,14 @@
 {
   "name": "@iebh/polyglot",
-  "version": "4.3.3",
+  "version": "4.3.4",
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
   "scripts": {
     "test": "npm run prepare && mocha test/v4",
     "test:old": "npm run prepare && mocha './test/**/!(v4).js'",
     "test:all": "npm run prepare && mocha",
-    "prepare": "babel src --out-dir lib"
+    "prepare": "babel src --out-dir lib",
+    "preprocess": "cd ./data && node ./preprocess"
   },
   "babel": {
     "presets": [
