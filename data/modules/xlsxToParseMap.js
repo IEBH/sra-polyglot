@@ -95,18 +95,19 @@ export default settings => {
                             console.error(`\n${row[source.id]} failed to match field code\n`)
                         }
                     }
-                    // Match based on entire string
+                    // Match based on entire string (for mesh translations)
                     else if (row[source.id]) {
-                        if (!parseObject[row[source.id].toLowerCase()]) {
-                            parseObject[row[source.id].toLowerCase()] = row[settings.rowHeader];
+                        const key = row[source.id].toLowerCase().replaceAll('"', '')
+                        if (!parseObject[key]) {
+                            parseObject[key] = row[settings.rowHeader];
                         } else {
                             console.log(
                                 `Duplicate key (${source.id})`,
-                                `'${row[source.id].toLowerCase()}'`,
+                                `'${key}'`,
                                 "for",
                                 `'${row[settings.rowHeader]}'`,
                                 "already exists for",
-                                `'${parseObject[row[source.id].toLowerCase()]}'`
+                                `'${parseObject[key]}'`
                             );
                         }
                     } else {

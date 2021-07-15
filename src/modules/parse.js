@@ -247,13 +247,13 @@ export const parse = (query, options) => {
             cropString = false;
         } 
         // MESHTRANSLATIONS {{{
-        else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q))) {
+        else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q.toLowerCase().replaceAll('"', '')))) {
             branch.nodes.push({
                 type: 'meshTranslation',
-                field: meshTranslationsParse[match[1].toLowerCase()]
+                field: meshTranslationsParse[match[1]]
             });
-            offset += match[0].length;
-            q = q.substr(match[0].length);
+            offset += q.length;
+            q = q.substr(q.length);
             cropString = false;
         }
         /// }}}
