@@ -15,7 +15,7 @@ describe('Translate subheadings with or without quotes (Ovid -> *)', ()=> {
 describe('Translate subheadings at end of mesh term (PubMed -> *)', ()=> {
 
 	it('translate `exp *psoriasis/dt` -> PM `psoriasis/dt[majr]`', ()=> {
-		expect(polyglot.translate('exp *psoriasis/dt', 'PubMed abbreviation')).to.equal('psoriasis/dt[majr]');
+		expect(polyglot.translate('exp *psoriasis/dt', 'PubMed abbreviation')).to.equal('psoriasis/dt[Majr]');
 	});
 
 });

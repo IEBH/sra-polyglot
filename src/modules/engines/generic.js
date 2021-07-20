@@ -172,7 +172,13 @@ export default {
                                     if (el && el.toLowerCase() !== "test") {
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
-                                        return tools.quotePhrase(branch, engine, settings);
+                                        // Perform logic for the phrase in the mesh
+                                        var phrase = tools.quotePhrase(branch, engine, settings);
+                                        // If a subheading exists (e.g. psoriasis/dt)
+                                        if (branch.heading) {
+                                            phrase += "/" + branch.heading;
+                                        }
+                                        return phrase;
                                     } else { // Empty string
                                         return el;
                                     }
