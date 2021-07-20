@@ -171,6 +171,7 @@ export default {
                                 var containsHeading = false;
                                 var content = termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
+                                        // If heading already exists dont add second / at end (for ovid)
                                         if (containsHeading && el == "/") {
                                             return "";
                                         }
@@ -181,7 +182,13 @@ export default {
                                         // If a subheading exists (e.g. psoriasis/dt)
                                         if (branch.heading) {
                                             containsHeading = true;
-                                            phrase += "/" + branch.heading;
+                                            phrase += settings.highlighting
+                                                ? tools.createTooltip(
+                                                    "/" + branch.heading,
+                                                    "Subheading may need to be manually translated",
+                                                    "red-underline"
+                                                )
+                                                : "/" + branch.heading;
                                         }
                                         return phrase;
                                     } else { // Empty string
