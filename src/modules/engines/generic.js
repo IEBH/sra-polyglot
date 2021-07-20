@@ -168,14 +168,19 @@ export default {
                             if (translateObject) {
                                 const termArray = translateObject.terms;
                                 const comment = translateObject.comment;
+                                var containsHeading = false;
                                 var content = termArray.map(el => {
                                     if (el && el.toLowerCase() !== "test") {
+                                        if (containsHeading && el == "/") {
+                                            return "";
+                                        }
                                         return settings.highlighting ? `<font color="blue">${el}</font>` : el;
                                     } else if (el && el.toLowerCase() === "test") {
                                         // Perform logic for the phrase in the mesh
                                         var phrase = tools.quotePhrase(branch, engine, settings);
                                         // If a subheading exists (e.g. psoriasis/dt)
                                         if (branch.heading) {
+                                            containsHeading = true;
                                             phrase += "/" + branch.heading;
                                         }
                                         return phrase;
