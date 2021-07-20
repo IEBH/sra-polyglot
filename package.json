@@ -4,9 +4,9 @@
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
   "scripts": {
-    "test": "npm run prepare && mocha test/v4",
+    "test": "npm run prepare && mocha",
     "test:old": "npm run prepare && mocha './test/**/!(v4).js'",
-    "test:all": "npm run prepare && mocha",
+    "test:new": "npm run prepare && mocha test/v4",
     "prepare": "babel src --out-dir lib",
     "preprocess": "cd ./data && node ./preprocess"
   },
