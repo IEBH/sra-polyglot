@@ -136,8 +136,8 @@ export const parse = (query, options) => {
             leaf = branch.nodes;
         } else if (match = /^([0-9]+)\s*[‐\-]\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
-                type: 'ref', 
-                ref: _.range(match[1], (match[2]+1)/10), 
+                type: 'ref',
+                ref: _.range(match[1], (match[2]+1)/10),
                 cond: match[3].toUpperCase(),
                 nodes: []
             });
@@ -146,8 +146,8 @@ export const parse = (query, options) => {
             cropString = false;
         } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*[‐\-]\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
-                type: 'ref', 
-                ref: _.range(match[2], (match[3]+1)/10), 
+                type: 'ref',
+                ref: _.range(match[2], (match[3]+1)/10),
                 cond: match[1].toUpperCase(),
                 nodes: []
             });
@@ -157,11 +157,11 @@ export const parse = (query, options) => {
         } else if (match = /^(#?([0-9]+)) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             if (leaf.type != "phrase") {
                 branch.nodes.push({
-                    type: 'ref', 
+                    type: 'ref',
                     ref: [match[2]],
                     cond: '',
                     nodes: []
-                }); 
+                });
                 offset += match[1].length;
                 q = q.substr(match[1].length); // NOTE we only move by the digits, not the whole expression - so we can still handle the AND/OR correctly
                 cropString = false;
@@ -187,13 +187,13 @@ export const parse = (query, options) => {
             cropString = false;
 
             branch.nodes.push({
-                type: 'ref', 
+                type: 'ref',
                 ref: [match[3]],
                 cond: '',
                 nodes: []
-            }); 
-            offset += match[1].length; 
-            q = q.substr(match[1].length); 
+            });
+            offset += match[1].length;
+            q = q.substr(match[1].length);
         } else if (match = /^([0-9]+\.?)\s+/i.exec(q)) { // 1 or 1. (Line number)
             if (leaf.type != "phrase") {
                 lineNumber = parseInt(match[1], 10)
@@ -207,7 +207,7 @@ export const parse = (query, options) => {
                 offset += match[1].length-1;
                 q = q.substr(match[1].length-1);
             }
-        } 
+        }
         else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
             trimLastLeaf();
             branch.nodes.push({type: 'joinAnd'});
@@ -245,15 +245,16 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } 
+        }
         // MESHTRANSLATIONS {{{
         else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q.toLowerCase().replaceAll('"', '')))) {
             branch.nodes.push({
                 type: 'meshTranslation',
                 field: meshTranslationsParse[match[1]]
             });
-            offset += q.length;
-            q = q.substr(q.length);
+						match = /.+?[\.\[]\S+[\.\]]/.exec(q);
+            offset += match[0].length;
+            q = q.substr(match[0].length);
             cropString = false;
         }
         /// }}}
@@ -347,7 +348,7 @@ export const parse = (query, options) => {
                 leaf.field = 'MeSH Major Topic search (Not exploded)'
             }
             else leaf.field = 'Mesh search (Not exploded)';
-        } 
+        }
         // }}}
         else if (match = /^<(.*?)>/.exec(q)) {
             branch.nodes.push({type: 'template', content: match[1].toLowerCase()});
@@ -393,7 +394,7 @@ export const parse = (query, options) => {
                 q = q.substr(match[1].length)
             }
             cropString = false;
-        } 
+        }
         // }}}
         /// Comment {{{
         else if (match = /^#([^\)\d\n][^\)\n]+)/.exec(q)) {
@@ -462,16 +463,16 @@ export const parse = (query, options) => {
                             node.nodes[reference].pop();
                             found = true;
                         }
-                    }	
+                    }
                 }
                 // Line not found, push error message
                 if (!found) {
                     node.nodes.push(
                     [{
-                        type: "phrase", 
+                        type: "phrase",
                         content: tools.createTooltip(
-                            "Line " + node.ref[reference] + " not found", 
-                            "Polyglot could not find specified line in the search query", 
+                            "Line " + node.ref[reference] + " not found",
+                            "Polyglot could not find specified line in the search query",
                             "red-underline"
                         )
                     }]);
