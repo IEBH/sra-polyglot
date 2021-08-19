@@ -2,14 +2,14 @@ var expect = require('chai').expect;
 const polyglot = require('../lib').default;
 
 describe('Translate Mesh which appears later in search (Pubmed -> *)', () => {
-	it.only('translate `Language[Majr]` -> OV `exp *Language/`', ()=> {
+	it('translate `Language[Majr]` -> OV `exp *Language/`', ()=> {
 		expect(polyglot.translate(
 			'Title[ti] and Language[Majr]', 'Ovid MEDLINE'
 		)).to.equal(
 			'Title.ti. AND exp *Language/'
 		);
 	});
-	it.only('translate `"Practice Guidelines as Topic"[Majr]` -> OV `exp *"Practice Guidelines as Topic"/`', ()=> {
+	it('translate `"Practice Guidelines as Topic"[Majr]` -> OV `exp *"Practice Guidelines as Topic"/`', ()=> {
 		expect(polyglot.translate(
 			'Title[ti] and "Practice Guidelines as Topic"[Majr]', 'Ovid MEDLINE'
 		)).to.equal(

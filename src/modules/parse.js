@@ -266,7 +266,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^([^\s\/]*)\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax
+        } else if (match = /^([^\s\/]*)\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax (No Quotes)
             var newLeaf = {};
             newLeaf.type = 'mesh';
             newLeaf.content = match[1];
@@ -279,7 +279,20 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
+        } else if (match = /^"([^\/]*)"\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax (With Quotes)
+					var newLeaf = {};
+					newLeaf.type = 'mesh';
+					newLeaf.content = match[1];
+					if (match[2]) {
+							newLeaf.heading = match[2];
+					}
+					newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
+					if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+					branch.nodes.push(newLeaf);
+					offset += match[0].length;
+					q = q.substr(match[0].length);
+					cropString = false;
+				} else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
             leaf.type = 'mesh';
             leaf.field = 'MeSH subheading search';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
