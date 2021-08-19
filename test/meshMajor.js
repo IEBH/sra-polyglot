@@ -16,7 +16,7 @@ describe('Translate Mesh which appears later in search (Pubmed -> *)', () => {
 			'Title.ti. AND exp *"Practice Guidelines as Topic"/'
 		);
 	});
-	it.only('translate `Sandwiched mesh` -> OV', ()=> {
+	it('translate `Sandwiched mesh` -> OV', ()=> {
 		expect(polyglot.translate(
 			'"Practice Guidelines as Topic"[Majr] OR Guideline[ti] OR "Guideline Adherence"[Majr]', 'Ovid MEDLINE'
 		)).to.equal(

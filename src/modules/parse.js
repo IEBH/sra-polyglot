@@ -279,7 +279,7 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^"([^\/]*)"\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax (With Quotes)
+        } else if (match = /^"([^\\[]*)"\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax (With Quotes)
 					var newLeaf = {};
 					newLeaf.type = 'mesh';
 					newLeaf.content = match[1];
