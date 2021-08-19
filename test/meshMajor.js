@@ -1,5 +1,16 @@
 var expect = require('chai').expect;
 const polyglot = require('../lib').default;
+
+describe('Translate Mesh which appears later in search (Pubmed -> *)', () => {
+	it.only('translate `Long query` -> OV `Long query`', ()=> {
+		expect(polyglot.translate(
+			'Title[ti] and Language[Majr]', 'Ovid MEDLINE'
+		)).to.equal(
+			'Title.ti. AND exp *Language/'
+		);
+	});
+})
+
 describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 
 	it('translate `term[Majr]` -> PM `term[Majr]`', ()=> {
