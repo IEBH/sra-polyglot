@@ -108,7 +108,7 @@ While Ovid Medline supports using field tags on groups, PubMed doesn't, so any t
 
 
 ## Replacing Empty Field Tags
-Any time there is a phrase without a field tag (a generic search for all fields), a dashed blue underline will appear underneath it. Clicking on the word will bring up a dialogue box which will allow you to specify a field tag to replace the missing field tag for either just that word or all phrases with no field tags. 
+Any time there is a phrase without a field tag (a generic search for all fields), a dashed blue underline will appear underneath it. Clicking on the word will bring up a dialogue box which will allow you to specify a field tag to replace the missing field tag for either just that word or all phrases with no field tags.
 
 ![box](https://user-images.githubusercontent.com/25999161/61197578-07e54e00-a719-11e9-96b3-b64d0282fff3.png)
 
@@ -142,6 +142,9 @@ To use comments simply add a hash character (`#`) anywhere on a line. Any text *
 
 # For Developers
 
+## Updating Polyglot
+To update polyglot, update spreadsheet and then replace `data/v4.xlsx` with spreadsheet
+Run `npm preprocess` to update translations and republish
 ## Input Output API
 ```javascript
 polyglot = require('sra-polyglot').default;
