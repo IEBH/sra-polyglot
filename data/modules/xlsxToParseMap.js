@@ -46,7 +46,7 @@ export default settings => {
             // Return sliced data - removing all header areas
             return sheet.slice(settings.dataRowStart); // Remove first row
         })
-        // Create lookup map 
+        // Create lookup map
         .then(sheet => {
             let parseObject = {};
             sheet.forEach((row, rowIndex) => {
@@ -97,7 +97,7 @@ export default settings => {
                     }
                     // Match based on entire string (for mesh translations)
                     else if (row[source.id]) {
-                        const key = row[source.id].toLowerCase().replaceAll('"', '')
+                        const key = row[source.id].toLowerCase().replace(/"/g, '')
                         if (!parseObject[key]) {
                             parseObject[key] = row[settings.rowHeader];
                         } else {
@@ -125,15 +125,15 @@ export default settings => {
             })
             // Create alternative keys with & or and
             Object.keys(parseObject).forEach(key => {
-                const newKey = key.replaceAll("&", "and");
+                const newKey = key.replace(/&/g, "and");
                 parseObject[newKey] = parseObject[key];
             })
             // Sort keys descending to ensure longest is matched first
             const ordered = Object.keys(parseObject).sort().reverse().reduce(
-                (obj, key) => { 
-                    obj[key] = parseObject[key]; 
+                (obj, key) => {
+                    obj[key] = parseObject[key];
                     return obj;
-                }, 
+                },
                 {}
             );
             return ordered;

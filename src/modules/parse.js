@@ -247,7 +247,7 @@ export const parse = (query, options) => {
             cropString = false;
         }
         // MESHTRANSLATIONS {{{
-        else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q.toLowerCase().replaceAll('"', '')))) {
+        else if (afterWhitespace && (match = new RegExp(`^(${meshTranslations})`, "i").exec(q.toLowerCase().replace(/"/g, '')))) {
             branch.nodes.push({
                 type: 'meshTranslation',
                 field: meshTranslationsParse[match[1]]
