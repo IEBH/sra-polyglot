@@ -35,7 +35,7 @@ export default {
                             break;
                         case 'group':
                             if (branch.field) {
-                                if (engine === "Ovid MEDLINE" || engine === "Scopus (advanced search)" || engine === "Embase (Elsevier)") {
+                                if (engine === "Ovid MEDLINE" || engine === "Scopus (advanced search)" || engine === "Embase (Elsevier)" || engine === "WoS Advanced") {
                                     // Put field code outside brackets
                                     if (branch.field.match(/mesh/i)) {
                                         var translateObject = meshObject[engine] ? meshObject[engine][branch.field] : null;
@@ -90,18 +90,18 @@ export default {
                                         b.field = branch.field
                                     });
                                     branch.nodes = tools.visit(branch.nodes, ['group'], b => b.field = branch.field);
-                                    buffer += '(' + compileWalker(branch.nodes) + ')';					
+                                    buffer += '(' + compileWalker(branch.nodes) + ')';
 
                                 }
                             } else {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
-                            }					
+                            }
                             break;
                             case 'ref':
                                 if (settings.transposeLines) {
                                     // Expand each line to show full query
                                     var node;
-                                    
+
                                     for (node in branch.nodes) {
                                         if (node == 0) {
                                             // First line is printed as is wrapped in brackets
@@ -109,10 +109,10 @@ export default {
                                         } else {
                                             // Remaining lines are appended with the condition
                                             buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
-                                        }	
+                                        }
                                     }
                                 } else {
-                                    // Only print each line number in format defined by engine 
+                                    // Only print each line number in format defined by engine
                                     // If branch.ref is array then user specified OR/1-4
                                     if(Array.isArray(branch.ref)) {
                                         for (node in branch.ref) {
