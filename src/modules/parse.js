@@ -170,7 +170,7 @@ export const parse = (query, options) => {
                 offset += match[1].length-1;
                 q = q.substr(match[1].length-1);
             }
-        } else if (match = /^((AND|OR|NOT) +#?([0-9]+))($(?![\r\n])|\s+)/i.exec(q)) { // AND 2...
+        } else if (match = /^((AND|OR|NOT) +#?([0-9]+))($(?![\r\n])|\s+|\))/i.exec(q)) { // AND 2...
             trimLastLeaf();
             switch(match[2].toLowerCase()) {
                 case "and":

@@ -34,6 +34,13 @@ describe('Allow reference numbering', ()=> {
 
 });
 
+describe('Translate numbers in brackets', ()=> {
+	it('Basic number bracket translation', ()=> {
+		expect(polyglot.translate('1. Foo\n2. Bar\n3. (1 or 2)', 'CINAHL (Ebsco)', {html: false})).to.equal('Foo\nBar\n((Foo) OR (Bar))');
+	});
+});
+
+
 describe('Avoid False Positives', ()=> {
 
 	it('type 1 diabetes', ()=> {
