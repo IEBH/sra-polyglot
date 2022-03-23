@@ -18,8 +18,8 @@ describe('Translate multiple MESH terms (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[Mesh]` -> EM `"term1 term2"/exp`', ()=> {
-		expect(polyglot.translate('"term1 term2"[Mesh]', 'Embase (Elsevier)')).to.equal('"term1 term2"/exp');
-		expect(polyglot.translate('"term1 and term2"[Mesh]', 'Embase (Elsevier)')).to.equal('"term1 and term2"/exp');
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'Embase (Elsevier)')).to.equal("'term1 term2'/exp");
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'Embase (Elsevier)')).to.equal("'term1 and term2'/exp");
 	});
 
 	it('translate `"term1 term2"[Mesh]` -> CI `(MH "term1 term2+")`', ()=> {
@@ -62,8 +62,8 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[mh]` -> EM `"term1 term2"/exp`', ()=> {
-		expect(polyglot.translate('"term1 term2"[mh]', 'Embase (Elsevier)')).to.equal('"term1 term2"/exp');
-		expect(polyglot.translate('"term1 and term2"[mh]', 'Embase (Elsevier)')).to.equal('"term1 and term2"/exp');
+		expect(polyglot.translate('"term1 term2"[mh]', 'Embase (Elsevier)')).to.equal("'term1 term2'/exp");
+		expect(polyglot.translate('"term1 and term2"[mh]', 'Embase (Elsevier)')).to.equal("'term1 and term2'/exp");
 	});
 
 	it('translate `"term1 term2"[mh]` -> CI `(MH "term1 term2+")`', ()=> {
@@ -106,8 +106,8 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"[MeSH Terms]` -> EM `"term1 term2"/exp`', ()=> {
-		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'Embase (Elsevier)')).to.equal('"term1 term2"/exp');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'Embase (Elsevier)')).to.equal('"term1 and term2"/exp');
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'Embase (Elsevier)')).to.equal("'term1 term2'/exp");
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'Embase (Elsevier)')).to.equal("'term1 and term2'/exp");
 	});
 
 	it('translate `"term1 term2"[MeSH Terms]` -> CI `(MH "term1 term2+")`', ()=> {
@@ -153,9 +153,9 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `exp term1 term2/` -> EM `"term1 term2"/exp`', ()=> {
-		expect(polyglot.translate('exp term1 term2/', 'Embase (Elsevier)')).to.equal('"term1 term2"/exp');
-		expect(polyglot.translate('exp term1 and term2/', 'Embase (Elsevier)')).to.equal('"term1 and term2"/exp');
-		expect(polyglot.translate('exp "term1 and term2"/', 'Embase (Elsevier)')).to.equal('"term1 and term2"/exp');
+		expect(polyglot.translate('exp term1 term2/', 'Embase (Elsevier)')).to.equal("'term1 term2'/exp");
+		expect(polyglot.translate('exp term1 and term2/', 'Embase (Elsevier)')).to.equal("'term1 and term2'/exp");
+		expect(polyglot.translate('exp "term1 and term2"/', 'Embase (Elsevier)')).to.equal("'term1 and term2'/exp");
 	});
 
 	it('translate `exp term1 term2/` -> CI `(MH "term1 term2+")`', ()=> {

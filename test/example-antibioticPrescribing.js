@@ -236,13 +236,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 
 	it('should translate the example into Embase format', ()=> {
 		expect(polyglot.translate(example.query, 'Embase (Elsevier)', {groupLines: true, html: false})).to.equal(
-			'("Primary Health Care"/exp OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
-			'AND\n\n' +
-			'("Treatment Failure"/exp OR "Treatment failure" OR "Treatment failures")\n\n' +
-			'AND\n\n' +
-			'("Bacterial Infections"/exp OR Bacteria OR Bacterial)\n\n' +
-			'AND\n\n' +
-			'("Anti-Bacterial Agents"/exp OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+			"('Primary Health Care'/exp OR 'Primary care' OR 'Primary healthcare' OR 'Family practice' OR 'General practice')\n\n" +
+			"AND\n\n" +
+			"('Treatment Failure'/exp OR 'Treatment failure' OR 'Treatment failures')\n\n" +
+			"AND\n\n" +
+			"('Bacterial Infections'/exp OR Bacteria OR Bacterial)\n\n" +
+			"AND\n\n" +
+			"('Anti-Bacterial Agents'/exp OR 'Antibacterial Agents' OR 'Antibacterial Agent' OR Antibiotics OR Antibiotic)"
 		);
 	});
 

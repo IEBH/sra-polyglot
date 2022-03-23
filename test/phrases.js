@@ -15,7 +15,7 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> EM `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'Embase (Elsevier)')).to.equal('"term1 term2"');
+		expect(polyglot.translate('"term1 term2"', 'Embase (Elsevier)')).to.equal("'term1 term2'");
 	});
 
 	it('translate `"term1 term2"` -> CI `"term1 term2"`', ()=> {
@@ -51,7 +51,7 @@ describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `"term1 term2"` -> EM `"term1 term2"`', ()=> {
-		expect(polyglot.translate('"term1 term2"', 'Embase (Elsevier)')).to.equal('"term1 term2"');
+		expect(polyglot.translate('"term1 term2"', 'Embase (Elsevier)')).to.equal("'term1 term2'");
 	});
 
 	it('translate `"term1 term2"` -> CI `"term1 term2"`', ()=> {
