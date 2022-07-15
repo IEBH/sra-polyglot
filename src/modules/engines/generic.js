@@ -7,6 +7,13 @@ import fieldCodesObject from "../../data/fieldCodesObject.js"
 import meshObject from "../../data/meshObject.js"
 import meshTranslationsObject from "../../data/meshTranslationsObject.js"
 
+// Function to fix cinahl exploded mesh (move + sign back before ")
+function fixCinahl(content) {
+    content = content.replace(/"\+/, '+"');
+    content = content.replace(/"<\/font><font color="blue">\+/, '+"</font><font color="blue">');
+    return content;
+}
+
 export default {
     id: 'generic',
     title: 'generic',
@@ -52,7 +59,7 @@ export default {
                                         }).join("");
                                         // Fix to move '+' back one space when quoting
                                         if (engine === "CINAHL (Ebsco)") {
-                                            content = content.replace(/"\+/, '+"');
+                                            content = fixCinahl(content);
                                         }
                                         buffer += (comment && settings.highlighting)
                                             ? tools.createTooltip(content, comment)
@@ -196,8 +203,8 @@ export default {
                                     }
                                 }).join("");
                                 // Fix to move '+' back one space when quoting
-                                if (engine === "CINAHL (Ebsco)") {
-                                    content = content.replace(/"\+/, '+"');
+                                if (engine == "CINAHL (Ebsco)") {
+                                    content = fixCinahl(content);
                                 }
                                 buffer += (comment && settings.highlighting)
                                     ? tools.createTooltip(content, comment)
