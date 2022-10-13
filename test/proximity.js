@@ -146,8 +146,24 @@ describe('Translate adjacency searches (N3 format)', ()=> {
 
 });
 
-describe('Translate adjacency fields cinahl', ()=> {
-	it('translate `(term1 adj3 term2).ti.` -> CI `((TI term1) N3 (TI term2))`', ()=> {
+describe('Translate edge case adjacency fields Cinahl', ()=> {
+	it('translate `title`', ()=> {
 		expect(polyglot.translate('(term1 adj3 term2).ti.', 'CINAHL (Ebsco)')).to.equal('((TI term1) N3 (TI term2))');
+	});
+
+	it('translate `abstract`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).ab.', 'CINAHL (Ebsco)')).to.equal('((AB term1) N3 (AB term2))');
+	});
+
+	it('translate `author`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).au.', 'CINAHL (Ebsco)')).to.equal('((AU term1) N3 (AU term2))');
+	});
+
+	it('translate `ISBN`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).ib.', 'CINAHL (Ebsco)')).to.equal('((IB term1) N3 (IB term2))');
+	});
+
+	it('translate `journal issue numbers`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).ip.', 'CINAHL (Ebsco)')).to.equal('((IP term1) N3 (IP term2))');
 	});
 });
