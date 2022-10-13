@@ -19,7 +19,7 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[nm]` -> CI `MW term`', ()=> {
-		expect(polyglot.translate('term[nm]', 'CINAHL (Ebsco)')).to.equal('MW term');
+		expect(polyglot.translate('term[nm]', 'CINAHL (Ebsco)')).to.equal('(MW term)');
 	});
 
 	it('translate `term[nm]` -> PY `term.hw.`', ()=> {
@@ -55,7 +55,7 @@ describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `term.nm` -> CI `TI term`', ()=> {
-		expect(polyglot.translate('term.nm', 'CINAHL (Ebsco)')).to.equal('MW term');
+		expect(polyglot.translate('term.nm', 'CINAHL (Ebsco)')).to.equal('(MW term)');
 	});
 
 	it('translate `term.hw.` -> PY `AB term`', ()=> {

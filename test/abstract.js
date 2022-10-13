@@ -20,7 +20,7 @@ describe('Translate abstract searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[ab]` -> CI `AB term`', ()=> {
-		expect(polyglot.translate('term[ab]', 'CINAHL (Ebsco)')).to.equal('AB term');
+		expect(polyglot.translate('term[ab]', 'CINAHL (Ebsco)')).to.equal('(AB term)');
 	});
 
 	it('translate `term[ab]` -> PY `term.ab.`', ()=> {

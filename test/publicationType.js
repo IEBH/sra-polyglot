@@ -19,7 +19,7 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[pt]` -> CI `PT term`', ()=> {
-		expect(polyglot.translate('term[pt]', 'CINAHL (Ebsco)')).to.equal('PT term');
+		expect(polyglot.translate('term[pt]', 'CINAHL (Ebsco)')).to.equal('(PT term)');
 	});
 
 	it('translate `term[pt]` -> PY `term.pt.`', ()=> {

@@ -19,7 +19,7 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[ti]` -> CI `TI term`', ()=> {
-		expect(polyglot.translate('term[ti]', 'CINAHL (Ebsco)')).to.equal('TI term');
+		expect(polyglot.translate('term[ti]', 'CINAHL (Ebsco)')).to.equal('(TI term)');
 	});
 
 	it('translate `term[ab]` -> PY `term.ti.`', ()=> {
@@ -55,7 +55,7 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 	});
 
 	it('translate `term[Title]` -> CI `TI term`', ()=> {
-		expect(polyglot.translate('term[Title]', 'CINAHL (Ebsco)')).to.equal('TI term');
+		expect(polyglot.translate('term[Title]', 'CINAHL (Ebsco)')).to.equal('(TI term)');
 	});
 
 	it('translate `term[Title]` -> PY `term.ti.`', ()=> {
@@ -91,7 +91,7 @@ describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
 	});
 
 	it('translate `term.ti` -> CI `TI term`', ()=> {
-		expect(polyglot.translate('term.ti', 'CINAHL (Ebsco)')).to.equal('TI term');
+		expect(polyglot.translate('term.ti', 'CINAHL (Ebsco)')).to.equal('(TI term)');
 	});
 
 	it('translate `term.ti.` -> PY `AB term`', ()=> {
