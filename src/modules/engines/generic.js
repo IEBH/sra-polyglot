@@ -263,7 +263,7 @@ export default {
                                     buffer += `W/${branch.proximity}`;
                                     break;
                                 case 'SPORTDiscus':
-                                    buffer += `N/${branch.proximity}`;
+                                    buffer += `N${branch.proximity}`;
                                     break;
                             }
                             break;
@@ -292,8 +292,11 @@ export default {
                                     break;
                                 case 'Scopus (basic search)':
                                 case 'Scopus (advanced search)':
+                                    buffer +='W/1'
+                                    break;
+                                
                                 case 'SPORTDiscus':
-                                    buffer += 'W/1';
+                                    buffer += 'W1';
                                     break;
                                 case 'ProQuest Health and Medical':
                                     buffer += 'PRE/0'
