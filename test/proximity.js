@@ -145,3 +145,9 @@ describe('Translate adjacency searches (N3 format)', ()=> {
 	});
 
 });
+
+describe('Translate adjacency fields cinahl', ()=> {
+	it('translate `(term1 adj3 term2).ti.` -> CI `((TI term1) N3 (TI term2))`', ()=> {
+		expect(polyglot.translate('term1 adj3 term2).ti.', 'CINAHL (Ebsco)')).to.equal('((TI term1) N3 (TI term2))');
+	});
+});
