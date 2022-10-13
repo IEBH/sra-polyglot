@@ -8,20 +8,32 @@ It forms the [Polyglot Search Syntax Translator](http://sr-accelerator.com/#/pol
 [DEMO](https://iebh.github.io/sra-polyglot/)
 
 # Table of Contents
+- [Polyglot Search Translator](#polyglot-search-translator)
+- [Table of Contents](#table-of-contents)
 - [Usage Guide](#usage-guide)
-  * [Plain-text phrases](#plain-text-phrases)
-  * [Mesh Headings](#mesh-headings)
-  * [Logical Syntax](#logical-syntax)
-  * [Proximity searching](#proximity-searching)
-  * [Line Referencing](#line-referencing)
-  * [Bracket Expansion](#bracket-expansion)
-  * [Replacing Empty Field Tags](#replacing-empty-field-tags)
-  * [Tooltips](#tooltips)
-  * [Templates](#templates)
-  * [Comments](#comments)
-- [For Developers](#how-polyglot-works)
-  * [Input/Output API](#input-output-api)
-  * [Parsed Tree Object](#parsed-tree-object)
+  - [Plain-text phrases](#plain-text-phrases)
+  - [Mesh Headings](#mesh-headings)
+  - [Logical Syntax](#logical-syntax)
+  - [Proximity searching](#proximity-searching)
+  - [Line Referencing](#line-referencing)
+  - [Bracket Expansion](#bracket-expansion)
+  - [Replacing Empty Field Tags](#replacing-empty-field-tags)
+  - [Tooltips](#tooltips)
+  - [Templates](#templates)
+  - [Comments](#comments)
+- [For Developers](#for-developers)
+  - [Updating Polyglot](#updating-polyglot)
+  - [Input Output API](#input-output-api)
+  - [Parsed Tree Object](#parsed-tree-object)
+    - [group](#group)
+    - [joinAnd](#joinand)
+    - [joinNear](#joinnear)
+    - [joinNot](#joinnot)
+    - [joinOr](#joinor)
+    - [mesh](#mesh)
+    - [phrase](#phrase)
+    - [raw](#raw)
+    - [template](#template)
 
 
 # Usage Guide
@@ -144,7 +156,7 @@ To use comments simply add a hash character (`#`) anywhere on a line. Any text *
 
 ## Updating Polyglot
 To update polyglot, update spreadsheet and then replace `data/v4.xlsx` with spreadsheet
-Run `npm preprocess` to update translations and republish
+Run `npm run preprocess` to update translations and republish
 ## Input Output API
 ```javascript
 polyglot = require('sra-polyglot').default;
