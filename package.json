@@ -30,7 +30,11 @@
     "medical",
     "research"
   ],
-  "author": "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang), Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)",
+  "author": [
+    "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
+    "Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)",
+    "Justin Cark <jclark@bond.edu.au> (https://github.com/Justin-Clarc)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/IEBH/sra-polyglot/issues"
