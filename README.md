@@ -9,7 +9,8 @@ It forms the [Polyglot Search Syntax Translator](http://sr-accelerator.com/#/pol
 
 # Table of Contents
 - [Polyglot Search Translator](#polyglot-search-translator)
-- [Table of Contents](#table-of-contents)
+- [Contributing](#contributing)
+- [Testing](#testing)
 - [Usage Guide](#usage-guide)
   - [Plain-text phrases](#plain-text-phrases)
   - [Mesh Headings](#mesh-headings)
@@ -34,6 +35,25 @@ It forms the [Polyglot Search Syntax Translator](http://sr-accelerator.com/#/pol
     - [phrase](#phrase)
     - [raw](#raw)
     - [template](#template)
+
+
+# Contributing
+Please get in touch if you would like to extend Polyglot or any of the databases we support. Its best to [get in touch with us](https://sr-accelerator.com/#/contact) as we can provide help and resources.
+
+Generally the process of extending Polyglot takes these steps:
+
+1. Prepare a list of translations for known search symbols
+2. Copy a known translation set most similar to the database being added
+3. Check the translations using the [TestKits#testing]
+4. Create a Pull-Request against this repo to include your changes
+
+
+# Testing
+When adding new search translations we would strongly recommend existing the existing suite of [testing scripts](./test) to include the new translations. This allows us to track regressions with future feature additions.
+
+1. Edit an existing [test file](./test) or create a new one to include your fixes
+2. Run `npm run test` to verify the tests all pass successfully
+3. Create a Pull-Request against this repo to include your changes
 
 
 # Usage Guide
