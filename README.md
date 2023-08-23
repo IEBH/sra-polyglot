@@ -73,7 +73,7 @@ The following sub-headings break down each individual syntax.
 ## Plain-text phrases
 To search for basic phrases simply specify the words within the search term with or without being enclosed in speachmarks. Specific search fields can be specified by appending it to the term in any of the following supported formats:
 
-* `Term` (Generic search in all fields, polyglot will undeline the word in blue: [Replacing Empty Field Tags](#replacing-empty-field-tags))
+* `Term` (Generic search in all fields, polyglot will underline the word in blue: [Replacing Empty Field Tags](#replacing-empty-field-tags))
 * `Term[ti]` (PubMed field specification, fields also supported: `tiab`, `ti`, `tw`, `ab`, `nm`, `sh`, `pt`, `la`)
 * `Term.ti.` or `Term:ti` (Ovid MEDLINE field specification, fields also supported: `tw`, `ti,ab`, `ab,ti`, `ti`, `ab`, `mp`, `nm`, `pt`, `fs`, `sh`, `xm`, `lg`)
 
@@ -112,7 +112,7 @@ Similar to [Logical Syntax](#logical-syntax), proximity searching allows the sea
 
 
 ## Line Referencing
-There are two main methods to number lines, either leave the beggining of the line blank and use the numbers provided in the left hand side of the editor, or specify a custom number at the begining of each line.
+There are two main methods to number lines, either leave the beginning of the line blank and use the numbers provided in the left hand side of the editor, or specify a custom number at the beginning of each line.
 Automatic line expansion can be used by enabling the checkbox.
 **If you specify a line number at the beginning of a line, all lines must be numbered.**
 
@@ -146,7 +146,7 @@ Any time there is a phrase without a field tag (a generic search for all fields)
 
 
 ## Tooltips
-Any time a black dotted line appears underneath a word, howver over it to display a tooltip with more information. These tooltips will usually appear to inform the user when polyglot makes a decision on their behalf.
+Any time a black dotted line appears underneath a word, hover over it to display a tooltip with more information. These tooltips will usually appear to inform the user when polyglot makes a decision on their behalf.
 
 **e.g. When attempting to convert foo.ab. from and Ovid Medline Search to PubMed, because PubMed does not support searching the abstract field term by itself Polyglot translates it to the Title and Abstract field term.**
 
@@ -156,7 +156,7 @@ Any time a black dotted line appears underneath a word, howver over it to displa
 ## Templates
 These are specified using the `<Template ID>` syntax.
 
-For example the "RCT Filter" template (specified via `<RCT Filter>` in Polglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the synax based on the output engine.
+For example the "RCT Filter" template (specified via `<RCT Filter>` in Polyglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the syntax based on the output engine.
 
 | Template ID	| Description                  	|
 |---------------|-------------------------------|
@@ -274,7 +274,7 @@ A meta template specified which Polyglot will insert into the output correctly b
 
 These are specified using the `<Template ID>` syntax.
 
-For example the "RCT Filter" template (specified via `<RCT Filter>` in Polglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the synax based on the output engine.
+For example the "RCT Filter" template (specified via `<RCT Filter>` in Polyglot) has a specific syntax in PubMed and Ovid MEDLINE and in some search engines is omitted all other. Using templates allows Polyglot to correctly swap the syntax based on the output engine.
 
 
 | Property  | Type   | Description                                      |
