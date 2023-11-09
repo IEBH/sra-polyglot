@@ -34,6 +34,9 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[nm]', 'Web of Science')).to.equal('term');
 	});
 
+	it('translate `term[nm]` -> HAT `term`', ()=> {
+		expect(polyglot.translate('term[nm]', 'International HTA Database')).to.equal('term');
+	});
 });
 
 describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
@@ -70,4 +73,7 @@ describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translate('term.nm', 'Web of Science')).to.equal('term');
 	});
 
+	it('translate `term.nm` -> HAT `term`', ()=> {
+		expect(polyglot.translate('term.nm', 'International HTA Database')).to.equal('term');
+	});
 });

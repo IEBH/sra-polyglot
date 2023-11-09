@@ -34,6 +34,10 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[ti]', 'Web of Science')).to.equal('term');
 	});
 
+	it('translate `term[ti]` -> HTA `(term)[title]`', ()=> {
+		expect(polyglot.translate('term[ti]', 'International HTA Database')).to.equal('(term)[title]');
+	});
+
 });
 
 describe('Translate title searches (PubMed -> *)', ()=> {
@@ -70,6 +74,9 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[Title]', 'Web of Science')).to.equal('term');
 	});
 
+	it('translate `term[Title]` -> HTA `(term)[title]`', ()=> {
+		expect(polyglot.translate('term[Title]', 'International HTA Database')).to.equal('(term)[title]');
+	});
 });
 
 describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
@@ -106,4 +113,7 @@ describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translate('term.ti', 'Web of Science')).to.equal('term');
 	});
 
+	it('translate `term.ti` -> HTA `(term)[title]`', ()=> {
+		expect(polyglot.translate('term.ti', 'International HTA Database')).to.equal('(term)[title]');
+	});
 });
