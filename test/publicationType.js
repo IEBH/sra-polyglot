@@ -34,4 +34,9 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[pt]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[pt]` -> HTA `term`', ()=> {
+		expect(polyglot.translate('term[pt]', 'International HTA Database')).to.equal('term');
+	});
+
 });

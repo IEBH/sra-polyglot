@@ -42,6 +42,12 @@ describe('Translate multiple MESH terms (PubMed -> *)', ()=> {
 		expect(polyglot.translate('"term1 and term2"[Mesh]', 'Web of Science')).to.equal('"term1 and term2"');
 	});
 
+	//International HTA Database
+	it('translate `"term1 term2"[Mesh]` -> HTA `"term1 term2"[mh]`', ()=>{
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
@@ -86,6 +92,12 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 		expect(polyglot.translate('"term1 and term2"[mh]', 'Web of Science')).to.equal('"term1 and term2"');
 	});
 
+	//International HTA Database
+	it('translate `"term1 term2"[mh]` -> HTA `"term1 term2"[mh]`', ()=>{
+		expect(polyglot.translate('"term1 term2"[mh]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
+		expect(polyglot.translate('"term1 and term2"[mh]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
@@ -128,6 +140,12 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 	it('translate `"term1 term2"[MeSH Terms]` -> WS `"term1 term2"`', ()=> {
 		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'Web of Science')).to.equal('"term1 term2"');
 		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'Web of Science')).to.equal('"term1 and term2"');
+	});
+
+	//International HTA Database
+	it('translate `"term1 term2"[MeSH Terms]` -> HTA `"term1 term2"[mh]`', ()=>{
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
 	});
 
 });
@@ -180,6 +198,13 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translate('exp term1 term2/', 'Web of Science')).to.equal('"term1 term2"');
 		expect(polyglot.translate('exp term1 and term2/', 'Web of Science')).to.equal('"term1 and term2"');
 		expect(polyglot.translate('exp "term1 and term2"/', 'Web of Science')).to.equal('"term1 and term2"');
+	});
+
+	//International HTA Database
+	it('translate `exp term1 term2/` -> HTA `"term1 term2"[mh]', ()=>{
+		expect(polyglot.translate('exp term1 term2/', 'International HTA Database')).to.equal('"term1 term2"[mh]');
+		expect(polyglot.translate('exp term1 and term2/', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+		expect(polyglot.translate('exp "term1 and term2"/', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
 	});
 
 });

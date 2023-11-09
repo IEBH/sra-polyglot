@@ -25,6 +25,7 @@ describe('Translate Mesh which appears later in search (Pubmed -> *)', () => {
 	});
 })
 
+//MeSH Major Topic search (exploded)
 describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 
 	it('translate `term[Majr]` -> PM `term[Majr]`', ()=> {
@@ -59,8 +60,14 @@ describe('Translate MeSH major terms (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[Majr]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[Majr]` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('term[Majr]', 'International HTA Database')).to.equal('"term"[mhe]');
+	})
+
 });
 
+//PubMed Full
 describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 
 	it('translate `term[MeSH Major Topic]` -> PM `term[Majr]`', ()=> {
@@ -93,6 +100,11 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', ()=> {
 
 	it('translate `term[MeSH Major Topic]` -> WS `term`', ()=> {
 		expect(polyglot.translate('term[MeSH Major Topic]', 'Web of Science')).to.equal('term');
+	});
+
+	//International HTA Database
+	it('translate `term[MeSH Major Topic]` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('term[MeSH Major Topic]', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 
 });
@@ -129,6 +141,11 @@ describe('Translate Translate MeSH major terms (Ovid MEDLINE -> *)', ()=> {
 
 	it('translate `exp *term/` -> WS `term`', ()=> {
 		expect(polyglot.translate('exp *term/', 'Web of Science')).to.equal('term');
+	});
+
+	//International HTA Database
+	it('translate `exp *term/` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('exp *term/', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 
 });

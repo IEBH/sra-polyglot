@@ -34,6 +34,7 @@ describe('Translate title + abstract + other searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[tw]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
 	it('translate `term[tw]` -> HTA `term`', ()=> {
 		expect(polyglot.translate('term[tw]', 'International HTA Database')).to.equal('term');
 	});
@@ -74,6 +75,7 @@ describe('Translate title + abstract + other searches (Ovid MEDLINE -> *)', () =
 		expect(polyglot.translate('term.mp.', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
 	it('translate `term.mp` -> HTA `term`', ()=> {
 		expect(polyglot.translate('term.mp.', 'International HTA Database')).to.equal('term');
 	});
@@ -114,6 +116,7 @@ describe('Translate title + abstract + other searches, with automated gunk (Ovid
 		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
 	it('translate `term.mp. [...]` -> HTA `term`', () => {
 		expect(polyglot.translate('term.mp.[mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'International HTA Database')).to.equal('term');
 	});

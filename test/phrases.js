@@ -34,6 +34,11 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 		expect(polyglot.translate('"term1 term2"', 'Web of Science')).to.equal('"term1 term2"');
 	});
 
+	//International HTA Database
+	it('translate `"term1 term2"` -> HTA `"term1 term2"`', ()=>{
+		expect(polyglot.translate('"term1 term2"', 'International HTA Database')).to.equal('"term1 term2"');
+	});
+
 });
 
 describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
@@ -68,6 +73,11 @@ describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
 
 	it('translate `"term1 term2"` -> WS `"term1 term2"`', ()=> {
 		expect(polyglot.translate('"term1 term2"', 'Web of Science')).to.equal('"term1 term2"');
+	});
+
+	//International HTA Database
+	it('translate `"term1 term2"` -> HTA `"term1 term2"`', ()=>{
+		expect(polyglot.translate('"term1 term2"', 'International HTA Database')).to.equal('"term1 term2"');
 	});
 
 });

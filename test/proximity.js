@@ -34,6 +34,11 @@ describe('Translate adjacency searches (ADJ format)', ()=> {
 		expect(polyglot.translate('term1 ADJ3 term2', 'Web of Science')).to.equal('term1 NEAR/3 term2');
 	});
 
+	//International HTA Database
+	it('translate `term1 ADJ3 term2` -> HTA `term1 AND term2`', ()=>{
+		expect(pollyglot.translate('term1 ADJ3 term2', 'International HTA Database')).to.equal('term1 AND term2');
+	});
+
 });
 
 describe('Translate adjacency searches (NEAR3 format)', ()=> {
@@ -68,6 +73,11 @@ describe('Translate adjacency searches (NEAR3 format)', ()=> {
 
 	it('translate `term1 NEAR3 term2` -> WS `term1 NEAR/3 term2`', ()=> {
 		expect(polyglot.translate('term1 NEAR3 term2', 'Web of Science')).to.equal('term1 NEAR/3 term2');
+	});
+
+	//International HTA Database
+	it('translate `term1 NEAR3 term2` -> HTA `term1 AND term2`', ()=>{
+		expect(pollyglot.translate('term1 NEAR3 term2', 'International HTA Database')).to.equal('term1 AND term2');
 	});
 
 });
@@ -107,6 +117,11 @@ describe('Translate adjacency searches (NEAR/3 format)', ()=> {
 		expect(polyglot.translate('term1 NEAR/3 term2', 'Web of Science')).to.equal('term1 NEAR/3 term2');
 	});
 
+	//International HTA Database
+	it('translate `term1 NEAR/3 term2` -> HTA `term1 AND term2`', ()=>{
+		expect(pollyglot.translate('term1 NEAR/3 term2', 'International HTA Database')).to.equal('term1 AND term2');
+	});
+
 });
 
 
@@ -144,6 +159,11 @@ describe('Translate adjacency searches (N3 format)', ()=> {
 		expect(polyglot.translate('term1 N3 term2', 'Web of Science')).to.equal('term1 NEAR/3 term2');
 	});
 
+	//International HTA Database
+	it('translate `term1 N3 term2` -> HTA `term1 AND term2`', ()=>{
+		expect(pollyglot.translate('term1 N3 term2', 'International HTA Database')).to.equal('term1 AND term2');
+	});
+
 });
 
 describe('Translate edge case adjacency fields Cinahl', ()=> {
@@ -165,5 +185,28 @@ describe('Translate edge case adjacency fields Cinahl', ()=> {
 
 	it('translate `journal issue numbers`', ()=> {
 		expect(polyglot.translate('(term1 adj3 term2).ip.', 'CINAHL (Ebsco)')).to.equal('((IP term1) N3 (IP term2))');
+	});
+});
+
+//International HTA Database
+describe('Translate Ovid MEDLINE adjacency fields to HTA', ()=>{
+	it('translate `title`', ()=>{
+		expect(polyglot.translate('(term1 adj3 term2).ti.', 'International HTA Database')).to.equal('(term1)[title] AND (term2)[title]');
+	});
+
+	it('translate `abstract`', ()=>{
+		expect(polyglot.translate('(term1 adj3 term2).ab.', 'International HTA Database')).to.equal('(term1)[abs] AND (term2)[abs]');
+	});
+
+	it('translate `author`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).au.', 'International HTA Database')).to.equal('(term1)[Author] AND (term2)[Author]');
+	});
+
+	it('translate `ISBN`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).ib.', 'International HTA Database')).to.equal('term1 AND term2');
+	});
+
+	it('translate `journal issue numbers`', ()=> {
+		expect(polyglot.translate('(term1 adj3 term2).ip.', 'International HTA Database')).to.equal('term1 AND term2');
 	});
 });

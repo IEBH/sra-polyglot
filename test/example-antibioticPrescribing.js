@@ -270,4 +270,17 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
+	//New International HTA Database
+	it('should translate the example into HTA format', ()=>{
+		expect(polyglot.translate(example.query, 'International HTA Database', {groupLines:true, html: false})).to.equal(
+			'("Primary Health Care"[mhe] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n'+
+			'AND\n\n'+
+			'("Treatment Failure"[mhe] OR "Treatment failure" OR "Treatment failures")\n\n'+
+			'AND\n\n'+
+			'("Bacterial Infections"[mhe] OR "Bacteria" OR "Bacterial")\n\n'+
+			'AND\n\n'+
+			'("Anti-Bacterial Agents"[mhe] OR "Antibacterial Agents" OR "Antibacterial Agent" OR "Antibiotics" OR "Antibiotic")\n\n'
+		);
+	});
+
 });

@@ -35,4 +35,9 @@ describe('Translate abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[ab]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[ab]` -> HTA `(term)[abs]`', ()=>{
+		expect(polyglot.translate('term[ab]', 'International HTA Database')).to.equal('(term)[abs]');
+	})
+
 });

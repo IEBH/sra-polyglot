@@ -36,6 +36,7 @@ describe('Translate the meta template `<rct filter>`', ()=> {
 		expect(polyglot.translate('<RCT Filter>', 'Web of Science')).to.equal('TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)');
 	});
 
+	//International HTA Database
 	it('translate `<RCT Filter>` -> HTA', ()=> {
 		expect(polyglot.translate('<RCT Filter>', 'International HTA Database')).to.equal('Template: "rct filter" not found for engine: "International HTA Database"');
 	});
@@ -76,6 +77,7 @@ describe('Translate the meta template `<sr filter>`', ()=> {
 		expect(polyglot.translate('<SR Filter>', 'Web of Science')).to.equal('Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane');
 	});
 
+	//International HTA Database
 	it('translate `<SR Filter>` -> HTA', ()=> {
 		expect(polyglot.translate('<SR Filter>', 'International HTA Database')).to.equal('Template: "sr filter" not found for engine: "International HTA Database"');
 	});

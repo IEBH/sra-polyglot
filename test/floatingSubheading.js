@@ -34,4 +34,9 @@ describe('Translate floating subheading searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[sh]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[sh]` -> HTA `term`', ()=>{
+		expect(polyglot.translate('term[sh]', 'International HTA Database')).to.equal('term');
+	});
+
 });

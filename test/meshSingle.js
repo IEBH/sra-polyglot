@@ -34,6 +34,11 @@ describe('Translate single MESH terms (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[Mesh]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[Mesh]` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('term[Mesh]', 'International HTA Database')).to.equal('"term"[mhe]');
+	});
+
 });
 
 describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
@@ -68,6 +73,11 @@ describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 
 	it('translate `term[mh]` -> WS `term`', ()=> {
 		expect(polyglot.translate('term[mh]', 'Web of Science')).to.equal('term');
+	});
+
+	//International HTA Database
+	it('translate `term[mh]` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('term[mh]', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 	
 });
@@ -106,6 +116,11 @@ describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
 		expect(polyglot.translate('term[MeSH Terms]', 'Web of Science')).to.equal('term');
 	});
 
+	//International HTA Database
+	it('translate `term[MeSH Terms]` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('term[MeSH Terms]', 'International HTA Database')).to.equal('"term"[mhe]');
+	});
+
 });
 
 describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
@@ -140,6 +155,11 @@ describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
 
 	it('translate `exp term/` -> WS `term`', ()=> {
 		expect(polyglot.translate('exp term/', 'Web of Science')).to.equal('term');
+	});
+
+	//International HTA Database
+	it('translate `exp term/` -> HTA `"term"[mhe]`', ()=>{
+		expect(polyglot.translate('exp term/', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 
 });

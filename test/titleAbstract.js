@@ -34,8 +34,9 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[tiab]', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term[tiab]` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term[tiab]', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term[tiab]` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term[tiab]', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
 });
 
@@ -73,8 +74,9 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[Title/Abstract]', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term[Title/Abstract]` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term[Title/Abstract]', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term[Title/Abstract]` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term[Title/Abstract]', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
 });
 
@@ -112,8 +114,9 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format)
 		expect(polyglot.translate('term.ti,ab', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term.ti,ab` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term.ti,ab', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term.ti,ab` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term.ti,ab', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
 });
 
@@ -151,8 +154,9 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) ->
 		expect(polyglot.translate('term.tw.', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term.tw` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term.tw', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term.tw` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term.tw', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
 });
 
@@ -190,8 +194,9 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 		expect(polyglot.translate('term.ab,ti', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term.ab,ti` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term.ab,ti', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term.ab,ti` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term.ab,ti', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
 });
 
@@ -229,7 +234,8 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 		expect(polyglot.translate('term.ab,ti.', 'Web of Science')).to.equal('term');
 	});
 
-	it('translate `term.ab,ti.` -> HTA `(term)[title]`', () => {
-		expect(polyglot.translate('term.ab,ti.', 'International HTA Database')).to.equal('(term)[title]');
+	//International HTA Database
+	it('translate `term.ab,ti.` -> HTA `(term)[title] OR (term)[abs]`', () => {
+		expect(polyglot.translate('term.ab,ti.', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	})
 });

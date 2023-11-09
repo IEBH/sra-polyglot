@@ -34,6 +34,7 @@ describe('Translate wildcards searches (multiple character "*" style)', ()=> {
 		expect(polyglot.translate('term*', 'Web of Science')).to.equal('term*');
 	});
 
+	//International HTA Database
 	it('translate `term*` -> HTA `term*`', ()=> {
 		expect(polyglot.translate('term*', 'International HTA Database')).to.equal('term*');
 	});
@@ -74,8 +75,9 @@ describe('Translate wildcards searches (single character "#" style)', ()=> {
 		expect(polyglot.translate('term#', 'Web of Science')).to.equal('term?');
 	});
 
-	it('translate `term#` -> HTA `term#`', ()=> {
-		expect(polyglot.translate('term#', 'International HTA Database')).to.equal('term#');
+	//International HTA Database
+	it('translate `term#` -> HTA `term*`', ()=> {
+		expect(polyglot.translate('term#', 'International HTA Database')).to.equal('term*');
 	});
 
 });
@@ -114,8 +116,9 @@ describe('Translate wildcards searches (single character Ovid "?" style)', ()=> 
 		expect(polyglot.translate('term?', 'Web of Science')).to.equal('term$');
 	});
 
-	it('translate `term?` -> HTA `term?`', ()=> {
-		expect(polyglot.translate('term?', 'International HTA Database')).to.equal('term?');
+	//International HTA Database
+	it('translate `term?` -> HTA `term*`', ()=> {
+		expect(polyglot.translate('term?', 'International HTA Database')).to.equal('term*');
 	});
 
 });
@@ -154,8 +157,9 @@ describe('Translate wildcards searches (single character Ovid MEDLINE "$" style)
 		expect(polyglot.translate('term$', 'Web of Science')).to.equal('term?');
 	});
 
-	it('translate `term$` -> HTA `term$`', ()=> {
-		expect(polyglot.translate('term$', 'International HTA Database')).to.equal('term$');
+	//International HTA Database
+	it('translate `term$` -> HTA `term*`', ()=> {
+		expect(polyglot.translate('term$', 'International HTA Database')).to.equal('term*');
 	});
 
 });
