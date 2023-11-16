@@ -165,6 +165,8 @@ const tools = {
 						case 'WoS Advanced':
 						case 'Scopus (basic search)':
 						case 'Scopus (advanced search)':
+					    //HTA
+						case 'International HTA Database':
 								number = "#" + ref;
 								break;
 						case 'Ovid MEDLINE':
@@ -274,6 +276,21 @@ const tools = {
 										replaceObj = {
 												'$': '?',
 												'?': '*1'
+										}
+										break;
+								//HTA
+								case 'International HTA Database':
+									    replaceObj = {
+											    '$': settings.highlighting
+												    ? tools.createTooltip("*","As INAHTA does not support single character truncation a wildcard is used here","highlight")
+													: '*',
+												'?': settings.highlighting
+													? tools.createTooltip("*", "As INAHTA does not support single character truncation a wildcard is used here", "highlight")
+													: '*',
+											    '#': settings.highlighting
+													? tools.createTooltip("*", "As INAHTA does not support single character truncation a wildcard is used here", "highlight")
+													: '*'
+
 										}
 										break;
 						}

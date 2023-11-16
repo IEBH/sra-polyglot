@@ -242,6 +242,8 @@ export default {
                             switch(engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
+                                //HTA
+                                case 'International HTA Database':
                                     buffer += 'AND';
                                     break;
                                 case 'Ovid MEDLINE':
@@ -271,6 +273,8 @@ export default {
                             switch(engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
+                                //HTA
+                                case 'International HTA Database':
                                     buffer += 'AND';
                                     break;
                                 case 'Ovid MEDLINE':
