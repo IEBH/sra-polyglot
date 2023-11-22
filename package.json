@@ -46,7 +46,7 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.0.0",
     "chai": "^4.2.0",
-    "mocha": "^8.2.1",
+    "mocha": "^8.4.0",
     "xlsx": "^0.16.9"
   },
   "dependencies": {

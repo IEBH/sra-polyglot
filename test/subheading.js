@@ -11,8 +11,8 @@ describe('Translate subheadings with or without quotes (Ovid -> *)', ()=> {
 	});
 
 	//International HTA Database
-	it('translate `abnormalities.fs.` -> HTA `term`', ()=> {
-		expect(polyglot.translate('abnormalities.fs.', 'International HTA Database')).to.equal('term');
+	it('translate `abnormalities.fs.` -> HTA `"Abnormalities"`', ()=> {
+		expect(polyglot.translate('abnormalities.fs.', 'International HTA Database')).to.equal('"Abnormalities"');
 	});
 });
 
@@ -27,8 +27,8 @@ describe('Translate subheadings at end of mesh term (PubMed -> *)', ()=> {
 	});
 
 	//International HTA Database
-	it('translate `psoriasis/dt[Majr]` -> HTA `term`', ()=> {
-		expect(polyglot.translate('psoriasis/dt[Majr]', 'International HTA Database')).to.equal('"term"[mhe]');
+	it('translate `psoriasis/dt[Majr]` -> HTA `"psoriasis/dt"[mhe]`', ()=> {
+		expect(polyglot.translate('psoriasis/dt[Majr]', 'International HTA Database')).to.equal('"psoriasis/dt"[mhe]');
 	});
 });
 
@@ -43,8 +43,8 @@ describe('Translate subheadings at end of mesh term (Ovid -> *)', ()=> {
 	});
 
 	//International HTA Database
-	it('translate `exp *psoriasis/dt` -> HTA `term`', ()=> {
-		expect(polyglot.translate('exp *psoriasis/dt', 'International HTA Database')).to.equal('"term"[mhe]');
+	it('translate `exp *psoriasis/dt` -> HTA `"psoriasis/dt"[mhe]`', ()=> {
+		expect(polyglot.translate('exp *psoriasis/dt', 'International HTA Database')).to.equal('"psoriasis/dt"[mhe]');
 	});
 
 });
