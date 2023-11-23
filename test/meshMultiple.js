@@ -44,8 +44,8 @@ describe('Translate multiple MESH terms (PubMed -> *)', ()=> {
 
 	//International HTA Database
 	it('translate `"term1 term2"[Mesh]` -> HTA `"term1 term2"[mh]`', ()=>{
-		expect(polyglot.translate('"term1 term2"[Mesh]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
-		expect(polyglot.translate('"term1 and term2"[Mesh]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
 });
@@ -94,8 +94,8 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 
 	//International HTA Database
 	it('translate `"term1 term2"[mh]` -> HTA `"term1 term2"[mh]`', ()=>{
-		expect(polyglot.translate('"term1 term2"[mh]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
-		expect(polyglot.translate('"term1 and term2"[mh]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+		expect(polyglot.translate('"term1 term2"[mh]', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
+		expect(polyglot.translate('"term1 and term2"[mh]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
 });
@@ -144,8 +144,8 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 
 	//International HTA Database
 	it('translate `"term1 term2"[MeSH Terms]` -> HTA `"term1 term2"[mh]`', ()=>{
-		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 term2"[mh]');
-		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
 });
@@ -202,9 +202,9 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', ()=> {
 
 	//International HTA Database
 	it('translate `exp term1 term2/` -> HTA `"term1 term2"[mh]', ()=>{
-		expect(polyglot.translate('exp term1 term2/', 'International HTA Database')).to.equal('"term1 term2"[mh]');
-		expect(polyglot.translate('exp term1 and term2/', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
-		expect(polyglot.translate('exp "term1 and term2"/', 'International HTA Database')).to.equal('"term1 and term2"[mh]');
+		expect(polyglot.translate('exp term1 term2/', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
+		expect(polyglot.translate('exp term1 and term2/', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
+		expect(polyglot.translate('exp "term1 and term2"/', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
 });
