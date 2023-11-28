@@ -1,6 +1,6 @@
 {
   "name": "@iebh/polyglot",
-  "version": "4.5.1",
+  "version": "4.6.0",
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
   "scripts": {
@@ -33,7 +33,8 @@
   "author": [
     "Matt Carter <m@ttcarter.com> (https://github.com/hash-bang)",
     "Connor Forbes <cforbes.software@gmail.com> (https://github.com/connorf25)",
-    "Justin Cark <jclark@bond.edu.au> (https://github.com/Justin-Clarc)"
+    "Justin Cark <jclark@bond.edu.au> (https://github.com/Justin-Clarc)",
+    "Tian Liang <amethystoct2012@gmail.com> (https://github.com/Octian)"
   ],
   "license": "MIT",
   "bugs": {
