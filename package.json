@@ -1,6 +1,6 @@
 {
   "name": "@iebh/polyglot",
-  "version": "4.6.0",
+  "version": "4.6.1",
   "description": "IEBH-SRA tool to convert between different medical database search formats",
   "main": "lib/index.js",
   "scripts": {
