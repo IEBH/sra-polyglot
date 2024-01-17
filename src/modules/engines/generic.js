@@ -58,7 +58,7 @@ export default {
                                             }
                                         }).join("");
                                         // Fix to move '+' back one space when quoting
-                                        if (engine === "CINAHL (Ebsco)") {
+                                        if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)") {
                                             content = fixCinahl(content);
                                         }
                                         buffer += (comment && settings.highlighting)
@@ -104,36 +104,36 @@ export default {
                                 buffer += '(' + compileWalker(branch.nodes) + ')';
                             }
                             break;
-                            case 'ref':
-                                if (settings.transposeLines) {
-                                    // Expand each line to show full query
-                                    var node;
+                        case 'ref':
+                            if (settings.transposeLines) {
+                                // Expand each line to show full query
+                                var node;
 
-                                    for (node in branch.nodes) {
+                                for (node in branch.nodes) {
+                                    if (node == 0) {
+                                        // First line is printed as is wrapped in brackets
+                                        buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                    } else {
+                                        // Remaining lines are appended with the condition
+                                        buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                    }
+                                }
+                            } else {
+                                // Only print each line number in format defined by engine
+                                // If branch.ref is array then user specified OR/1-4
+                                if (Array.isArray(branch.ref)) {
+                                    for (node in branch.ref) {
                                         if (node == 0) {
-                                            // First line is printed as is wrapped in brackets
-                                            buffer += '(' + compileWalker(branch.nodes[node]) + ')';
+                                            buffer += tools.printNumber(engine, branch.ref[node]);
                                         } else {
-                                            // Remaining lines are appended with the condition
-                                            buffer += ' ' + branch.cond + ' (' + compileWalker(branch.nodes[node]) + ')';
+                                            buffer += ' ' + branch.cond + ' ' + tools.printNumber(engine, branch.ref[node]);
                                         }
                                     }
                                 } else {
-                                    // Only print each line number in format defined by engine
-                                    // If branch.ref is array then user specified OR/1-4
-                                    if(Array.isArray(branch.ref)) {
-                                        for (node in branch.ref) {
-                                            if (node == 0) {
-                                                buffer += tools.printNumber(engine, branch.ref[node]);
-                                            } else {
-                                                buffer += ' ' + branch.cond + ' ' + tools.printNumber(engine, branch.ref[node]);
-                                            }
-                                        }
-                                    } else {
-                                        buffer += tools.printNumber(engine, branch.ref);
-                                    }
+                                    buffer += tools.printNumber(engine, branch.ref);
                                 }
-                                break;
+                            }
+                            break;
                         case 'phrase':
                             if (branch.field) {
                                 var translateObject = fieldCodesObject[engine] ? fieldCodesObject[engine][branch.field] : null;
@@ -203,7 +203,7 @@ export default {
                                     }
                                 }).join("");
                                 // Fix to move '+' back one space when quoting
-                                if (engine == "CINAHL (Ebsco)") {
+                                if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)") {
                                     content = fixCinahl(content);
                                 }
                                 buffer += (comment && settings.highlighting)
@@ -239,7 +239,7 @@ export default {
                             }
                             break;
                         case 'joinNear':
-                            switch(engine) {
+                            switch (engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
                                 //HTA
@@ -260,6 +260,9 @@ export default {
                                 case 'CINAHL (Ebsco)':
                                     buffer += `N${branch.proximity}`;
                                     break;
+                                case 'PsycInfo (Ebsco)':
+                                    buffer += `N${branch.proximity}`;
+                                    break;
                                 case 'Scopus (basic search)':
                                 case 'Scopus (advanced search)':
                                     buffer += `W/${branch.proximity}`;
@@ -270,7 +273,7 @@ export default {
                             }
                             break;
                         case 'joinNext':
-                            switch(engine) {
+                            switch (engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
                                 //HTA
@@ -294,11 +297,14 @@ export default {
                                 case 'CINAHL (Ebsco)':
                                     buffer += 'W1';
                                     break;
+                                case 'PsycInfo (Ebsco)':
+                                    buffer += 'W1';
+                                    break;
                                 case 'Scopus (basic search)':
                                 case 'Scopus (advanced search)':
-                                    buffer +='W/1'
+                                    buffer += 'W/1'
                                     break;
-                                
+
                                 case 'SPORTDiscus':
                                     buffer += 'W1';
                                     break;
@@ -332,10 +338,10 @@ export default {
                         // Add spacing provided... its not a raw buffer or the last entity within the structure
                         + (
                             branch.type == 'raw' || // Its not a raw node
-                            branch.type == 'line' || // Its not a line node
-                            branchIndex == tree.length-1 || // Its not the last item in the sequence
-                            (branchIndex < tree.length-1 && tree[branchIndex+1] && tree[branchIndex+1].type && tree[branchIndex+1].type == 'raw')
-                            ? '' : ' '
+                                branch.type == 'line' || // Its not a line node
+                                branchIndex == tree.length - 1 || // Its not the last item in the sequence
+                                (branchIndex < tree.length - 1 && tree[branchIndex + 1] && tree[branchIndex + 1].type && tree[branchIndex + 1].type == 'raw')
+                                ? '' : ' '
                         );
                 })
                 .join('');

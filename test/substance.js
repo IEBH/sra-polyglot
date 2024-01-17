@@ -38,6 +38,11 @@ describe('Translate substance searches (PubMed -> *)', ()=> {
 	it('translate `term[nm]` -> HAT `term`', ()=> {
 		expect(polyglot.translate('term[nm]', 'International HTA Database')).to.equal('term');
 	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term[nm]` -> PYE `MW term`', ()=> {
+		expect(polyglot.translate('term[nm]', 'PsycInfo (Ebsco)')).to.equal('(MW term)');
+	});
 });
 
 describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
@@ -77,5 +82,10 @@ describe('Translate substance searches (Ovid MEDLINE -> *)', ()=> {
 	//International HTA Database
 	it('translate `term.nm.` -> HAT `term`', ()=> {
 		expect(polyglot.translate('term.nm.', 'International HTA Database')).to.equal('term');
+	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term.nm.` -> PYE `TI term`', ()=> {
+		expect(polyglot.translate('term.nm.', 'PsycInfo (Ebsco)')).to.equal('(MW term)');
 	});
 });

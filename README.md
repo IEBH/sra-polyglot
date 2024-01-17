@@ -109,6 +109,7 @@ Similar to [Logical Syntax](#logical-syntax), proximity searching allows the sea
 * `Term1 NEAR3 Term2` (Search for `Term2` within 3 words of `Term1`, Cochrane Library format)
 * `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, CINAHL format)
 * `Term1 NEAR/3 Term2` (Search for `Term2` within 3 words of `Term1`, Embase and Web of Science formats)
+* `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, PsycInfo (Ebsco) format)
 
 
 ## Line Referencing

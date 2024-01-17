@@ -39,6 +39,11 @@ describe('Translate search phrases (PubMed -> *)', ()=> {
 		expect(polyglot.translate('"term1 term2"', 'International HTA Database')).to.equal('"term1 term2"');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `"term1 term2"` -> PYE `"term1 term2"`', ()=> {
+		expect(polyglot.translate('"term1 term2"', 'PsycInfo (Ebsco)')).to.equal('"term1 term2"');
+	});
+
 });
 
 describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
@@ -78,6 +83,11 @@ describe('Translate search phrases (Ovid MEDLINE -> *)', ()=> {
 	//International HTA Database
 	it('translate `"term1 term2"` -> HTA `"term1 term2"`', ()=>{
 		expect(polyglot.translate('"term1 term2"', 'International HTA Database')).to.equal('"term1 term2"');
+	});
+
+	// PsycInfo (Ebsco)
+	it('translate `"term1 term2"` -> PYE `"term1 term2"`', ()=> {
+		expect(polyglot.translate('"term1 term2"', 'PsycInfo (Ebsco)')).to.equal('"term1 term2"');
 	});
 
 });

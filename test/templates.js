@@ -40,6 +40,11 @@ describe('Translate the meta template `<rct filter>`', ()=> {
 	it('translate `<RCT Filter>` -> HTA', ()=> {
 		expect(polyglot.translate('<RCT Filter>', 'International HTA Database')).to.equal('Template: "rct filter" not found for engine: "International HTA Database"');
 	});
+
+	// PsycInfo(Ebsco)
+	it('translate `<RCT Filter>` -> PYE', ()=> {
+		expect(polyglot.translate('<RCT Filter>', 'PsycInfo (Ebsco)')).to.equal('(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial');
+	});
 });
 
 
@@ -80,5 +85,10 @@ describe('Translate the meta template `<sr filter>`', ()=> {
 	//International HTA Database
 	it('translate `<SR Filter>` -> HTA', ()=> {
 		expect(polyglot.translate('<SR Filter>', 'International HTA Database')).to.equal('Template: "sr filter" not found for engine: "International HTA Database"');
+	});
+
+	// PsycInfo(Ebsco)
+	it('translate `<SR Filter>` -> PYE', ()=> {
+		expect(polyglot.translate('<SR Filter>', 'PsycInfo (Ebsco)')).to.equal('TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis');
 	});
 });

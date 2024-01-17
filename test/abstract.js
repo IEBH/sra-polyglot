@@ -40,4 +40,9 @@ describe('Translate abstract searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[ab]', 'International HTA Database')).to.equal('(term)[abs]');
 	})
 
+	// PsycInfo (Ebsco)
+	it('translate `term[ab]` -> PYE `AB term`', ()=> {
+		expect(polyglot.translate('term[ab]', 'PsycInfo (Ebsco)')).to.equal('(AB term)');
+	});
+
 });

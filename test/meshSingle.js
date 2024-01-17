@@ -39,6 +39,11 @@ describe('Translate single MESH terms (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[Mesh]', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `term[Mesh]` -> PYE `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[Mesh]', 'PsycInfo (Ebsco)')).to.equal('(MH term+)');
+	});
+
 });
 
 describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
@@ -78,6 +83,11 @@ describe('Translate single MESH terms (PubMed (short) -> *)', ()=> {
 	//International HTA Database
 	it('translate `term[mh]` -> HTA `"term"[mhe]`', ()=>{
 		expect(polyglot.translate('term[mh]', 'International HTA Database')).to.equal('"term"[mhe]');
+	});
+
+	// PsycInfo (Ebsco)
+	it('translate `term[mh]` -> PYE `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[mh]', 'PsycInfo (Ebsco)')).to.equal('(MH term+)');
 	});
 	
 });
@@ -121,6 +131,11 @@ describe('Translate single MESH terms (PubMed (long) -> *)', ()=> {
 		expect(polyglot.translate('term[MeSH Terms]', 'International HTA Database')).to.equal('"term"[mhe]');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `term[MeSH Terms]` -> PYE `(MH term+)`', ()=> {
+		expect(polyglot.translate('term[MeSH Terms]', 'PsycInfo (Ebsco)')).to.equal('(MH term+)');
+	});
+
 });
 
 describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
@@ -160,6 +175,11 @@ describe('Translate single MESH terms (Ovid MEDLINE -> *)', ()=> {
 	//International HTA Database
 	it('translate `exp term/` -> HTA `"term"[mhe]`', ()=>{
 		expect(polyglot.translate('exp term/', 'International HTA Database')).to.equal('"term"[mhe]');
+	});
+
+	// PsycInfo (Ebsco)
+	it('translate `exp term/` -> PYE `(MH term+)`', ()=> {
+		expect(polyglot.translate('exp term/', 'PsycInfo (Ebsco)')).to.equal('(MH term+)');
 	});
 
 });

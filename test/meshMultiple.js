@@ -48,6 +48,12 @@ describe('Translate multiple MESH terms (PubMed -> *)', ()=> {
 		expect(polyglot.translate('"term1 and term2"[Mesh]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `"term1 term2"[Mesh]` -> PYE `(MH "term1 term2+")`', ()=> {
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 term2+")');
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 and term2+")');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
@@ -98,6 +104,12 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', ()=> {
 		expect(polyglot.translate('"term1 and term2"[mh]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `"term1 term2"[mh]` -> PYE `(MH "term1 term2+")`', ()=> {
+		expect(polyglot.translate('"term1 term2"[mh]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 term2+")');
+		expect(polyglot.translate('"term1 and term2"[mh]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 and term2+")');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
@@ -146,6 +158,12 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', ()=> {
 	it('translate `"term1 term2"[MeSH Terms]` -> HTA `"term1 term2"[mh]`', ()=>{
 		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
 		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
+	});
+
+	// PsycInfo (Ebsco)
+	it('translate `"term1 term2"[MeSH Terms]` -> PYE `(MH "term1 term2+")`', ()=> {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 term2+")');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 and term2+")');
 	});
 
 });
@@ -205,6 +223,13 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', ()=> {
 		expect(polyglot.translate('exp term1 term2/', 'International HTA Database')).to.equal('"term1 term2"[mhe]');
 		expect(polyglot.translate('exp term1 and term2/', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
 		expect(polyglot.translate('exp "term1 and term2"/', 'International HTA Database')).to.equal('"term1 and term2"[mhe]');
+	});
+
+	// PsycInfo (Ebsco)
+	it('translate `exp term1 term2/` -> PYE `(MH "term1 term2+")`', ()=> {
+		expect(polyglot.translate('exp term1 term2/', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 term2+")');
+		expect(polyglot.translate('exp term1 and term2/', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 and term2+")');
+		expect(polyglot.translate('exp "term1 and term2"/', 'PsycInfo (Ebsco)')).to.equal('(MH "term1 and term2+")');
 	});
 
 });

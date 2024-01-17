@@ -39,6 +39,11 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[ti]', 'International HTA Database')).to.equal('(term)[title]');
 	});
 
+	// PsycInfo (Ebsco)
+	it('translate `term[ti]` -> PYE `TI term`', ()=> {
+		expect(polyglot.translate('term[ti]', 'PsycInfo (Ebsco)')).to.equal('(TI term)');
+	});
+
 });
 
 describe('Translate title searches (PubMed -> *)', ()=> {
@@ -79,6 +84,11 @@ describe('Translate title searches (PubMed -> *)', ()=> {
 	it('translate `term[Title]` -> HTA `(term)[title]`', ()=> {
 		expect(polyglot.translate('term[Title]', 'International HTA Database')).to.equal('(term)[title]');
 	});
+
+	// PsycInfo (Ebsco)
+	it('translate `term[Title]` -> PYE `TI term`', ()=> {
+		expect(polyglot.translate('term[Title]', 'PsycInfo (Ebsco)')).to.equal('(TI term)');
+	});
 });
 
 describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
@@ -118,5 +128,10 @@ describe('Translate title searches (Ovid MEDLINE -> *)', ()=> {
 	//International HTA Database
 	it('translate `term.ti` -> HTA `(term)[title]`', ()=> {
 		expect(polyglot.translate('term.ti', 'International HTA Database')).to.equal('(term)[title]');
+	});
+	
+	// PsycInfo (Ebsco)
+	it('translate `term.ti` -> PYE `TI term`', ()=> {
+		expect(polyglot.translate('term.ti', 'PsycInfo (Ebsco)')).to.equal('(TI term)');
 	});
 });

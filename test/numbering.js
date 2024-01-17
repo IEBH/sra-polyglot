@@ -48,4 +48,10 @@ describe('Avoid False Positives', ()=> {
 		expect(polyglot.translate('type 1 or type', 'PubMed abbreviation', {html: false})).to.equal('"type 1" OR type');
 	})
 
+	// PsycInfo (Ebsco)
+	describe('Translate numbers in brackets', ()=> {
+		it('Basic number bracket translation', ()=> {
+			expect(polyglot.translate('1. Foo\n2. Bar\n3. (1 or 2)', 'PsycInfo (Ebsco)', {html: false})).to.equal('Foo\nBar\n((Foo) OR (Bar))');
+		});
+	});
 });

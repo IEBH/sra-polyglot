@@ -38,6 +38,11 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 	it('translate `term[tiab]` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term[tiab]', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term[tiab]` -> PYE `TI term OR AB term2`', () => {
+		expect(polyglot.translate('term[tiab]', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate title + abstract searches (PubMed -> *)', () => {
@@ -77,6 +82,11 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 	//International HTA Database
 	it('translate `term[Title/Abstract]` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term[Title/Abstract]', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
+	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term[Title/Abstract]` -> PYE `TI term OR AB term2`', () => {
+		expect(polyglot.translate('term[Title/Abstract]', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 });
 
@@ -118,6 +128,11 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format)
 	it('translate `term.ti,ab` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term.ti,ab', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term.ti,ab` -> PYE `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ti,ab', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) -> *)', () => {
@@ -157,6 +172,11 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) ->
 	//International HTA Database
 	it('translate `term.tw` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term.tw', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
+	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term.tw.` -> PYE `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.tw.', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
 });
 
@@ -198,6 +218,11 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 	it('translate `term.ab,ti` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term.ab,ti', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	});
+
+	// PsycInfo(Ebsco)
+	it('translate `term.ab,ti` -> PYE `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ab,ti', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format) -> *)', () => {
@@ -238,4 +263,9 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 	it('translate `term.ab,ti.` -> HTA `(term)[title] OR (term)[abs]`', () => {
 		expect(polyglot.translate('term.ab,ti.', 'International HTA Database')).to.equal('(term)[title] OR (term)[abs]');
 	})
+
+	// PsycInfo (Ebsco)
+	it('translate `term.ab,ti.` -> PYE `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ab,ti.', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
 });

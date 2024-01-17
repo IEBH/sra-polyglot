@@ -283,4 +283,17 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
+	// PsycInfo (Ebsco)
+	it('should translate the example into PsycInfo format', ()=> {
+		expect(polyglot.translate(example.query, 'PsycInfo (Ebsco)', {groupLines: true, html: false})).to.equal(
+			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+			'AND\n\n' +
+			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +
+			'AND\n\n' +
+			'((MH "Bacterial Infections+") OR Bacteria OR Bacterial)\n\n' +
+			'AND\n\n' +
+			'((MH "Anti-Bacterial Agents+") OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+		);
+	});
+
 });

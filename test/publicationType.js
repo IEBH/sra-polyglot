@@ -39,4 +39,9 @@ describe('Translate publication type searches (PubMed -> *)', ()=> {
 		expect(polyglot.translate('term[pt]', 'International HTA Database')).to.equal('term');
 	});
 
+	// PsycInfo(Ebsco)
+	it('translate `term[pt]` -> PYE `PT term`', ()=> {
+		expect(polyglot.translate('term[pt]', 'PsycInfo (Ebsco)')).to.equal('(PT term)');
+	});
+
 });
