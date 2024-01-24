@@ -35,7 +35,7 @@ export const parse = (query, options) => {
     global.variables.no_field_tag = []; // Empty array of offsets each time the query is parsed
 
     var q = query + ''; // Clone query
-    var tree = {nodes: []}; // Tree is the full parsed tree
+    var tree = { nodes: [] }; // Tree is the full parsed tree
     var branchStack = [tree]; // Stack for where we are within the tree (will get pushed when a new group is encountered)
     var branch = tree; // Branch is the parent of leaf (branch always equals last element of branchStack)
     var lastGroup; // Optional reference to the previously created group (used to pin things)
@@ -90,7 +90,7 @@ export const parse = (query, options) => {
         lastGroup = branch;
         branch = branchStack.pop();
         leaf = branch.nodes;
-        var newGroup = {type: 'line', number: currentNumber, isNumbered: false, nodes: []};
+        var newGroup = { type: 'line', number: currentNumber, isNumbered: false, nodes: [] };
         branch.nodes.push(newGroup);
         branchStack.push(branch);
         branch = newGroup;
@@ -99,7 +99,7 @@ export const parse = (query, options) => {
     // }}}
 
     // Create a group for the first line
-    var newGroup = {type: 'line', number: 1, isNumbered: false, nodes: []};
+    var newGroup = { type: 'line', number: 1, isNumbered: false, nodes: [] };
     branch.nodes.push(newGroup);
     branchStack.push(branch);
     branch = newGroup;
@@ -120,14 +120,14 @@ export const parse = (query, options) => {
         var match;
 
         if (/^\(/.test(q)) {
-            var newGroup = {type: 'group', nodes: []};
+            var newGroup = { type: 'group', nodes: [] };
             branch.nodes.push(newGroup);
             branchStack.push(branch);
             branch = newGroup;
             leaf = branch.nodes;
         } else if (/^\)/.test(q)) {
             lastGroup = branch;
-            if(branchStack.length > 0) {
+            if (branchStack.length > 0) {
                 branch = branchStack.pop();
             } else {
                 // TODO: Code for popover message
@@ -137,7 +137,7 @@ export const parse = (query, options) => {
         } else if (match = /^([0-9]+)\s*[‐\-]\s*([0-9]+)(?:\/(AND|OR|NOT))/i.exec(q)) { // 1-7/OR
             branch.nodes.push({
                 type: 'ref',
-                ref: _.range(match[1], (match[2]+1)/10),
+                ref: _.range(match[1], (match[2] + 1) / 10),
                 cond: match[3].toUpperCase(),
                 nodes: []
             });
@@ -147,8 +147,20 @@ export const parse = (query, options) => {
         } else if (match = /^(AND|OR|NOT)(?:\/([0-9]+)\s*[‐\-]\s*([0-9]+))/i.exec(q)) { // OR/1-7
             branch.nodes.push({
                 type: 'ref',
-                ref: _.range(match[2], (match[3]+1)/10),
+                ref: _.range(match[2], (match[3] + 1) / 10),
                 cond: match[1].toUpperCase(),
+                nodes: []
+            });
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) {
+            // OR/11,14,..
+            const refNumbers = match[2].split(',').map(num => `#${num.trim()}`).join(' OR ');
+            branch.nodes.push({
+                type: 'ref',
+                ref: refNumbers,
+                cond: 'OR',
                 nodes: []
             });
             offset += match[0].length;
@@ -167,20 +179,20 @@ export const parse = (query, options) => {
                 cropString = false;
             } else {
                 leaf.content += match[1];
-                offset += match[1].length-1;
-                q = q.substr(match[1].length-1);
+                offset += match[1].length - 1;
+                q = q.substr(match[1].length - 1);
             }
         } else if (match = /^((AND|OR|NOT) +#?([0-9]+))($(?![\r\n])|\s+|\))/i.exec(q)) { // AND 2...
             trimLastLeaf();
-            switch(match[2].toLowerCase()) {
+            switch (match[2].toLowerCase()) {
                 case "and":
-                    branch.nodes.push({type: 'joinAnd'});
+                    branch.nodes.push({ type: 'joinAnd' });
                     break;
                 case "or":
-                    branch.nodes.push({type: 'joinOr'});
+                    branch.nodes.push({ type: 'joinOr' });
                     break;
                 case "not":
-                    branch.nodes.push({type: 'joinNot'});
+                    branch.nodes.push({ type: 'joinNot' });
                     break;
             }
             leaf = undefined;
@@ -200,47 +212,47 @@ export const parse = (query, options) => {
                 branch.number = lineNumber
                 branch.isNumbered = true
                 userLineNumber = true
-                offset += match[0].length-1;
-                q = q.substr(match[0].length-1);
+                offset += match[0].length - 1;
+                q = q.substr(match[0].length - 1);
             } else {
                 leaf.content += match[1];
-                offset += match[1].length-1;
-                q = q.substr(match[1].length-1);
+                offset += match[1].length - 1;
+                q = q.substr(match[1].length - 1);
             }
         }
         else if (afterWhitespace && (match = /^and\b/i.exec(q))) {
             trimLastLeaf();
-            branch.nodes.push({type: 'joinAnd'});
+            branch.nodes.push({ type: 'joinAnd' });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (afterWhitespace && (match = /^or\b/i.exec(q))) {
             trimLastLeaf();
-            branch.nodes.push({type: 'joinOr'});
+            branch.nodes.push({ type: 'joinOr' });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (afterWhitespace && (match = /^not\b/i.exec(q))) {
             trimLastLeaf();
-            branch.nodes.push({type: 'joinNot'});
+            branch.nodes.push({ type: 'joinNot' });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (afterWhitespace && (match = /^(near\/|near|adj|n)(\d+)\b/i.exec(q))) {
             trimLastLeaf();
-            if (match[2]) branch.nodes.push({type: 'joinNear', proximity: _.toNumber(match[2])});
-            else branch.nodes.push({type: 'joinNear', proximity: 1});
+            if (match[2]) branch.nodes.push({ type: 'joinNear', proximity: _.toNumber(match[2]) });
+            else branch.nodes.push({ type: 'joinNear', proximity: 1 });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (afterWhitespace && (match = /^(next\/|next|adj|w|w\/|pre\/|p\/)(\d+)?\b/i.exec(q))) {
             trimLastLeaf();
-            if (match[2]) branch.nodes.push({type: 'joinNext', proximity: _.toNumber(match[2])});
-            else branch.nodes.push({type: 'joinNext', proximity: 1});
+            if (match[2]) branch.nodes.push({ type: 'joinNext', proximity: _.toNumber(match[2]) });
+            else branch.nodes.push({ type: 'joinNext', proximity: 1 });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -252,7 +264,7 @@ export const parse = (query, options) => {
                 type: 'meshTranslation',
                 field: meshTranslationsParse[match[1]]
             });
-						match = /.+?[\.\[]\S+[\.\]]/.exec(q);
+            match = /.+?[\.\[]\S+[\.\]]/.exec(q);
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -280,19 +292,19 @@ export const parse = (query, options) => {
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^"([^\\[]*)"\/?([^\s\)\/]+)?\[(majr|mesh major topic)(:NoExp|:no exp)?\]/i.exec(q)) { // Major Mesh term - PubMed syntax (With Quotes)
-					var newLeaf = {};
-					newLeaf.type = 'mesh';
-					newLeaf.content = match[1];
-					if (match[2]) {
-							newLeaf.heading = match[2];
-					}
-					newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
-					if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
-					branch.nodes.push(newLeaf);
-					offset += match[0].length;
-					q = q.substr(match[0].length);
-					cropString = false;
-				} else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
+            var newLeaf = {};
+            newLeaf.type = 'mesh';
+            newLeaf.content = match[1];
+            if (match[2]) {
+                newLeaf.heading = match[2];
+            }
+            newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
+            if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+            branch.nodes.push(newLeaf);
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
             leaf.type = 'mesh';
             leaf.field = 'MeSH subheading search';
             if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
@@ -356,7 +368,7 @@ export const parse = (query, options) => {
         } else if (/^\//.test(q) && leaf && leaf.type && leaf.type == 'phrase') { // Mesh term - Ovid syntax (non-exploded)
             leaf.type = 'mesh'
             // Major Mesh
-            if(leaf.content[0] == "*") {
+            if (leaf.content[0] == "*") {
                 leaf.content = leaf.content.substr(1)
                 leaf.field = 'MeSH Major Topic search (Not exploded)'
             }
@@ -364,18 +376,18 @@ export const parse = (query, options) => {
         }
         // }}}
         else if (match = /^<(.*?)>/.exec(q)) {
-            branch.nodes.push({type: 'template', content: match[1].toLowerCase()});
+            branch.nodes.push({ type: 'template', content: match[1].toLowerCase() });
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
         } else if (match = /^(\n)+/.exec(q)) {
             if (settings.preserveNewlines) {
                 var number_newline = match[0].length
-                branch.nodes.push({type: 'raw', content: '\n'.repeat(number_newline)});
+                branch.nodes.push({ type: 'raw', content: '\n'.repeat(number_newline) });
                 leaf = undefined;
             }
             lineNumber += match[0].length;
-            if (branchStack.length > 0 && branchStack[branchStack.length-1].nodes.every(node => node.type !== "group")) { // If we are currently inside a group don't add a newline group
+            if (branchStack.length > 0 && branchStack[branchStack.length - 1].nodes.every(node => node.type !== "group")) { // If we are currently inside a group don't add a newline group
                 newLine(lineNumber);
             }
             offset += match[0].length;
@@ -412,7 +424,7 @@ export const parse = (query, options) => {
         /// Comment {{{
         else if (match = /^#([^\)\d\n][^\)\n]+)/.exec(q)) {
             trimLastLeaf();
-            branch.nodes.push({type: 'comment', content: match[1]});
+            branch.nodes.push({ type: 'comment', content: match[1] });
             leaf = undefined;
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -423,19 +435,19 @@ export const parse = (query, options) => {
             var nextChar = q.substr(0, 1);
             if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
                 if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
-                    leaf = {type: 'phrase', content: match[1], offset: offset};
+                    leaf = { type: 'phrase', content: match[1], offset: offset };
                     branch.nodes.push(leaf);
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
                 } else if (match = /^[^\s:/[.)]+/.exec(q)) { // Slurp the phrase until the space or any character which indicates the end of a phrase
-                    leaf = {type: 'phrase', content: match[0], offset: offset};
+                    leaf = { type: 'phrase', content: match[0], offset: offset };
                     branch.nodes.push(leaf);
                     offset += match[0].length;
                     q = q.substr(match[0].length);
                     cropString = false;
                 } else { // All other first chars - just dump into a buffer and let it fill slowly
-                    leaf = {type: 'phrase', content: nextChar, offset: offset};
+                    leaf = { type: 'phrase', content: nextChar, offset: offset };
                     branch.nodes.push(leaf);
                 }
             } else if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -481,14 +493,14 @@ export const parse = (query, options) => {
                 // Line not found, push error message
                 if (!found) {
                     node.nodes.push(
-                    [{
-                        type: "phrase",
-                        content: tools.createTooltip(
-                            "Line " + node.ref[reference] + " not found",
-                            "Polyglot could not find specified line in the search query",
-                            "red-underline"
-                        )
-                    }]);
+                        [{
+                            type: "phrase",
+                            content: tools.createTooltip(
+                                "Line " + node.ref[reference] + " not found",
+                                "Polyglot could not find specified line in the search query",
+                                "red-underline"
+                            )
+                        }]);
                 }
             }
         });
