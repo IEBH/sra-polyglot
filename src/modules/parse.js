@@ -154,14 +154,23 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        }
-        else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) { // OR/1,3
+        } else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) { // OR/1,3
             branch.nodes.push({
                 type: 'ref',
                 ref: match[2].split(','),
                 cond: match[1].toUpperCase(),
                 nodes: []
-            }); 
+            });
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } else if (match = /^(AND)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) { // AND/1,3
+            branch.nodes.push({
+                type: 'ref',
+                ref: match[2].split(',').map(num => `#${num.trim()}`),
+                cond: match[1].toUpperCase(),
+                nodes: []
+            });
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
