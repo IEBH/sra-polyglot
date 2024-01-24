@@ -18,7 +18,7 @@ var settings = {
 	includeCols: ['PubMed full', 'PubMed abbreviation', 'PubMed abbreviation 2', 'Ovid MEDLINE', 'Ovid MEDLINE 2', 'Ovid MEDLINE 3'],
 	rowHeader: 'Explanation',
 	dataRowStart: 0,
-};
+}; 
 
 // Field Codes {{{
 xlsxToParseMap(settings).then(parseMap => {

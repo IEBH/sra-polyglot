@@ -161,7 +161,7 @@ export const parse = (query, options) => {
                 ref: match[2].split(','),
                 cond: match[1].toUpperCase(),
                 nodes: []
-            });
+            }); 
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;

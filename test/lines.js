@@ -32,7 +32,7 @@ describe('Translate Line numbers (Ovid MEDLINE -> *)', () => {
 		expect(polyglot.translate('OR/1,3', 'International HTA Database')).to.equal('#1 OR #3');
 	});
 
-});
+}); 
 
 describe('Line expression expansion', () => {
 	var input =

@@ -9,7 +9,7 @@ const xlsx = require('xlsx');
 * @property {string} polyglotSources Which columns (using `driverRow`) can be used as polyglot sources
 * @property {number} [dataRowStart] Row offset to start reading data from, if falsy is calculated as driverRow+1
 */
-var settings = {
+var settings = { 
 	sheets: ['fieldCodes', 'mesh', 'meshTranslations', 'searchCommands', 'testCases'],
 	omitCols: ['PubMed abbreviation 2', 'Ovid MEDLINE 2', 'Ovid MEDLINE 3'],
 	rowHeader: 'Explanation',
