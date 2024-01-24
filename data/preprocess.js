@@ -15,7 +15,7 @@ var settings = {
 	sheet: 'fieldCodes',
 	matchFieldCode: true,
 	omitCols: ['Searching type'],
-	includeCols: ['PubMed full', 'PubMed abbreviation', 'PubMed abbreviation 2', 'Ovid MEDLINE', 'Ovid MEDLINE 2'],
+	includeCols: ['PubMed full', 'PubMed abbreviation', 'PubMed abbreviation 2', 'Ovid MEDLINE', 'Ovid MEDLINE 2', 'Ovid MEDLINE 3'],
 	rowHeader: 'Explanation',
 	dataRowStart: 0,
 };
@@ -32,7 +32,7 @@ xlsxToEngineObject(settings).then(engineObject => {
 	fs.writeFileSync(
 		'../src/data/fieldCodesObject.js',
 		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
-	) 
+	)
 });
 // }}}
 
@@ -41,7 +41,7 @@ xlsxToEngineObject({ ...settings, sheet: 'mesh' }).then(engineObject => {
 	fs.writeFileSync(
 		'../src/data/meshObject.js',
 		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
-	) 
+	)
 });
 // }}}
 
@@ -57,6 +57,6 @@ xlsxToEngineObject({ ...settings, sheet: 'meshTranslations' }).then(engineObject
 	fs.writeFileSync(
 		'../src/data/meshTranslationsObject.js',
 		`export default JSON.parse(\`${JSON.stringify(engineObject).replace(/\\/g, "\\\\")}\`)` // Replace \ with \\ to escape \
-	) 
+	)
 });
 // }}}

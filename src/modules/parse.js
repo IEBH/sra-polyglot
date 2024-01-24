@@ -154,18 +154,30 @@ export const parse = (query, options) => {
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
-        } else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) {
-            // OR/11,14,..
-            const refNumbers = match[2].split(',').map(num => `#${num.trim()}`).join(' OR ');
+        }
+        else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) { // OR/1,3
             branch.nodes.push({
                 type: 'ref',
-                ref: refNumbers,
-                cond: 'OR',
+                ref: match[2].split(','),
+                cond: match[1].toUpperCase(),
                 nodes: []
             });
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
+            // } else if (match = /^(OR)\/([0-9]+(?:,[0-9]+)*)/i.exec(q)) {
+            //     // OR/11,14,..
+            //     const refNumbers = match[2].split(',').map(num => `#${num.trim()}`).join(' OR ');
+
+            //     branch.nodes.push({
+            //         type: 'ref',
+            //         ref: refNumbers,
+            //         cond: 'OR',
+            //         nodes: []
+            //     });
+            //     offset += match[0].length;
+            //     q = q.substr(match[0].length);
+            //     cropString = false;
         } else if (match = /^(#?([0-9]+)) +(AND|OR|NOT)\s+/i.exec(q)) { // 1 AND ...
             if (leaf.type != "phrase") {
                 branch.nodes.push({

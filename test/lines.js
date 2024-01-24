@@ -1,9 +1,9 @@
 var expect = require('chai').expect;
 const polyglot = require('../lib').default;
 // FIXME: Not currently supported
-describe.skip('Line numbers', ()=> {
+describe.skip('Line numbers', () => {
 
-	it('should be preserved for all engines', ()=> {
+	it('should be preserved for all engines', () => {
 		var input =
 			'1 Foo AND\n' +
 			'2 Bar AND\n' +
@@ -27,7 +27,14 @@ describe.skip('Line numbers', ()=> {
 
 })
 
-describe('Line expression expansion', ()=> {
+describe('Translate Line numbers (Ovid MEDLINE -> *)', () => {
+	it('translate `OR/1,3` -> HTA `#1 OR #3`', () => {
+		expect(polyglot.translate('OR/1,3', 'International HTA Database')).to.equal('#1 OR #3');
+	});
+
+});
+
+describe('Line expression expansion', () => {
 	var input =
 		'1 Foo AND\n' +
 		'2 Bar AND\n' +
@@ -35,7 +42,7 @@ describe('Line expression expansion', ()=> {
 		'4 Quz\n' +
 		'5 OR/1-4';
 
-	it('translate line expansion format -> PM', ()=> {
+	it('translate line expansion format -> PM', () => {
 		expect(polyglot.translate(input, 'PubMed abbreviation')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -45,7 +52,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> OV', ()=> {
+	it('translate line expansion format -> OV', () => {
 		expect(polyglot.translate(input, 'Ovid MEDLINE')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -55,7 +62,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> CO', ()=> {
+	it('translate line expansion format -> CO', () => {
 		expect(polyglot.translate(input, 'Cochrane Library')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -65,7 +72,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> EM', ()=> {
+	it('translate line expansion format -> EM', () => {
 		expect(polyglot.translate(input, 'Embase (Elsevier)')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -75,7 +82,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> CI', ()=> {
+	it('translate line expansion format -> CI', () => {
 		expect(polyglot.translate(input, 'CINAHL (Ebsco)')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -85,7 +92,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> PY', ()=> {
+	it('translate line expansion format -> PY', () => {
 		expect(polyglot.translate(input, 'PsycInfo (Ovid)')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -95,7 +102,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> SC', ()=> {
+	it('translate line expansion format -> SC', () => {
 		expect(polyglot.translate(input, 'Scopus (advanced search)')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -105,7 +112,7 @@ describe('Line expression expansion', ()=> {
 		);
 	});
 
-	it('translate line expansion format -> WS', ()=> {
+	it('translate line expansion format -> WS', () => {
 		expect(polyglot.translate(input, 'Web of Science')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
@@ -116,7 +123,7 @@ describe('Line expression expansion', ()=> {
 	});
 
 	// PsycInfo (Ebsco)
-	it('translate line expansion format -> PYE', ()=> {
+	it('translate line expansion format -> PYE', () => {
 		expect(polyglot.translate(input, 'PsycInfo (Ebsco)')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
