@@ -277,9 +277,9 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 			'AND\n\n'+
 			'("Treatment Failure"[mhe] OR "Treatment failure" OR "Treatment failures")\n\n'+
 			'AND\n\n'+
-			'("Bacterial Infections"[mhe] OR "Bacteria" OR "Bacterial")\n\n'+
+			'("Bacterial Infections"[mhe] OR Bacteria OR Bacterial)\n\n'+
 			'AND\n\n'+
-			'("Anti-Bacterial Agents"[mhe] OR "Antibacterial Agents" OR "Antibacterial Agent" OR "Antibiotics" OR "Antibiotic")\n\n'
+			'("Anti-Bacterial Agents"[mhe] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
