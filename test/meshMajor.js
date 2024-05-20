@@ -70,6 +70,11 @@ describe('Translate MeSH major terms (PubMed -> *)', () => {
 		expect(polyglot.translate('term[Majr]', 'PsycInfo (Ebsco)')).to.equal('(MM term+)');
 	});
 
+	// Business Source Ultimate
+	it('translate `term[Majr]` -> BU `(MM term+)`', () => {
+		expect(polyglot.translate('term[Majr]', 'Business Source Ultimate')).to.equal('(MM term+)');
+	});
+
 });
 
 //PubMed Full
@@ -117,6 +122,11 @@ describe('Translate Translate MeSH major terms (PubMed (long) -> *)', () => {
 		expect(polyglot.translate('term[MeSH Major Topic]', 'PsycInfo (Ebsco)')).to.equal('(MM term+)');
 	});
 
+	// Business Source Ultimate
+	it('translate `term[MeSH Major Topic]` -> BU `(MM term+)`', () => {
+		expect(polyglot.translate('term[MeSH Major Topic]', 'Business Source Ultimate')).to.equal('(MM term+)');
+	});
+
 });
 
 describe('Translate Translate MeSH major terms (Ovid MEDLINE -> *)', () => {
@@ -161,6 +171,11 @@ describe('Translate Translate MeSH major terms (Ovid MEDLINE -> *)', () => {
 	// PsycInfo (Ebsco)
 	it('translate `exp *term/` -> PYE `(MM term+)`', () => {
 		expect(polyglot.translate('exp *term/', 'PsycInfo (Ebsco)')).to.equal('(MM term+)');
+	});
+
+	// Business Source Ultimate
+	it('translate `exp *term/` -> BU `(MM term+)`', () => {
+		expect(polyglot.translate('exp *term/', 'Business Source Ultimate')).to.equal('(MM term+)');
 	});
 
 });

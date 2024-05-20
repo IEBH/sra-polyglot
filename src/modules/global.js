@@ -45,6 +45,7 @@ export default {
 				"PubMed abbreviation": 'randomized controlled trial[pt] OR controlled clinical trial[pt] OR randomized[tiab] OR randomised[tiab] OR placebo[tiab] OR "drug therapy"[sh] OR randomly[tiab] OR trial[tiab] OR groups[tiab] NOT (Animals[Mesh] not (Animals[Mesh] and Humans[Mesh]))',
 				"Web of Science": 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)',
 				"WoS Advanced": 'TS=(random* or placebo* or allocat* or crossover* or "cross over" or ((singl* or doubl*) NEAR/1 blind*)) OR TI=(trial)',
+				"Business Source Ultimate": '(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial',
 			},
 		},
 		'sr filter': {
@@ -59,6 +60,7 @@ export default {
 				"PubMed abbreviation": 'search*[Title/Abstract] OR meta analysis[Publication Type] OR meta analysis[Title/Abstract] OR meta analysis[MeSH] OR review[Publication Type] OR diagnosis[MeSH Subheading] OR associated[Title/Abstract]',
 				"Web of Science": 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane',
 				"WoS Advanced": 'Medline OR Pubmed OR (systematic AND review) OR meta-analysis OR Cochrane',
+				"Business Source Ultimate": 'TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis',
 			},
 		},
 	},

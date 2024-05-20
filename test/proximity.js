@@ -44,6 +44,11 @@ describe('Translate adjacency searches (ADJ format)', () => {
 		expect(polyglot.translate('term1 ADJ3 term2', 'PsycInfo (Ebsco)')).to.equal('term1 N3 term2');
 	});
 
+	// Business Source Ultimate
+	it('translate `term1 ADJ3 term2` -> BU `term1 N3 term2`', () => {
+		expect(polyglot.translate('term1 ADJ3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
+	});
+
 });
 
 describe('Translate adjacency searches (NEAR3 format)', () => {
@@ -88,6 +93,11 @@ describe('Translate adjacency searches (NEAR3 format)', () => {
 	// PsycInfo (Ebsco)
 	it('translate `term1 NEAR3 term2` -> PYE `term1 N3 term2`', () => {
 		expect(polyglot.translate('term1 NEAR3 term2', 'PsycInfo (Ebsco)')).to.equal('term1 N3 term2');
+	});
+
+	// Business Source Ultimate
+	it('translate `term1 NEAR3 term2` -> BU `term1 N3 term2`', () => {
+		expect(polyglot.translate('term1 NEAR3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
 	});
 
 });
@@ -136,6 +146,11 @@ describe('Translate adjacency searches (NEAR/3 format)', () => {
 	it('translate `term1 NEAR/3 term2` -> PYE `term1 N3 term2`', () => {
 		expect(polyglot.translate('term1 NEAR/3 term2', 'PsycInfo (Ebsco)')).to.equal('term1 N3 term2');
 	});
+
+	// Business Source Ultimate
+	it('translate `term1 NEAR/3 term2` -> BU `term1 N3 term2`', () => {
+		expect(polyglot.translate('term1 NEAR/3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
+	});
 });
 
 
@@ -181,6 +196,11 @@ describe('Translate adjacency searches (N3 format)', () => {
 	// PsycInfo(Ebsco)
 	it('translate `term1 N3 term2` -> PYE `term1 N3 term2`', () => {
 		expect(polyglot.translate('term1 N3 term2', 'PsycInfo (Ebsco)')).to.equal('term1 N3 term2');
+	});
+
+	// Business Source Ultimate
+	it('translate `term1 N3 term2` -> BU `term1 N3 term2`', () => {
+		expect(polyglot.translate('term1 N3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
 	});
 
 });
@@ -251,5 +271,28 @@ describe('Translate edge case adjacency fields PsycInfo', () => {
 
 	it('translate `journal issue numbers`', () => {
 		expect(polyglot.translate('(term1 adj3 term2).ip.', 'PsycInfo (Ebsco)')).to.equal('((IP term1) N3 (IP term2))');
+	});
+});
+
+// Business Source Ultimate
+describe('Translate edge case adjacency fields Business', () => {
+	it('translate `title`', () => {
+		expect(polyglot.translate('(term1 adj3 term2).ti.', 'Business Source Ultimate')).to.equal('((TI term1) N3 (TI term2))');
+	});
+
+	it('translate `abstract`', () => {
+		expect(polyglot.translate('(term1 adj3 term2).ab.', 'Business Source Ultimate')).to.equal('((AB term1) N3 (AB term2))');
+	});
+
+	it('translate `author`', () => {
+		expect(polyglot.translate('(term1 adj3 term2).au.', 'Business Source Ultimate')).to.equal('((AU term1) N3 (AU term2))');
+	});
+
+	it('translate `ISBN`', () => {
+		expect(polyglot.translate('(term1 adj3 term2).ib.', 'Business Source Ultimate')).to.equal('((IB term1) N3 (IB term2))');
+	});
+
+	it('translate `journal issue numbers`', () => {
+		expect(polyglot.translate('(term1 adj3 term2).ip.', 'Business Source Ultimate')).to.equal('((IP term1) N3 (IP term2))');
 	});
 });

@@ -43,4 +43,9 @@ describe('Translate floating subheading searches (PubMed -> *)', () => {
 	it('translate `term[sh]` -> PYE `MW term`', () => {
 		expect(polyglot.translate('term[sh]', 'PsycInfo (Ebsco)')).to.equal('(MW term)');
 	});
+
+	// Business Source Ultimate
+	it('translate `term[sh]` -> BU `MW term`', () => {
+		expect(polyglot.translate('term[sh]', 'Business Source Ultimate')).to.equal('(MW term)');
+	});
 });

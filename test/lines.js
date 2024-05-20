@@ -23,6 +23,7 @@ describe.skip('Line numbers', () => {
 		expect(polyglot.translate(input, 'PsycInfo (Ovid)')).to.equal(output);
 		expect(polyglot.translate(input, 'Scopus (advanced search)')).to.equal(output);
 		expect(polyglot.translate(input, 'Web of Science')).to.equal(output);
+		expect(polyglot.translate(input, 'Business Source Ultimate')).to.equal(output);
 	});
 
 })
@@ -125,6 +126,17 @@ describe('Line expression expansion', () => {
 	// PsycInfo (Ebsco)
 	it('translate line expansion format -> PYE', () => {
 		expect(polyglot.translate(input, 'PsycInfo (Ebsco)')).to.equal(
+			'Foo AND<br/>' +
+			'Bar AND<br/>' +
+			'Baz OR<br/>' +
+			'Quz<br/>' +
+			'S1 OR S2 OR S3 OR S4'
+		);
+	});
+
+	// Business Source Ultimate
+	it('translate line expansion format -> BU', () => {
+		expect(polyglot.translate(input, 'Business Source Ultimate ')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
 			'Baz OR<br/>' +

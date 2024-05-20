@@ -175,6 +175,7 @@ const tools = {
 				number = ref;
 				break;
 			case 'CINAHL (Ebsco)':
+			case 'Business Source Ultimate':
 			case 'PsycInfo (Ebsco)':
 			case 'SPORTDiscus':
 				number = "S" + ref;
@@ -236,6 +237,13 @@ const tools = {
 					}
 					break;
 				case 'CINAHL (Ebsco)':
+					replaceObj = {
+						'$': '?',
+						'?': '#',
+						'#': '?'
+					}
+					break;
+				case 'Business Source Ultimate':
 					replaceObj = {
 						'$': '?',
 						'?': '#',

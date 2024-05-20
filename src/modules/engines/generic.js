@@ -58,7 +58,7 @@ export default {
                                             }
                                         }).join("");
                                         // Fix to move '+' back one space when quoting
-                                        if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)") {
+                                        if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)" || engine == "Business Source Ultimate") {
                                             content = fixCinahl(content);
                                         }
                                         buffer += (comment && settings.highlighting)
@@ -203,7 +203,7 @@ export default {
                                     }
                                 }).join("");
                                 // Fix to move '+' back one space when quoting
-                                if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)") {
+                                if (engine == "CINAHL (Ebsco)" || engine == "PsycInfo (Ebsco)" || engine == "Business Source Ultimate") {
                                     content = fixCinahl(content);
                                 }
                                 buffer += (comment && settings.highlighting)
@@ -260,6 +260,9 @@ export default {
                                 case 'CINAHL (Ebsco)':
                                     buffer += `N${branch.proximity}`;
                                     break;
+                                case 'Business Source Ultimate':
+                                    buffer += `N${branch.proximity}`;
+                                    break;
                                 case 'PsycInfo (Ebsco)':
                                     buffer += `N${branch.proximity}`;
                                     break;
@@ -295,6 +298,9 @@ export default {
                                     buffer += 'NEAR/0';
                                     break;
                                 case 'CINAHL (Ebsco)':
+                                    buffer += 'W1';
+                                    break;
+                                case 'Business Source Ultimate':
                                     buffer += 'W1';
                                     break;
                                 case 'PsycInfo (Ebsco)':

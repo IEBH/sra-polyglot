@@ -1,15 +1,15 @@
-const global = require( '../lib/modules/global.js').default;
+const global = require('../lib/modules/global.js').default;
 const parse = require('../lib/modules/parse.js').parse;
 
 var _ = require('lodash');
 var expect = require('chai').expect;
 const polyglot = require('../lib').default;
-describe('Example test "Failure of antibiotic prescribing for bacterial infections"', ()=> {
-	var example = _.find(global.examples, {title: 'Failure of antibiotic prescribing for bacterial infections'});
+describe('Example test "Failure of antibiotic prescribing for bacterial infections"', () => {
+	var example = _.find(global.examples, { title: 'Failure of antibiotic prescribing for bacterial infections' });
 	expect(example).to.be.an.instanceOf(Object);
 	expect(example).to.have.property('query');
 
-	it('should parse the object tree correctly', ()=> {
+	it('should parse the object tree correctly', () => {
 		/*
 			"Primary Health Care"[Mesh] OR Primary care OR Primary healthcare OR Family practice OR General practice
 			AND
@@ -32,25 +32,25 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						content: 'Primary Health Care',
 						offset: 0,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Primary care',
 						offset: 31,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Primary healthcare',
 						offset: 47,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Family practice',
 						offset: 69,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'General practice',
@@ -67,7 +67,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				number: 3,
 				isNumbered: false,
 				nodes: [
-					{type: 'joinAnd'},
+					{ type: 'joinAnd' },
 					{
 						type: 'raw',
 						content: '\n\n',
@@ -85,13 +85,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						content: 'Treatment Failure',
 						offset: 111,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Treatment failure',
 						offset: 140,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Treatment failures',
@@ -108,7 +108,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				number: 7,
 				isNumbered: false,
 				nodes: [
-					{type: 'joinAnd'},
+					{ type: 'joinAnd' },
 					{
 						type: 'raw',
 						content: '\n\n',
@@ -126,13 +126,13 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						content: 'Bacterial Infections',
 						offset: 186,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Bacteria',
 						offset: 218,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Bacterial',
@@ -149,7 +149,7 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 				number: 11,
 				isNumbered: false,
 				nodes: [
-					{type: 'joinAnd'},
+					{ type: 'joinAnd' },
 					{
 						type: 'raw',
 						content: '\n\n',
@@ -167,25 +167,25 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 						content: 'Anti-Bacterial Agents',
 						offset: 246,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Antibacterial Agents',
 						offset: 279,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Antibacterial Agent',
 						offset: 303,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Antibiotics',
 						offset: 326,
 					},
-					{type: 'joinOr'},
+					{ type: 'joinOr' },
 					{
 						type: 'phrase',
 						content: 'Antibiotic',
@@ -195,11 +195,11 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 			},
 		];
 		// }}}
-		expect(parse(example.query, {groupLines: false})).to.deep.equal(tree);
+		expect(parse(example.query, { groupLines: false })).to.deep.equal(tree);
 	});
 
-	it('should translate the example into PubMed format', ()=> {
-		expect(polyglot.translate(example.query, 'PubMed abbreviation', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into PubMed format', () => {
+		expect(polyglot.translate(example.query, 'PubMed abbreviation', { groupLines: true, html: false })).to.equal(
 			'("Primary Health Care"[Mesh] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'("Treatment Failure"[Mesh] OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -210,8 +210,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Ovid MEDLINE format', ()=> {
-		expect(polyglot.translate(example.query, 'Ovid MEDLINE', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into Ovid MEDLINE format', () => {
+		expect(polyglot.translate(example.query, 'Ovid MEDLINE', { groupLines: true, html: false })).to.equal(
 			'(exp "Primary Health Care"/ OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'(exp "Treatment Failure"/ OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -222,8 +222,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Cochrane format', ()=> {
-		expect(polyglot.translate(example.query, 'Cochrane Library', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into Cochrane format', () => {
+		expect(polyglot.translate(example.query, 'Cochrane Library', { groupLines: true, html: false })).to.equal(
 			'([mh "Primary Health Care"] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'([mh "Treatment Failure"] OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -234,8 +234,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into Embase format', ()=> {
-		expect(polyglot.translate(example.query, 'Embase (Elsevier)', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into Embase format', () => {
+		expect(polyglot.translate(example.query, 'Embase (Elsevier)', { groupLines: true, html: false })).to.equal(
 			"('Primary Health Care'/exp OR 'Primary care' OR 'Primary healthcare' OR 'Family practice' OR 'General practice')\n\n" +
 			"AND\n\n" +
 			"('Treatment Failure'/exp OR 'Treatment failure' OR 'Treatment failures')\n\n" +
@@ -246,8 +246,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into CINAHL format', ()=> {
-		expect(polyglot.translate(example.query, 'CINAHL (Ebsco)', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into CINAHL format', () => {
+		expect(polyglot.translate(example.query, 'CINAHL (Ebsco)', { groupLines: true, html: false })).to.equal(
 			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -258,8 +258,8 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
-	it('should translate the example into WoS format', ()=> {
-		expect(polyglot.translate(example.query, 'Web of Science', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into WoS format', () => {
+		expect(polyglot.translate(example.query, 'Web of Science', { groupLines: true, html: false })).to.equal(
 			'("Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'("Treatment Failure" OR "Treatment failure" OR "Treatment failures")\n\n' +
@@ -271,21 +271,34 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 	});
 
 	//New International HTA Database
-	it('should translate the example into HTA format', ()=>{
-		expect(polyglot.translate(example.query, 'International HTA Database', {groupLines:true, html: false})).to.equal(
-			'("Primary Health Care"[mhe] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n'+
-			'AND\n\n'+
-			'("Treatment Failure"[mhe] OR "Treatment failure" OR "Treatment failures")\n\n'+
-			'AND\n\n'+
-			'("Bacterial Infections"[mhe] OR Bacteria OR Bacterial)\n\n'+
-			'AND\n\n'+
+	it('should translate the example into HTA format', () => {
+		expect(polyglot.translate(example.query, 'International HTA Database', { groupLines: true, html: false })).to.equal(
+			'("Primary Health Care"[mhe] OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+			'AND\n\n' +
+			'("Treatment Failure"[mhe] OR "Treatment failure" OR "Treatment failures")\n\n' +
+			'AND\n\n' +
+			'("Bacterial Infections"[mhe] OR Bacteria OR Bacterial)\n\n' +
+			'AND\n\n' +
 			'("Anti-Bacterial Agents"[mhe] OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
 		);
 	});
 
 	// PsycInfo (Ebsco)
-	it('should translate the example into PsycInfo format', ()=> {
-		expect(polyglot.translate(example.query, 'PsycInfo (Ebsco)', {groupLines: true, html: false})).to.equal(
+	it('should translate the example into PsycInfo format', () => {
+		expect(polyglot.translate(example.query, 'PsycInfo (Ebsco)', { groupLines: true, html: false })).to.equal(
+			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+			'AND\n\n' +
+			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +
+			'AND\n\n' +
+			'((MH "Bacterial Infections+") OR Bacteria OR Bacterial)\n\n' +
+			'AND\n\n' +
+			'((MH "Anti-Bacterial Agents+") OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+		);
+	});
+
+	// Business Source Ultimate
+	it('should translate the example into Business format', () => {
+		expect(polyglot.translate(example.query, 'Business Source Ultimate', { groupLines: true, html: false })).to.equal(
 			'((MH "Primary Health Care+") OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
 			'AND\n\n' +
 			'((MH "Treatment Failure+") OR "Treatment failure" OR "Treatment failures")\n\n' +

@@ -43,6 +43,11 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 	it('translate `term[tiab]` -> PYE `TI term OR AB term2`', () => {
 		expect(polyglot.translate('term[tiab]', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
+
+	// Business Source Ultimate
+	it('translate `term[tiab]` -> BU `TI term OR AB term2`', () => {
+		expect(polyglot.translate('term[tiab]', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate title + abstract searches (PubMed -> *)', () => {
@@ -87,6 +92,11 @@ describe('Translate title + abstract searches (PubMed -> *)', () => {
 	// PsycInfo(Ebsco)
 	it('translate `term[Title/Abstract]` -> PYE `TI term OR AB term2`', () => {
 		expect(polyglot.translate('term[Title/Abstract]', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
+
+	// Business Source Ultimate
+	it('translate `term[Title/Abstract]` -> BU `TI term OR AB term2`', () => {
+		expect(polyglot.translate('term[Title/Abstract]', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
 	});
 });
 
@@ -133,6 +143,11 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.ti,ab` format)
 	it('translate `term.ti,ab` -> PYE `TI term OR AB term`', () => {
 		expect(polyglot.translate('term.ti,ab', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
+
+	// Business Source Ultimate
+	it('translate `term.ti,ab` -> BU `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ti,ab', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) -> *)', () => {
@@ -177,6 +192,11 @@ describe('Translate title + abstract searches (Ovid MEDLINE `term.tw` format) ->
 	// PsycInfo(Ebsco)
 	it('translate `term.tw.` -> PYE `TI term OR AB term`', () => {
 		expect(polyglot.translate('term.tw.', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
+
+	// Business Source Ultimate
+	it('translate `term.tw.` -> BU `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.tw.', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
 	});
 });
 
@@ -223,6 +243,11 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti` format)
 	it('translate `term.ab,ti` -> PYE `TI term OR AB term`', () => {
 		expect(polyglot.translate('term.ab,ti', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
 	});
+
+	// Business Source Ultimate
+	it('translate `term.ab,ti` -> BU `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ab,ti', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
+	});
 });
 
 describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format) -> *)', () => {
@@ -267,5 +292,10 @@ describe('Translate abstract + title searches (Ovid MEDLINE `term.ab,ti.` format
 	// PsycInfo (Ebsco)
 	it('translate `term.ab,ti.` -> PYE `TI term OR AB term`', () => {
 		expect(polyglot.translate('term.ab,ti.', 'PsycInfo (Ebsco)')).to.equal('(TI term OR AB term)');
+	});
+
+	// Business Source Ultimate
+	it('translate `term.ab,ti.` -> BU `TI term OR AB term`', () => {
+		expect(polyglot.translate('term.ab,ti.', 'Business Source Ultimate')).to.equal('(TI term OR AB term)');
 	});
 });

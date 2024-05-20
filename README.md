@@ -110,6 +110,7 @@ Similar to [Logical Syntax](#logical-syntax), proximity searching allows the sea
 * `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, CINAHL format)
 * `Term1 NEAR/3 Term2` (Search for `Term2` within 3 words of `Term1`, Embase and Web of Science formats)
 * `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, PsycInfo (Ebsco) format)
+* `Term1 N3 Term2` (Search for `Term2` within 3 words of `Term1`, Business format)
 
 
 ## Line Referencing
@@ -196,7 +197,8 @@ Will output an object structure like:
 	"cochrane": "([mh \"Primary Health Care\"] OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n([mh \"Treatment Failure\"] OR Treatment failure OR Treatment failures)\n\nAND\n\n([mh \"Bacterial Infections\"] OR Bacteria OR Bacterial)\n\nAND\n\n([mh \"Anti-Bacterial Agents\"] OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)",
 	"embase": "('Primary Health Care'/exp OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n('Treatment Failure'/exp OR Treatment failure OR Treatment failures)\n\nAND\n\n('Bacterial Infections'/exp OR Bacteria OR Bacterial)\n\nAND\n\n('Anti-Bacterial Agents'/exp OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)",
 	"webofscience": "(Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n(Treatment failure OR Treatment failures)\n\nAND\n\n(Bacteria OR Bacterial)\n\nAND\n\n(Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)",
-	"cinahl": "((MH \"Primary Health Care+\") OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n((MH \"Treatment Failure+\") OR Treatment failure OR Treatment failures)\n\nAND\n\n((MH \"Bacterial Infections+\") OR Bacteria OR Bacterial)\n\nAND\n\n((MH \"Anti-Bacterial Agents+\") OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)"
+	"cinahl": "((MH \"Primary Health Care+\") OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n((MH \"Treatment Failure+\") OR Treatment failure OR Treatment failures)\n\nAND\n\n((MH \"Bacterial Infections+\") OR Bacteria OR Bacterial)\n\nAND\n\n((MH \"Anti-Bacterial Agents+\") OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)",
+  "business": "((MH \"Primary Health Care+\") OR Primary care OR Primary healthcare OR Family practice OR General practice)\n\nAND\n\n((MH \"Treatment Failure+\") OR Treatment failure OR Treatment failures)\n\nAND\n\n((MH \"Bacterial Infections+\") OR Bacteria OR Bacterial)\n\nAND\n\n((MH \"Anti-Bacterial Agents+\") OR Antibacterial Agents OR Antibacterial Agent OR Antibiotics OR Antibiotic)"
 }
 ```
 

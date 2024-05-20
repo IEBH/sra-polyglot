@@ -35,13 +35,18 @@ describe('Translate title + abstract + other searches (PubMed -> *)', () => {
 	});
 
 	//International HTA Database
-	it('translate `term[tw]` -> HTA `term`', ()=> {
+	it('translate `term[tw]` -> HTA `term`', () => {
 		expect(polyglot.translate('term[tw]', 'International HTA Database')).to.equal('term');
 	});
 
 	// PsycInfo (Ebsco)
 	it('translate `term[tw]` -> PYE `term`', () => {
 		expect(polyglot.translate('term[tw]', 'PsycInfo (Ebsco)')).to.equal('term');
+	});
+
+	// Business Source Ultimate
+	it('translate `term[tw]` -> BU `term`', () => {
+		expect(polyglot.translate('term[tw]', 'Business Source Ultimate')).to.equal('term');
 	});
 
 });
@@ -81,13 +86,18 @@ describe('Translate title + abstract + other searches (Ovid MEDLINE -> *)', () =
 	});
 
 	//International HTA Database
-	it('translate `term.mp` -> HTA `term`', ()=> {
+	it('translate `term.mp` -> HTA `term`', () => {
 		expect(polyglot.translate('term.mp.', 'International HTA Database')).to.equal('term');
 	});
 
 	// PsycInfo (Ebsco)
 	it('translate `term.mp.` -> PYE `term`', () => {
 		expect(polyglot.translate('term.mp.', 'PsycInfo (Ebsco)')).to.equal('term');
+	});
+
+	// Business Source Ultimate
+	it('translate `term.mp.` -> BU `term`', () => {
+		expect(polyglot.translate('term.mp.', 'Business Source Ultimate')).to.equal('term');
 	});
 
 });
@@ -134,5 +144,10 @@ describe('Translate title + abstract + other searches, with automated gunk (Ovid
 	// PsycInfo (Ebsco)
 	it('translate `term.mp. [...]` -> PYE `term`', () => {
 		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'PsycInfo (Ebsco)')).to.equal('term');
+	});
+
+	// Business Source Ultimate
+	it('translate `term.mp. [...]` -> BU `term`', () => {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Business Source Ultimate')).to.equal('term');
 	});
 });
