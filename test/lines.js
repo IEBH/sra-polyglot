@@ -136,7 +136,7 @@ describe('Line expression expansion', () => {
 
 	// Business Source Ultimate
 	it('translate line expansion format -> BU', () => {
-		expect(polyglot.translate(input, 'Business Source Ultimate ')).to.equal(
+		expect(polyglot.translate(input, 'Business Source Ultimate')).to.equal(
 			'Foo AND<br/>' +
 			'Bar AND<br/>' +
 			'Baz OR<br/>' +
