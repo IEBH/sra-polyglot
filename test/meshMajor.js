@@ -75,6 +75,11 @@ describe('Translate MeSH major terms (PubMed -> *)', () => {
 		expect(polyglot.translate('term[Majr]', 'Business Source Ultimate')).to.equal('(MM term+)');
 	});
 
+	// Lilacs
+	// it('translate `term[Majr]` -> LI `(mh:term)`', () => {
+	// 	expect(polyglot.translate('term[Majr]', 'Lilacs')).to.equal('(mh:term)');
+	// });
+
 });
 
 //PubMed Full

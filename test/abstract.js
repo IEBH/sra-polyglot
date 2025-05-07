@@ -50,4 +50,9 @@ describe('Translate abstract searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[ab]', 'Business Source Ultimate')).to.equal('(AB term)');
 	});
 
+	// Lilacs
+	it('translate `term[ab]` -> LI `ab:term`', () => {
+		expect(polyglot.translate('term[ab]', 'Lilacs')).to.equal('ab:term');
+	});
+
 });

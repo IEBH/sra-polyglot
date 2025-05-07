@@ -49,6 +49,11 @@ describe('Translate wildcards searches (multiple character "*" style)', () => {
 		expect(polyglot.translate('term*', 'Business Source Ultimate')).to.equal('term*');
 	});
 
+	// Lilacs
+	it('translate `term*` -> LI `term*`', () => {
+		expect(polyglot.translate('term*', 'Lilacs')).to.equal('term*');
+	});
+
 });
 
 describe('Translate wildcards searches (single character "#" style)', () => {

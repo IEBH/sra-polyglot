@@ -66,3 +66,12 @@ describe('Translate field groups (Ovid MEDLINE -> Business)', () => {
 	});
 
 });
+
+// Lilacs
+describe('Translate field groups (Ovid MEDLINE -> Lilacs)', () => {
+
+	it('translate `(term1).tw.` -> LI `tw:(term1)`', () => {
+		expect(polyglot.translate('(term1).tw.', 'Lilacs')).to.equal('(tw:term1)');
+	});
+
+});

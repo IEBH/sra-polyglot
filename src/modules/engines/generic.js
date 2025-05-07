@@ -242,6 +242,7 @@ export default {
                             switch (engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
+                                case 'Lilacs':
                                 //HTA
                                 case 'International HTA Database':
                                     buffer += 'AND';
@@ -279,6 +280,7 @@ export default {
                             switch (engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
+                                case 'Lilacs':
                                 //HTA
                                 case 'International HTA Database':
                                     buffer += 'AND';

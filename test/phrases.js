@@ -49,6 +49,11 @@ describe('Translate search phrases (PubMed -> *)', () => {
 		expect(polyglot.translate('"term1 term2"', 'Business Source Ultimate')).to.equal('"term1 term2"');
 	});
 
+	// Lilacs
+	it('translate `"term1 term2"` -> LI `"term1 term2"`', () => {
+		expect(polyglot.translate('"term1 term2"', 'Lilacs')).to.equal('"term1 term2"');
+	});
+
 });
 
 describe('Translate search phrases (Ovid MEDLINE -> *)', () => {
@@ -98,6 +103,11 @@ describe('Translate search phrases (Ovid MEDLINE -> *)', () => {
 	// Business Source Ultimate
 	it('translate `"term1 term2"` -> BU `"term1 term2"`', () => {
 		expect(polyglot.translate('"term1 term2"', 'Business Source Ultimate')).to.equal('"term1 term2"');
+	});
+
+	// Lilacs
+	it('translate `"term1 term2"` -> LI `"term1 term2"`', () => {
+		expect(polyglot.translate('"term1 term2"', 'Lilacs')).to.equal('"term1 term2"');
 	});
 
 });

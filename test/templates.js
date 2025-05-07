@@ -50,6 +50,11 @@ describe('Translate the meta template `<rct filter>`', () => {
 	it('translate `<RCT Filter>` -> BU', () => {
 		expect(polyglot.translate('<RCT Filter>', 'Business Source Ultimate')).to.equal('(MH "Clinical Trials+") OR (MH "Quantitative Studies") OR TI placebo* OR AB placebo* OR (MH "Placebos") OR (MH "Random Assignment") OR TI random* OR AB random* OR TI ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR AB ((singl* or doubl* or tripl* or trebl*) W1 (blind* or mask*)) OR TI clinic* trial* OR AB clinic* trial* OR PT clinical trial');
 	});
+
+	// Lilacs
+	it('translate `<RCT Filter>` -> LI', () => {
+		expect(polyglot.translate('<RCT Filter>', 'Lilacs')).to.equal('(mh:("Randomized Controlled Trials as Topic" OR "Controlled Clinical Trials as Topic" OR "Random Allocation" OR "Double-Blind Method" OR "Single-Blind Method" OR "Placebos" OR "Multicenter Studies as Topic" OR "Cross-Over Studies" OR "Pragmatic Clinical Trials as Topic") OR pt:("Randomized Controlled Trial" OR "Controlled Clinical Trial" OR "Multicenter Studies" OR "Pragmatic Clinical Trial") OR ti:(random* OR aleatori* OR placebo*) OR (ti:("clinical trial" OR "ensayo clinico" OR "ensaio clinico") AND tw:(control* OR random* OR aleatori* OR placebo*)) OR (ti:("cross-Over" OR multicenter OR multicentric*) AND ti:(study OR studies OR estud*)) OR ab:(randomi* OR aleatori* OR placebo*) OR (ab:("clinical trial" OR "ensayo clinico" OR "ensaio clinico") AND tw:(control* OR random* OR aleatori* OR placebo*)) OR (ab:("cross-Over" OR multicenter OR multicentric*) AND ab:(study OR studies OR estud*)) OR (tw:(simple* OR singl* OR duplo* OR doble* OR doubl* OR trebl* OR tripl*) AND tw:(cego OR ciego OR blind OR mask OR dumm*))) AND NOT ((mh:"animals" AND NOT mh:"humans") OR mh:"Retrospective Studies")');
+	});
 });
 
 
@@ -100,5 +105,10 @@ describe('Translate the meta template `<sr filter>`', () => {
 	// Business Source Ultimate
 	it('translate `<SR Filter>` -> BU', () => {
 		expect(polyglot.translate('<SR Filter>', 'Business Source Ultimate')).to.equal('TI Medline AB Medline OR TI Pubmed AB Pubmed OR (TI systematic AB systematic AND TI review AB review) OR TI meta-analysis OR AB meta-analysis');
+	});
+
+	// Lilacs
+	it('translate `<SR Filter>` -> LI', () => {
+		expect(polyglot.translate('<SR Filter>', 'Lilacs')).to.equal('(mh:("Systematic Reviews as Topic" OR "Meta-Analysis as Topic") OR pt:("systematic review" OR "meta-analysis") OR ti:("systematic review" OR "revisao sistematica" OR "revision sistematica" OR "systematic literature review" OR "systematic literature review" OR "systematic narrative review" OR "systematic qualitative review" OR "systematic evidence review" OR "systematic quantitative review" OR "systematic meta-review" OR "systematic critical review" OR "systematic mixed studies review" OR "systematic mixed methods" OR "systematic mapping review" OR "systematic cochrane review" OR "scoping review" OR "integrative review" OR "integrative literature review" OR "umbrella review" OR "rapid review" OR "meta-analysis" OR "meta-analise" OR metaanalise OR metanalise OR metaanalisis OR "meta-synthesis" OR "Metassintese") OR ab:("this systematic review" OR "esta revisao sistematica" OR "esta revision sistematica" OR "this meta-analysis" OR "esta meta-analise" OR "esta metaanalise" OR "esta metanalise" OR "esta metaanalisis" OR "this meta-synthesis" OR "esta metassintese") OR ta:"Cochrane Database Syst Rev")');
 	});
 });

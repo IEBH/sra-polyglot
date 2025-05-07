@@ -309,4 +309,30 @@ describe('Example test "Failure of antibiotic prescribing for bacterial infectio
 		);
 	});
 
+	// Lilacs
+	// it('should translate the example into Lilacs', () => {
+	// 	expect(polyglot.translate(example.query, 'Lilacs', { groupLines: true, html: false })).to.equal(
+	// 		'( OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+	// 		'AND\n\n' +
+	// 		'( OR "Treatment failure" OR "Treatment failures")\n\n' +
+	// 		'AND\n\n' +
+	// 		'( OR Bacteria OR Bacterial)\n\n' +
+	// 		'AND\n\n' +
+	// 		'( OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+	// 	);
+	// });
+
+	it('should translate the example into Lilacs', () => {
+		expect(polyglot.translate(example.query, 'Lilacs', { groupLines: true, html: false })).to.equal(
+			'(mh:"Primary Health Care" OR "Primary care" OR "Primary healthcare" OR "Family practice" OR "General practice")\n\n' +
+			'AND\n\n' +
+			'(mh:"Treatment Failure" OR "Treatment failure" OR "Treatment failures")\n\n' +
+			'AND\n\n' +
+			'(mh:"Bacterial Infections" OR Bacteria OR Bacterial)\n\n' +
+			'AND\n\n' +
+			'(mh:"Anti-Bacterial Agents" OR "Antibacterial Agents" OR "Antibacterial Agent" OR Antibiotics OR Antibiotic)'
+		);
+	});
+
+
 });

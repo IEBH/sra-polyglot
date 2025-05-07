@@ -60,6 +60,12 @@ describe('Translate multiple MESH terms (PubMed -> *)', () => {
 		expect(polyglot.translate('"term1 and term2"[Mesh]', 'Business Source Ultimate')).to.equal('(MH "term1 and term2+")');
 	});
 
+	// Lilacs
+	it('translate `"term1 term2"[Mesh]` -> LI `mh:"term1 term2"`', () => {
+		expect(polyglot.translate('"term1 term2"[Mesh]', 'Lilacs')).to.equal('mh:"term1 term2"');
+		expect(polyglot.translate('"term1 and term2"[Mesh]', 'Lilacs')).to.equal('mh:"term1 and term2"');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (short) -> *)', () => {
@@ -122,6 +128,12 @@ describe('Translate multiple MESH terms (PubMed (short) -> *)', () => {
 		expect(polyglot.translate('"term1 and term2"[mh]', 'Business Source Ultimate')).to.equal('(MH "term1 and term2+")');
 	});
 
+	// Lilacs
+	it('translate `"term1 term2"[mh]` -> LI `mh:"term1 term2"`', () => {
+		expect(polyglot.translate('"term1 term2"[mh]', 'Lilacs')).to.equal('mh:"term1 term2"');
+		expect(polyglot.translate('"term1 and term2"[mh]', 'Lilacs')).to.equal('mh:"term1 and term2"');
+	});
+
 });
 
 describe('Translate multiple MESH terms (PubMed (long) -> *)', () => {
@@ -182,6 +194,12 @@ describe('Translate multiple MESH terms (PubMed (long) -> *)', () => {
 	it('translate `"term1 term2"[MeSH Terms]` -> BU `(MH "term1 term2+")`', () => {
 		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'Business Source Ultimate')).to.equal('(MH "term1 term2+")');
 		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'Business Source Ultimate')).to.equal('(MH "term1 and term2+")');
+	});
+
+	// Lilacs
+	it('translate `"term1 term2"[MeSH Terms]` -> LI `mh:"term1 term2"`', () => {
+		expect(polyglot.translate('"term1 term2"[MeSH Terms]', 'Lilacs')).to.equal('mh:"term1 term2"');
+		expect(polyglot.translate('"term1 and term2"[MeSH Terms]', 'Lilacs')).to.equal('mh:"term1 and term2"');
 	});
 
 });
@@ -252,9 +270,17 @@ describe('Translate multiple MESH terms (Ovid MEDLINE -> *)', () => {
 
 	// Business Source Ultimate
 	it('translate `exp term1 term2/` -> BU `(MH "term1 term2+")`', () => {
+		console.log("Here ********************", polyglot.translate('exp term1 term2/', 'Business Source Ultimate'))
 		expect(polyglot.translate('exp term1 term2/', 'Business Source Ultimate')).to.equal('(MH "term1 term2+")');
 		expect(polyglot.translate('exp term1 and term2/', 'Business Source Ultimate')).to.equal('(MH "term1 and term2+")');
 		expect(polyglot.translate('exp "term1 and term2"/', 'Business Source Ultimate')).to.equal('(MH "term1 and term2+")');
+	});
+
+	// Lilacs
+	it('translate `exp term1 term2/` -> LI `mh:"term1 term2"`', () => {
+		expect(polyglot.translate('exp term1 term2/', 'Lilacs')).to.equal('mh:"term1 term2"');
+		expect(polyglot.translate('exp term1 and term2/', 'Lilacs')).to.equal('mh:"term1 and term2"');
+		expect(polyglot.translate('exp "term1 and term2"/', 'Lilacs')).to.equal('mh:"term1 and term2"');
 	});
 
 });

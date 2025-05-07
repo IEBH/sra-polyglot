@@ -49,6 +49,11 @@ describe('Translate title searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[ti]', 'Business Source Ultimate')).to.equal('(TI term)');
 	});
 
+	// Lilacs
+	it('translate `term[ti]` -> LI `ti:term`', () => {
+		expect(polyglot.translate('term[ti]', 'Lilacs')).to.equal('ti:term');
+	});
+
 });
 
 describe('Translate title searches (PubMed -> *)', () => {
@@ -99,6 +104,11 @@ describe('Translate title searches (PubMed -> *)', () => {
 	it('translate `term[Title]` -> BU `TI term`', () => {
 		expect(polyglot.translate('term[Title]', 'Business Source Ultimate')).to.equal('(TI term)');
 	});
+
+	// Lilacs
+	it('translate `term[Title]` -> LI `ti:term`', () => {
+		expect(polyglot.translate('term[Title]', 'Lilacs')).to.equal('ti:term');
+	});
 });
 
 describe('Translate title searches (Ovid MEDLINE -> *)', () => {
@@ -148,5 +158,10 @@ describe('Translate title searches (Ovid MEDLINE -> *)', () => {
 	// Business Source Ultimate
 	it('translate `term.ti` -> BU `TI term`', () => {
 		expect(polyglot.translate('term.ti', 'Business Source Ultimate')).to.equal('(TI term)');
+	});
+
+	// Lilacs
+	it('translate `term.ti` -> LI `ti:term`', () => {
+		expect(polyglot.translate('term.ti', 'Lilacs')).to.equal('ti:term');
 	});
 });

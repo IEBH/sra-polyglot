@@ -165,6 +165,7 @@ const tools = {
 			case 'WoS Advanced':
 			case 'Scopus (basic search)':
 			case 'Scopus (advanced search)':
+			case 'Lilacs':
 			//HTA
 			case 'International HTA Database':
 				number = "#" + ref;
@@ -214,6 +215,7 @@ const tools = {
 							: '*'
 					}
 					break;
+				case 'Lilacs':
 				case 'Ovid MEDLINE':
 					break; // Nothing needed
 				case 'Cochrane Library':
@@ -273,6 +275,11 @@ const tools = {
 						'$': '#'
 					}
 					break;
+				// case 'Lilacs':
+				// 	replaceObj = {
+				// 		'$': '#'
+				// 	}
+				// 	break;
 				case 'ProQuest Health and Medical':
 					replaceObj = {
 						'$': '?',

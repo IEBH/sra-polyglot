@@ -49,6 +49,11 @@ describe('Translate title + abstract + other searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[tw]', 'Business Source Ultimate')).to.equal('term');
 	});
 
+	// Lilacs
+	it('translate `term[tw]` -> LI `tw:term`', () => {
+		expect(polyglot.translate('term[tw]', 'Lilacs')).to.equal('tw:term');
+	});
+
 });
 
 describe('Translate title + abstract + other searches (Ovid MEDLINE -> *)', () => {
@@ -100,6 +105,11 @@ describe('Translate title + abstract + other searches (Ovid MEDLINE -> *)', () =
 		expect(polyglot.translate('term.mp.', 'Business Source Ultimate')).to.equal('term');
 	});
 
+	// Lilacs
+	it('translate `term.mp.` -> LI `tw:term`', () => {
+		expect(polyglot.translate('term.mp.', 'Lilacs')).to.equal('tw:term');
+	});
+
 });
 
 describe('Translate title + abstract + other searches, with automated gunk (Ovid MEDLINE -> *)', () => {
@@ -149,5 +159,10 @@ describe('Translate title + abstract + other searches, with automated gunk (Ovid
 	// Business Source Ultimate
 	it('translate `term.mp. [...]` -> BU `term`', () => {
 		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Business Source Ultimate')).to.equal('term');
+	});
+
+	// Lilacs
+	it('translate `term.mp. [...]` -> LI `term`', () => {
+		expect(polyglot.translate('term.mp. [mp=title, abstract, original title, name of substance word, subject heading word, keyword heading word, protocol supplementary concept word, rare disease supplementary concept word, unique identifier, synonyms]', 'Lilacs')).to.equal('tw:term');
 	});
 });

@@ -46,7 +46,14 @@ describe('Translate adjacency searches (ADJ format)', () => {
 
 	// Business Source Ultimate
 	it('translate `term1 ADJ3 term2` -> BU `term1 N3 term2`', () => {
+		console.log("Here...........",polyglot.translate('"term1 ADJ3 term2"', 'Business Source Ultimate'))
 		expect(polyglot.translate('term1 ADJ3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
+	});
+
+	// Lilacs
+	it('translate `term1 ADJ3 term2` -> LI `"term1 AND term2"`', () => {
+		console.log("Here...........",polyglot.translate('"term1 ADJ3 term2"', 'Lilacs'))
+		expect(polyglot.translate('"term1 ADJ3 term2"', 'Lilacs')).to.equal('"term1 ADJ3 term2"');
 	});
 
 });
@@ -100,6 +107,11 @@ describe('Translate adjacency searches (NEAR3 format)', () => {
 		expect(polyglot.translate('term1 NEAR3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
 	});
 
+	// Lilacs
+	it('translate `term1 NEAR3 term2` -> LI `"term1 AND term2"`', () => {
+		expect(polyglot.translate('"term1 NEAR3 term2"', 'Lilacs')).to.equal('"term1 NEAR3 term2"');
+	});
+
 });
 
 
@@ -151,6 +163,11 @@ describe('Translate adjacency searches (NEAR/3 format)', () => {
 	it('translate `term1 NEAR/3 term2` -> BU `term1 N3 term2`', () => {
 		expect(polyglot.translate('term1 NEAR/3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
 	});
+
+	// Lilacs
+	it('translate `term1 NEAR/3 term2` -> LI `"term1 AND term2"`', () => {
+		expect(polyglot.translate('"term1 NEAR/3 term2"', 'Lilacs')).to.equal('"term1 NEAR/3 term2"');
+	});
 });
 
 
@@ -201,6 +218,11 @@ describe('Translate adjacency searches (N3 format)', () => {
 	// Business Source Ultimate
 	it('translate `term1 N3 term2` -> BU `term1 N3 term2`', () => {
 		expect(polyglot.translate('term1 N3 term2', 'Business Source Ultimate')).to.equal('term1 N3 term2');
+	});
+
+	// Lilacs
+	it('translate `term1 N3 term2` -> LI `"term1 N3 term2"`', () => {
+		expect(polyglot.translate('"term1 N3 term2"', 'Lilacs')).to.equal('"term1 N3 term2"');
 	});
 
 });

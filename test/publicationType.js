@@ -49,4 +49,9 @@ describe('Translate publication type searches (PubMed -> *)', () => {
 		expect(polyglot.translate('term[pt]', 'Business Source Ultimate')).to.equal('(PT term)');
 	});
 
+	// Lilacs
+	it('translate `term[pt]` -> LI `pt:term`', () => {
+		expect(polyglot.translate('term[pt]', 'Lilacs')).to.equal('pt:term');
+	});
+
 });

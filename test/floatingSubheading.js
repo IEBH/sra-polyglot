@@ -48,4 +48,10 @@ describe('Translate floating subheading searches (PubMed -> *)', () => {
 	it('translate `term[sh]` -> BU `MW term`', () => {
 		expect(polyglot.translate('term[sh]', 'Business Source Ultimate')).to.equal('(MW term)');
 	});
+
+	// Lilacs
+	it('translate `term[sh]` -> LI `mh:term`', () => {
+		console.log("Hereeeee*************************",polyglot.translate('term[sh]', 'Lilacs') )
+		expect(polyglot.translate('term[sh]', 'Lilacs')).to.equal('mh:term');
+	});
 });
