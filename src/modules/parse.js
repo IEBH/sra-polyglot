@@ -295,7 +295,9 @@ export const parse = (query, options) => {
         else if (match = /^\[(mesh terms|mesh|mh)(:NoExp|:no exp)?\]/i.exec(q)) { // Mesh term - PubMed syntax
             leaf.type = 'mesh';
             leaf.field = match[2] ? 'Mesh search (Not exploded)' : 'Mesh search (exploded)';
-            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
+
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -307,7 +309,8 @@ export const parse = (query, options) => {
                 newLeaf.heading = match[2];
             }
             newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
-            if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             branch.nodes.push(newLeaf);
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -320,7 +323,8 @@ export const parse = (query, options) => {
                 newLeaf.heading = match[2];
             }
             newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
-            if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             branch.nodes.push(newLeaf);
             offset += match[0].length;
             q = q.substr(match[0].length);
@@ -328,7 +332,8 @@ export const parse = (query, options) => {
         } else if (match = /^\[(mesh subheading|sh)\]/i.exec(q)) { // Mesh subheading search - PubMed syntax
             leaf.type = 'mesh';
             leaf.field = 'MeSH subheading search';
-            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -341,7 +346,8 @@ export const parse = (query, options) => {
             }
             leaf.type = 'mesh';
             useLeaf.field = 'MeSH subheading search';
-            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -354,7 +360,8 @@ export const parse = (query, options) => {
             }
             leaf.type = 'mesh';
             useLeaf.field = match[1] === "xm" ? 'Mesh search (exploded)' : 'Mesh search (Not exploded)';
-            if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            // if (/^["“”].*["“”]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             offset += match[0].length;
             q = q.substr(match[0].length);
             cropString = false;
@@ -455,7 +462,8 @@ export const parse = (query, options) => {
         else {
             var nextChar = q.substr(0, 1);
             if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
-                if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
+                // if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
+                if (/^["“”'‘’]$/.test(nextChar) && (match = /^["“”'‘’](.*?)["“”'‘’]/.exec(q))) { 
                     leaf = { type: 'phrase', content: match[1], offset: offset };
                     branch.nodes.push(leaf);
                     offset += match[0].length;
