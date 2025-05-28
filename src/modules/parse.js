@@ -118,8 +118,36 @@ export const parse = (query, options) => {
     while (q.length) {
         var cropString = true; // Whether to remove one charcater from the beginning of the string (set to false if the lexical match handles this behaviour itself)
         var match;
-
-        if (/^\(/.test(q)) {
+        if (match = /(\$[1-9])\b/i.exec(q)){
+            q = q.replace(/([^ \t])(\$[1-9])\b/g, '$1 $2');
+        }
+        // if (match = /\bOR\b/i.exec(q)){
+        //     q= q.replace(/(?<!^)(\w)(?=OR\b)/g, '$1 ');
+        // }
+        
+        if (match = /^(\$1)\b/i.exec(q)) { // $1
+            branch.nodes.push({
+                type: 'dollarOne',
+                ref: [match[0]],
+                cond: match[0] ? match[0].toUpperCase() : '',
+                nodes: []
+            });
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        } 
+        else if (match = /^(\$[2-9])\b/i.exec(q)) { // $2, $3 ... $9
+            branch.nodes.push({
+                type: 'dollarNum',
+                ref: [match[0]],
+                value: match[0],
+                cond: match[0] ? match[0].toUpperCase() : '',
+                nodes: []
+            });
+            offset += match[0].length;
+            q = q.substr(match[0].length);
+            cropString = false;
+        }else if (/^\(/.test(q)) {
             var newGroup = { type: 'group', nodes: [] };
             branch.nodes.push(newGroup);
             branchStack.push(branch);
@@ -435,7 +463,7 @@ export const parse = (query, options) => {
             afterWhitespace = true;
         }
         // Match field codes {{{
-        else if (match = new RegExp(`^(${fieldCodes}) *(\\[mp=[^\\]\\n]*\\])?`, "i").exec(q)) { // Field specifier - PubMed syntax
+        else if (_.isObject(leaf) && leaf.type !== 'mesh' && (match = new RegExp(`^(${fieldCodes}) *(\\[mp=[^\\]\\n]*\\])?`, "i").exec(q))) { // Field specifier - PubMed syntax
             // Figure out the leaf to use (usually the last one) or the previously used group
             var useLeaf;
             if (_.isObject(leaf) && leaf.type == 'phrase') {
@@ -443,7 +471,6 @@ export const parse = (query, options) => {
             } else if (_.isArray(leaf) && lastGroup) {
                 useLeaf = lastGroup;
             }
-
             useLeaf.field = fieldCodesParse[match[1].toLowerCase()]
             if (match[2]) {
                 offset += match[0].length;

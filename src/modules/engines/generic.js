@@ -332,7 +332,71 @@ export default {
                         case 'raw':
                             buffer += branch.content;
                             break;
+                        case 'dollarOne':
+                            switch (engine) {
+                                case 'PubMed full':
+                                case 'PubMed abbreviation':
+                                case 'Lilacs':
+                                case 'Scopus (basic search)':
+                                case 'Scopus (advanced search)':
+                                case 'International HTA Database':
+                                    buffer += '*';
+                                    break;
+                                case 'Ovid MEDLINE':
+                                    buffer += '$1';
+                                    break;
+                                case 'Cochrane Library':
+                                case 'PsycInfo (Ovid)':
+                                case 'ProQuest Health and Medical':
+                                    buffer += '?';
+                                    break;
+                                case 'Embase (Elsevier)':
+                                case 'Web of Science':
+                                case 'WoS Advanced':
+                                    buffer += '$';
+                                    break;
+                                case 'CINAHL (Ebsco)':
+                                case 'SPORTDiscus':
+                                case 'Business Source Ultimate':
+                                case 'PsycInfo (Ebsco)':
+                                    buffer += '#';
+                                    break;
+                            }
+                            break;
+                        case 'dollarNum':
+                            console.log("Here1",branch,engine, buffer);
+                            switch (engine) {
+                                case 'PubMed full':
+                                case 'PubMed abbreviation':
+                                case 'Lilacs':
+                                case 'Scopus (basic search)':
+                                case 'Scopus (advanced search)':
+                                case 'International HTA Database':
+                                    buffer += '*';
+                                    break;
+                                case 'Ovid MEDLINE':
+                                    buffer += branch.value;
+                                    break;
+                                case 'Cochrane Library':
+                                case 'PsycInfo (Ovid)':
+                                case 'ProQuest Health and Medical':
+                                    buffer += '*';
+                                    break;
+                                case 'Embase (Elsevier)':
+                                case 'Web of Science':
+                                case 'WoS Advanced':
+                                    buffer += '*';
+                                    break;
+                                case 'CINAHL (Ebsco)':
+                                case 'SPORTDiscus':
+                                case 'Business Source Ultimate':
+                                case 'PsycInfo (Ebsco)':
+                                    buffer += '*';
+                                    break;
+                            }
+                            break;
                         case 'template':
+                            console.log("Here2", branch.content,engine,buffer)
                             buffer += tools.resolveTemplate(branch.content, engine);
                             break;
                         case 'comment':
