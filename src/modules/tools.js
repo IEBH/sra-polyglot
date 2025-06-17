@@ -230,6 +230,12 @@ const tools = {
 					}
 					return tools.multiReplace(text, replaceObj); // Return here to prevent duplicate quotes
 				case 'Embase (Elsevier)':
+					replaceObj = {
+						'$': '*',
+						'?': '$',
+						'#': '?',
+					}
+					break;
 				case 'Web of Science':
 				case 'WoS Advanced':
 					replaceObj = {
