@@ -239,28 +239,28 @@ const tools = {
 				case 'Web of Science':
 				case 'WoS Advanced':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': '$',
 						'#': '?',
 					}
 					break;
 				case 'CINAHL (Ebsco)':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': '#',
 						'#': '?'
 					}
 					break;
 				case 'Business Source Ultimate':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': '#',
 						'#': '?'
 					}
 					break;
 				case 'PsycInfo (Ebsco)':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': '#',
 						'#': '?'
 					}
@@ -269,7 +269,7 @@ const tools = {
 				case 'Scopus (advanced search)':
 					// space = true; //Always include quotes with scopus to make phrase a "loose phrase"
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': settings.highlighting
 							? tools.createTooltip("*", "0 or 1 character truncation is not available. The multiple character wildcard symbol has been substituted.", "highlight")
 							: '*',
@@ -278,7 +278,8 @@ const tools = {
 					break;
 				case 'PsycInfo (Ovid)':
 					replaceObj = {
-						'$': '#'
+						'$': '*',
+						// '$': '#'
 					}
 					break;
 				// case 'Lilacs':
@@ -288,7 +289,7 @@ const tools = {
 				// 	break;
 				case 'ProQuest Health and Medical':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'#': '?'
 					}
 					break;
@@ -297,13 +298,14 @@ const tools = {
 						space = true; //Always include quotes with SPORTDiscus
 					}
 					replaceObj = {
-						'$': '#?',
+						'$': '*',
+						// '$': '#?',
 						'?': '#'
 					}
 					break;
 				case 'Informit Health Collection':
 					replaceObj = {
-						'$': '?',
+						'$': '*',
 						'?': '*1'
 					}
 					break;
