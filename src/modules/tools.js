@@ -223,9 +223,10 @@ const tools = {
 						text = tools.wildCardCochrane(text, settings.highlighting);
 					}
 					replaceObj = {
-						'$': settings.highlighting
-							? tools.createTooltip("?", "As Cochrane does not support single character truncation, the 0 or 1 character truncation is used here.", "highlight")
-							: '*',
+						// '$': settings.highlighting
+						// 	? tools.createTooltip("?", "As Cochrane does not support single character truncation, the 0 or 1 character truncation is used here.", "highlight")
+						// 	: '*',
+						'$':'*',
 						'#': '?'
 					}
 					return tools.multiReplace(text, replaceObj); // Return here to prevent duplicate quotes
