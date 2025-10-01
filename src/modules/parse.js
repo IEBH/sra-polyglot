@@ -339,7 +339,7 @@ export const parse = (query, options) => {
             }
             newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
             // if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
-            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
             // if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             branch.nodes.push(newLeaf);
             offset += match[0].length;
@@ -354,7 +354,7 @@ export const parse = (query, options) => {
             }
             newLeaf.field = match[4] ? 'MeSH Major Topic search (Not exploded)' : 'MeSH Major Topic search (exploded)';
             // if (/^["“”].*["“”]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
-            if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content)) leaf.content = leaf.content.substr(1, leaf.content.length - 2); // Remove wrapping '"' characters
+            if (/^["“”'‘’].*["“”'‘’]$/.test(newLeaf.content)) newLeaf.content = newLeaf.content.substr(1, newLeaf.content.length - 2); // Remove wrapping '"' characters
             // if (/^["“”'‘’].*["“”'‘’]$/.test(leaf.content) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content[0]) && ['"', '“', '”', "'", '‘', '’'].includes(leaf.content.slice(-1))) leaf.content = leaf.content.slice(1, -1);
             branch.nodes.push(newLeaf);
             offset += match[0].length;
