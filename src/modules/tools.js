@@ -112,7 +112,7 @@ const tools = {
 			if (wildcards.some(wildcard => words[i].includes(wildcard))) {
 				foundMatch = true;
 				// Add quotation marks to previous word/s if the previous word was not a match
-				if (i - 1 > lastMatch) {
+				if (i - 1 > lastMatch + 1) {
 					words[lastMatch + 1] = highlighting
 						? '<font color="DarkBlue">"' + words[lastMatch + 1]
 						: '"' + words[lastMatch + 1];
@@ -136,7 +136,7 @@ const tools = {
 			}
 		}
 		// Add quotation marks to word/s after the final match
-		if (lastMatch + 1 < words.length) {
+		if (lastMatch + 1 < words.length - 1) {
 			words[lastMatch + 1] = highlighting
 				? '<font color="DarkBlue">"' + words[lastMatch + 1]
 				: '"' + words[lastMatch + 1];
