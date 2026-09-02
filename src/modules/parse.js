@@ -496,7 +496,22 @@ export const parse = (query, options) => {
             var nextChar = q.substr(0, 1);
             if ((_.isUndefined(leaf) || _.isArray(leaf)) && nextChar != ' ') { // Leaf pointing to array entity - probably not created fallback leaf to append to
                 // if (/^["“”]$/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) { // First character is a speachmark - slurp until we see the next one
-                if (/^["“”'‘’]$/.test(nextChar) && (match = /^["“”'‘’](.*?)["“”'‘’]/.exec(q))) { 
+                /*if (/^["“”'‘’]$/.test(nextChar) && (match = /^["“”'‘’](.*?)["“”'‘’]/.exec(q))) { 
+                    leaf = { type: 'phrase', content: match[1], offset: offset };
+                    branch.nodes.push(leaf);
+                    offset += match[0].length;
+                    q = q.substr(match[0].length);
+                    cropString = false;
+                }*/
+                if (/^["“”]/.test(nextChar) && (match = /^["“”](.*?)["“”]/.exec(q))) {
+                    leaf = { type: 'phrase', content: match[1], offset: offset };
+                    branch.nodes.push(leaf);
+                    offset += match[0].length;
+                    q = q.substr(match[0].length);
+                    cropString = false;
+                }
+                //match = /^['‘’](.*?)['‘’]/.exec(q)
+                else if (/^['‘’]/.test(nextChar) && (match = /^['‘’]((?:[^'‘’]|['’](?=\p{L}))*)['‘’]/u.exec(q))) {
                     leaf = { type: 'phrase', content: match[1], offset: offset };
                     branch.nodes.push(leaf);
                     offset += match[0].length;

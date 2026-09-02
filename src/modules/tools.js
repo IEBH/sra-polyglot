@@ -215,9 +215,15 @@ const tools = {
 							: '*'
 					}
 					break;
-				case 'Lilacs':
 				case 'Ovid MEDLINE':
 					break; // Nothing needed
+				case 'Lilacs':
+					replaceObj = {
+						'$': '*',
+						'?': '*',
+						'#': '*',
+					}
+					break;
 				case 'Cochrane Library':
 					if (space) {
 						text = tools.wildCardCochrane(text, settings.highlighting);
@@ -230,7 +236,8 @@ const tools = {
 						'#': '?'
 					}
 					return tools.multiReplace(text, replaceObj); // Return here to prevent duplicate quotes
-				case 'Embase (Elsevier)':
+                        case 'Embase (Elsevier)':
+                              text = text.replace(/['’](?=\p{L})/gu, ' '); // Change apostrophe to a space
 					replaceObj = {
 						'$': '*',
 						'?': '$',

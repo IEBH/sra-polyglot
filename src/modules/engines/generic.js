@@ -32,8 +32,23 @@ export default {
             testing: false
         });
 
-        var compileWalker = tree =>
-            tree
+        // Collapse a run of duplicate `$N OR $N+1 OR ...` clauses (Ovid's limited-truncation enumeration, e.g.
+        // `$2 OR $3 OR $4`) into just the first one - every target engine other than Ovid MEDLINE renders every
+        // `dollarNum` the same way ('*'), so the rest are redundant once translated.
+        var collapseDollarNumRuns = tree => tree.reduce((acc, branch, i) => {
+            var isRedundant = branch.type === 'joinOr'
+                && tree[i - 1] && tree[i - 1].type === 'dollarNum'
+                && tree[i + 1] && tree[i + 1].type === 'dollarNum';
+            var continuesRun = branch.type === 'dollarNum'
+                && tree[i - 1] && tree[i - 1].type === 'joinOr'
+                && tree[i - 2] && tree[i - 2].type === 'dollarNum';
+            if (!isRedundant && !continuesRun) acc.push(branch);
+            return acc;
+        }, []);
+
+        var compileWalker = tree => {
+            if (engine !== 'Ovid MEDLINE') tree = collapseDollarNumRuns(tree);
+            return tree
                 .map((branch, branchIndex) => {
                     var buffer = '';
                     switch (branch.type) {
@@ -327,7 +342,15 @@ export default {
                             buffer += 'OR';
                             break;
                         case 'joinNot':
-                            buffer += 'NOT';
+                            switch (engine) {
+                                case 'WoS Advanced':
+                                case 'Scopus (basic search)':
+                                case 'Lilacs':
+                                    buffer += 'AND NOT';
+                                    break;
+                                default:
+                                    buffer += 'NOT';
+                            }
                             break;
                         case 'raw':
                             buffer += branch.content;
@@ -364,7 +387,6 @@ export default {
                             }
                             break;
                         case 'dollarNum':
-                            console.log("Here1",branch,engine, buffer);
                             switch (engine) {
                                 case 'PubMed full':
                                 case 'PubMed abbreviation':
@@ -396,7 +418,6 @@ export default {
                             }
                             break;
                         case 'template':
-                            console.log("Here2", branch.content,engine,buffer)
                             buffer += tools.resolveTemplate(branch.content, engine);
                             break;
                         case 'comment':
@@ -417,6 +438,7 @@ export default {
                         );
                 })
                 .join('');
+        };
         return compileWalker(tree);
     },
     open: query => ({
